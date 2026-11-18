@@ -6,7 +6,7 @@ import { join } from "node:path";
 import type { ComfyEvent } from "@comfyorg/sdk";
 import { loadRegistry } from "../server/registry.ts";
 import { resolveValues } from "../server/runner.ts";
-import { History, Meter, pickOutputs, type JobLike } from "../server/history.ts";
+import { History, Meter, pickOutputs, replayValues, type JobLike } from "../server/history.ts";
 import { parseSse, type Frame } from "../server/runner.ts";
 
 const { apps } = loadRegistry();
@@ -130,7 +130,7 @@ test("backend expiration replays a text-only generation once, keeping the origin
   } finally { done(); }
 });
 
-test("repeated expiration never resubmits indefinitely; uploaded media is not replayed", async () => {
+test("repeated expiration never resubmits indefinitely; saved uploads safely replay", async () => {
   const { dir, done } = tempHistory();
   try {
     let retries = 0;
@@ -139,7 +139,16 @@ test("repeated expiration never resubmits indefinitely; uploaded media is not re
       startedAt: null, completedAt: null, events: async function* () {},
       wait: async () => {}, cancel: async () => {},
     };
-    const h = new History(dir, { retryExpired: async () => { retries++; return expired; } });
+    const h = new History(dir, { retryExpired: async (entry) => {
+      retries++;
+      if (entry.app === "edit") {
+        const values = replayValues(entry, dir);
+        assert.deepEqual([...((values.image as { bytes: Uint8Array }).bytes)], [...PNG]);
+        assert.equal((values.image as { type: string }).type, "image/png");
+        return fakeJob("succeeded");
+      }
+      return expired;
+    } });
     const textApp = byId("z-image");
     const e = h.start(textApp, resolveValues(textApp, { prompt: "repeat", seed: 100 }));
     const result = await h.follow(e, expired);
@@ -153,8 +162,22 @@ test("repeated expiration never resubmits indefinitely; uploaded media is not re
       instruction: "blue tint",
     }));
     const editResult = await h.follow(media, expired);
-    assert.equal(editResult.status, "expired");
-    assert.equal(retries, 1, "private uploaded media must not be replayed in memory");
+    assert.equal(editResult.status, "succeeded");
+    assert.equal(editResult.retries, 1);
+    assert.equal(retries, 2, "saved local original is replayed once after backend expiration");
+  } finally { done(); }
+});
+
+test("automatic retry of large uploaded files fails safely without losing originals", () => {
+  const { dir, history, done } = tempHistory();
+  try {
+    const edit = byId("edit");
+    const e = history.start(edit, resolveValues(edit, {
+      image: { bytes: PNG, name: "original.png", type: "image/png" }, instruction: "contrast",
+    }));
+    assert.throws(() => replayValues(e, dir, PNG.length - 1), /safe memory budget/);
+    assert.ok(existsSync(join(dir, e.id, "input-image.png")));
+    assert.equal((replayValues(e, dir).image as { name: string }).name, "original.png");
   } finally { done(); }
 });
 

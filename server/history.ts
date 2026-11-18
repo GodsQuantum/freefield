@@ -7,7 +7,7 @@
 // the UI shows it as "starting" right away instead of a spinner on a button.
 // On a hosted demo each run belongs to the visitor who started it (`owner`, from guard.ts): every read, file,
 // cancel and delete takes that visitor and sees only their runs. Locally there is no owner and nothing is filtered.
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { extname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 import type { ComfyEvent } from "@comfyorg/sdk";
@@ -139,6 +139,43 @@ function safeExt(name: string | undefined, type: string | undefined): string {
   const fromName = extname(name ?? "").toLowerCase();
   if (/^\.[a-z0-9]{1,5}$/.test(fromName)) return fromName;
   return EXT[(type ?? "").split(";")[0].trim()] ?? ".bin";
+}
+
+/** Replay from the originals that History.start() already persisted, not from
+ * temporary browser memory. The cap applies ONLY to silent automatic replay,
+ * never to the first user-requested media upload.
+ */
+const REPLAY_MIME: Record<string, string> = {
+  ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif",
+  ".mp4": "video/mp4", ".webm": "video/webm", ".mov": "video/quicktime", ".mkv": "video/x-matroska",
+  ".wav": "audio/wav", ".mp3": "audio/mpeg", ".flac": "audio/flac", ".ogg": "audio/ogg",
+  ".m4a": "audio/mp4", ".opus": "audio/ogg",
+};
+const REPLAY_INPUT_LIMIT = 256 * 1024 * 1024;
+
+export function replayValues(entry: Entry, historyDir: string, maxInputBytes = REPLAY_INPUT_LIMIT): Values {
+  if (!ID.test(entry.id)) throw new Error("Invalid history entry for replay");
+  const result: Values = { ...entry.values };
+  let total = 0;
+  for (const input of entry.inputs) {
+    // Only History.start's own filenames, never a user-controlled path.
+    if (!/^input-[a-z][a-z0-9_-]*\.[a-z0-9]{1,5}$/i.test(input.file)
+        || !/^\w+$/.test(input.id)) {
+      throw new Error("Invalid stored media input filename");
+    }
+    const path = join(historyDir, entry.id, input.file);
+    const size = statSync(path).size;
+    total += size;
+    if (total > maxInputBytes) {
+      throw new Error("Automatic replay skipped because saved media exceeds the safe memory budget; retry manually");
+    }
+    result[input.id] = {
+      bytes: new Uint8Array(readFileSync(path)),
+      name: input.name,
+      type: REPLAY_MIME[extname(input.file).toLowerCase()] ?? "application/octet-stream",
+    };
+  }
+  return result;
 }
 
 const VIDEO_EXT = new Set([".mp4", ".webm", ".mov", ".mkv", ".gif"]);
@@ -397,10 +434,11 @@ export class History {
     // If ComfyUI was terminated by an external SIGTERM mid-render, the proxy
     // reports "expired" once the backend comes back. Replaying exactly once
     // preserves the user's prompt/seed and does not require the browser.
-    // Exclude file uploads here: retrying must never rehydrate GB of private
-    // media into RAM or silently duplicate remote uploads.
+    // Local media replay reads the saved original with an explicit memory cap;
+    // the same user's data stays local and no media is retranscribed/reprocessed
+    // unless the backend has definitively lost the prior job.
     if (!waitError && normStatus(job.status) === "expired" && this.retryExpired
-        && (entry.retries ?? 0) < 1 && !entry.inputs.length && !live.cancelRequested
+        && (entry.retries ?? 0) < 1 && !live.cancelRequested
         && !this.removed.has(entry.id)) {
       entry.retries = 1;
       entry.status = "queued";

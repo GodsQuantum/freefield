@@ -25,7 +25,7 @@ import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
 import { loadRegistry, repoRoot, isFileInput, type App } from "./registry.ts";
 import { explainSubmitError, InputError, resolveValues, Runner, type Values } from "./runner.ts";
-import { History } from "./history.ts";
+import { History, replayValues } from "./history.ts";
 import { Flags } from "./flags.ts";
 import { DOOR_HTML, foreign, Guard, plainHttpToIp } from "./guard.ts";
 
@@ -77,12 +77,13 @@ const history = new History(join(outDir, "history"), {
   },
   frames: (jobId, signal) => getRunner().frames(jobId, signal),
   recheck: (jobId) => getRunner().jobs().get(jobId),
-  // Only local self-hosted jobs with persisted text inputs are replayed.
-  // Real model errors and user cancellations never trigger another run.
+  // Only local self-hosted jobs are replayed once, using the already-persisted
+  // original images/videos when needed. No blind replay for failed workflows.
   retryExpired: alwaysOn ? async (entry) => {
     const app = byId.get(entry.app);
     if (!app) throw new Error("Workflow no longer installed");
-    return getRunner().submit(app, entry.values, entry.preset ?? undefined);
+    const saved = replayValues(entry, join(outDir, "history"));
+    return getRunner().submit(app, saved, entry.preset ?? undefined);
   } : undefined,
 });
 const flags = new Flags(join(root, "lab", "flags.json"), apps);
