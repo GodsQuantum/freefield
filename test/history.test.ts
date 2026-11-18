@@ -230,6 +230,46 @@ test("a poll that cannot reach the backend is retried; a backend answer that the
   assert.equal(isTransient(Object.assign(new Error("bad request"), { httpStatus: 400 })), false);
 });
 
+test("long local generations have no deadline and tolerate transient SDK timeouts", async () => {
+  const { waitPatiently, recoverTransient } = await import("../server/history.ts");
+  let calls = 0;
+  const job = { async wait(timeout?: number) {
+    assert.equal(timeout, undefined, "SDK must not receive a wall-clock deadline");
+    if (++calls < 2) throw new Error("The operation was aborted due to timeout");
+  } };
+  await waitPatiently(job, undefined, Number.POSITIVE_INFINITY, () => {});
+  assert.equal(calls, 2);
+  let rehydrations = 0;
+  const fetched = await recoverTransient(async () => {
+    if (++rehydrations < 3) throw new Error("The operation was aborted due to timeout");
+    return { id: "still-running-job" };
+  }, 5);
+  assert.equal(rehydrations, 3);
+  assert.equal(fetched.id, "still-running-job");
+  await assert.rejects(() => recoverTransient(async () => {
+    throw Object.assign(new Error("job gone"), { httpStatus: 404 });
+  }, 5), /job gone/, "definitive backend 404 must not retry forever");
+});
+
+test("a local job older than a day is eligible for recovery after a restart", async () => {
+  const { dir, history, done } = tempHistory();
+  try {
+    const app = byId("z-image");
+    const entry = history.start(app, resolveValues(app, { prompt: "long process" }));
+    const { writeFileSync } = await import("node:fs");
+    const f = join(dir, entry.id, "meta.json");
+    const state = JSON.parse(readFileSync(f, "utf8"));
+    state.job = "job-1";
+    state.status = "running";
+    state.created = new Date(Date.now() - 27 * 3600 * 1000).toISOString();
+    writeFileSync(f, JSON.stringify(state));
+    const restored = new History(dir);
+    restored.resume(async () => fakeJob("succeeded"), Number.POSITIVE_INFINITY);
+    await new Promise((r) => setTimeout(r, 100));
+    assert.equal(restored.get(entry.id)?.status, "succeeded");
+  } finally { done(); }
+});
+
 test("on a hosted demo each visitor sees, opens, cancels and deletes only their own runs", async () => {
   const { history, done } = tempHistory();
   try {

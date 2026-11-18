@@ -207,7 +207,10 @@ export class Runner {
     this.allowDrafts = opts.allowDrafts ?? process.env.FREEFIELD_DRAFTS === "1";
     process.env.COMFY_BASE_URL = this.baseUrl; // the SDK reads its base URL from the environment
     this.doFetch = opts.fetch ?? fetch;
-    this.comfy = new Comfy({ apiKey: this.token, clientInfo: "freefield", fetch: opts.fetch });
+    // The upstream SDK defaults to 30s per HTTP request. A cold local GPU
+    // or a large upload can need longer. Job execution remains unbounded.
+    this.comfy = new Comfy({ apiKey: this.token, clientInfo: "freefield",
+      timeoutMs: 10 * 60 * 1000, fetch: opts.fetch });
   }
 
   /**
@@ -267,7 +270,8 @@ export class Runner {
       try {
         res = await this.doFetch(url, { headers, signal });
       } catch {
-        if (signal.aborted || ++failures > 20) return;
+        if (signal.aborted) return;
+        failures++;
         await new Promise((r) => setTimeout(r, Math.min(10_000, 1000 * failures)));
         continue;
       }

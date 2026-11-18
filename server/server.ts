@@ -422,7 +422,10 @@ const server = createServer(async (req, res) => {
 });
 
 // runs that were still going when the server stopped are followed again
-history.resume(async (jobId) => getRunner().jobs().get(jobId));
+// Local jobs can be recovered regardless of how long the browser was closed.
+// Hosted/demo deployments retain the original one-hour retention safeguard.
+history.resume(async (jobId) => getRunner().jobs().get(jobId),
+  alwaysOn ? Number.POSITIVE_INFINITY : 60 * 60 * 1000);
 
 server.listen(port, host, () => console.log(`freefield on http://${host}:${port} (${apps.length} apps)`
   + (guard.passcode ? " · passcode required" : "") + (guard.maxRunsPerDay ? ` · ${guard.maxRunsPerDay} runs a day` : "")));

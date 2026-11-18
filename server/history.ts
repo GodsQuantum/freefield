@@ -172,14 +172,16 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 /** job.wait() stops at the first poll that fails to reach the backend; a backend waking up (the Modal container's cold
  * start) drops one or two, so the wait is picked up again, for up to `patience` of continuous failures, before the
  * run is called lost. */
-export async function waitPatiently(job: { wait(timeoutMs?: number): Promise<unknown> }, timeoutMs: number, patience = 10 * 60 * 1000,
-  log: (msg: string) => void = () => {}): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
+export async function waitPatiently(job: { wait(timeoutMs?: number): Promise<unknown> }, timeoutMs?: number,
+  patience = Number.POSITIVE_INFINITY, log: (msg: string) => void = () => {}): Promise<void> {
+  // An undefined limit means indefinite polling; the backend job is the
+  // source of truth, not a wall-clock timer in the browser or web server.
+  const deadline = timeoutMs === undefined ? Number.POSITIVE_INFINITY : Date.now() + timeoutMs;
   let firstFailure: number | null = null;
   let failures = 0;
   for (;;) {
     try {
-      await job.wait(Math.max(1000, deadline - Date.now()));
+      await job.wait(Number.isFinite(deadline) ? Math.max(1000, deadline - Date.now()) : undefined);
       return;
     } catch (e) {
       if (!isTransient(e) || Date.now() >= deadline) throw e;
@@ -187,8 +189,28 @@ export async function waitPatiently(job: { wait(timeoutMs?: number): Promise<unk
       if (Date.now() - firstFailure > patience) throw e;
       failures++;
       const pause = Math.min(15_000, 2_000 * failures);
-      log(`poll failed (${(e as Error).message}); trying again in ${pause / 1000}s`);
+      if (failures <= 2 || failures % 8 === 0) {
+        log("connection lost (" + (e as Error).message + "); retrying after " + pause / 1000 + "s");
+      }
       await sleep(pause);
+    }
+  }
+}
+
+/** A transient SDK timeout during job rehydration is not evidence that a run
+ * disappeared. Retry until the backend gives a definite answer. */
+export async function recoverTransient<T>(get: () => Promise<T>, pauseMs = 2_000,
+  log: (msg: string) => void = () => {}): Promise<T> {
+  let failures = 0;
+  for (;;) {
+    try { return await get(); }
+    catch (error) {
+      if (!isTransient(error)) throw error;
+      failures++;
+      if (failures === 1 || failures % 8 === 0) {
+        log("rehydration deferred: " + (error as Error).message);
+      }
+      await sleep(Math.min(15_000, pauseMs * failures));
     }
   }
 }
@@ -353,7 +375,9 @@ export class History {
 
     let waitError: unknown = null;
     try {
-      await waitPatiently(job, 6 * 3600 * 1000, 10 * 60 * 1000, (msg) => console.warn(`[history] ${entry.id}: ${msg}`));
+      // No forced job or temporary-network-outage deadline for a local render.
+      await waitPatiently(job, undefined, Number.POSITIVE_INFINITY,
+        (msg) => console.warn("[history] " + entry.id + ": " + msg));
       this.onContact();
     } catch (e) {
       waitError = e;
@@ -422,9 +446,10 @@ export class History {
         continue;
       }
       this.live.set(entry.id, { progress: null, queue: null, preview: null });
-      getJob(entry.job)
+      recoverTransient(() => getJob(entry.job!), 2_000,
+        (msg) => console.warn("[history] " + entry.id + ": " + msg))
         .then((job) => this.follow(entry, job))
-        .catch((e) => this.fail(entry, `could not pick this run up again: ${(e as Error).message}`, "lost"));
+        .catch((e) => this.fail(entry, "could not pick this run up again: " + (e as Error).message, "lost"));
     }
   }
 
