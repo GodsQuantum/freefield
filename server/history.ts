@@ -35,6 +35,8 @@ export type Entry = {
   inputs: { id: string; type: string; file: string; name: string }[];
   outputs: { file: string; type: string; name: string; node: string }[];
   error: { message: string; class_type?: string | null; node?: string | null } | null;
+  /** Bounded replay count; persisted to keep server restarts idempotent. */
+  retries?: number;
   /** the visitor who started it, on a hosted demo; never sent to the browser */
   owner?: string;
 };
@@ -66,6 +68,8 @@ export type HistoryOptions = {
   frames?: (jobId: string, signal: AbortSignal) => AsyncIterable<Frame>;
   /** A fresh handle on a job, for a second look when the backend says "expired" the moment it ends (see follow). */
   recheck?: (jobId: string) => Promise<JobLike>;
+  /** Optional local-only, single replay on definitive backend expiration. */
+  retryExpired?: (entry: Entry) => Promise<JobLike>;
 };
 
 type Live = {
@@ -237,6 +241,7 @@ export class History {
   private appInfo: (appId: string) => AppInfo | undefined;
   private frames?: (jobId: string, signal: AbortSignal) => AsyncIterable<Frame>;
   private recheck?: (jobId: string) => Promise<JobLike>;
+  private retryExpired?: (entry: Entry) => Promise<JobLike>;
 
   constructor(dir: string, opts: HistoryOptions = {}) {
     this.dir = dir;
@@ -244,6 +249,7 @@ export class History {
     this.appInfo = opts.appInfo ?? (() => undefined);
     this.frames = opts.frames;
     this.recheck = opts.recheck;
+    this.retryExpired = opts.retryExpired;
     mkdirSync(dir, { recursive: true });
   }
 
@@ -268,7 +274,7 @@ export class History {
     }
     const entry: Entry = {
       id, app: app.id, status: "starting", job: null, created: new Date().toISOString(), started: null, finished: null,
-      seconds: null, total: null, values: shown, preset: preset ?? null, inputs, outputs: [], error: null,
+      seconds: null, total: null, values: shown, preset: preset ?? null, inputs, outputs: [], error: null, retries: 0,
       ...(owner ? { owner } : {}),
     };
     this.save(entry);
@@ -388,6 +394,32 @@ export class History {
     }
 
     if (!waitError) job = await this.secondLook(job);
+    // If ComfyUI was terminated by an external SIGTERM mid-render, the proxy
+    // reports "expired" once the backend comes back. Replaying exactly once
+    // preserves the user's prompt/seed and does not require the browser.
+    // Exclude file uploads here: retrying must never rehydrate GB of private
+    // media into RAM or silently duplicate remote uploads.
+    if (!waitError && normStatus(job.status) === "expired" && this.retryExpired
+        && (entry.retries ?? 0) < 1 && !entry.inputs.length && !live.cancelRequested
+        && !this.removed.has(entry.id)) {
+      entry.retries = 1;
+      entry.status = "queued";
+      entry.job = null;
+      entry.error = null;
+      live.job = undefined;
+      live.progress = null;
+      live.preview = null;
+      live.queue = null;
+      this.save(entry); // persist BEFORE submission: crash-safe retry budget
+      try {
+        const next = await this.retryExpired(entry);
+        console.warn("[history] " + entry.id + ": backend expired; replaying once as " + next.id);
+        return await this.follow(entry, next);
+      } catch (error) {
+        this.fail(entry, "Automatic single replay failed: " + (error as Error).message);
+        return entry;
+      }
+    }
     entry.started = job.startedAt?.toISOString() ?? entry.started;
     entry.finished = (job.completedAt ?? new Date()).toISOString();
     // backends that do not report timings: fall back to when this server saw it start running
@@ -420,7 +452,10 @@ export class History {
       } else {
         const err = job.error;
         entry.error = {
-          message: (err?.message || entry.status).trim(), class_type: err?.class_type ?? null, node: err?.node_id ?? null,
+          message: entry.status === "expired" && (entry.retries ?? 0) > 0
+            ? "ComfyUI lost this render again after one automatic replay; check GPU stability."
+            : (err?.message || entry.status).trim(),
+          class_type: err?.class_type ?? null, node: err?.node_id ?? null,
         };
       }
     }

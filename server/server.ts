@@ -77,6 +77,13 @@ const history = new History(join(outDir, "history"), {
   },
   frames: (jobId, signal) => getRunner().frames(jobId, signal),
   recheck: (jobId) => getRunner().jobs().get(jobId),
+  // Only local self-hosted jobs with persisted text inputs are replayed.
+  // Real model errors and user cancellations never trigger another run.
+  retryExpired: alwaysOn ? async (entry) => {
+    const app = byId.get(entry.app);
+    if (!app) throw new Error("Workflow no longer installed");
+    return getRunner().submit(app, entry.values, entry.preset ?? undefined);
+  } : undefined,
 });
 const flags = new Flags(join(root, "lab", "flags.json"), apps);
 

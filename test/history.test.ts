@@ -101,6 +101,63 @@ test("the progress bar is ours: nodes finished over the workflow's node count, n
   assert.equal(m.feed({ value: 1, nodes_done: 20, nodes_total: 20 }).value, 0.99);
 });
 
+test("backend expiration replays a text-only generation once, keeping the original seed", async () => {
+  const { dir, done } = tempHistory();
+  try {
+    let retries = 0;
+    const expired: JobLike = {
+      id: "job-gone", status: "expired", outputs: [], error: null,
+      startedAt: null, completedAt: null, events: async function* () {},
+      wait: async () => {}, cancel: async () => {},
+    };
+    const h = new History(dir, { retryExpired: async (entry) => {
+      retries++;
+      assert.equal(entry.retries, 1);
+      assert.equal(entry.values.seed, 42);
+      return fakeJob("succeeded");
+    }});
+    const app = byId("z-image");
+    const e = h.start(app, resolveValues(app, { prompt: "very long render", seed: 42 }));
+    const ended = await h.follow(e, expired);
+    assert.equal(retries, 1);
+    assert.equal(ended.retries, 1);
+    assert.equal(ended.job, "job-1");
+    assert.equal(ended.status, "succeeded");
+    assert.deepEqual(ended.values.prompt, "very long render");
+    assert.ok(existsSync(join(dir, e.id, "out-01.png")));
+    const persisted = JSON.parse(readFileSync(join(dir, e.id, "meta.json"), "utf8"));
+    assert.equal(persisted.retries, 1);
+  } finally { done(); }
+});
+
+test("repeated expiration never resubmits indefinitely; uploaded media is not replayed", async () => {
+  const { dir, done } = tempHistory();
+  try {
+    let retries = 0;
+    const expired: JobLike = {
+      id: "job-gone", status: "expired", outputs: [], error: null,
+      startedAt: null, completedAt: null, events: async function* () {},
+      wait: async () => {}, cancel: async () => {},
+    };
+    const h = new History(dir, { retryExpired: async () => { retries++; return expired; } });
+    const textApp = byId("z-image");
+    const e = h.start(textApp, resolveValues(textApp, { prompt: "repeat", seed: 100 }));
+    const result = await h.follow(e, expired);
+    assert.equal(result.status, "expired");
+    assert.equal(result.retries, 1);
+    assert.equal(retries, 1);
+    assert.match(result.error?.message ?? "", /after one automatic replay/);
+    const edit = byId("edit");
+    const media = h.start(edit, resolveValues(edit, {
+      image: { bytes: PNG, name: "a.png", type: "image/png" },
+      instruction: "blue tint",
+    }));
+    const editResult = await h.follow(media, expired);
+    assert.equal(editResult.status, "expired");
+    assert.equal(retries, 1, "private uploaded media must not be replayed in memory");
+  } finally { done(); }
+});
+
 test("a job is followed through the raw event stream when the history has one", async () => {
   const { history, done } = tempHistory();
   const sent: Frame[] = [
