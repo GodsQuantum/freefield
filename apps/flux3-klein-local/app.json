@@ -10,7 +10,7 @@
   "source": {
     "template": "image_flux3_klein_distilled_t2i.json",
     "comfyui": "0.45.0",
-    "notes": "Cloud9 gfx1103 ROCm E2E validated at 256x256 in 112 seconds using official GGUF-Qwen3VL-TE addon that supplies Flux3 text conditioning. FLUX Kommunity License governs diffusion weights; abliterated encoder does not guarantee unrestricted images."
+    "notes": "Cloud9 gfx1103 ROCm E2E validated at 256x256 in 112 seconds using official GGUF-Qwen3VL-TE addon that supplies Flux3 text conditioning. FLUX Kommunity License governs diffusion weights; abliterated encoder does not guarantee unrestricted images. Backend model inventory uses clip_gguf for text GGUF including the matching MMProj (even though NVMe physically stores them in image/text-encoders)."
   },
   "inputs": [
     {
@@ -166,7 +166,7 @@
     {
       "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
       "file": "flux3-klein-te-heretic-dhq-Q4_K_M.gguf",
-      "dir": "text_encoders",
+      "dir": "clip_gguf",
       "gb": 2.66,
       "phase": "encode",
       "license": "Apache-2.0"
@@ -174,7 +174,7 @@
     {
       "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
       "file": "mmproj-flux3-klein-te-heretic-dhq-f16.gguf",
-      "dir": "text_encoders",
+      "dir": "clip_gguf",
       "gb": 0.836,
       "phase": "aux",
       "license": "Apache-2.0"

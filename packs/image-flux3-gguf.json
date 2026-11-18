@@ -19,7 +19,7 @@
     {
       "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
       "file": "flux3-klein-te-heretic-dhq-Q4_K_M.gguf",
-      "dir": "text_encoders",
+      "dir": "clip_gguf",
       "gb": 2.66,
       "name": "flux3-klein-te-heretic-dhq-Q4_K_M.gguf",
       "gated": false,
@@ -31,7 +31,7 @@
     {
       "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
       "file": "mmproj-flux3-klein-te-heretic-dhq-f16.gguf",
-      "dir": "text_encoders",
+      "dir": "clip_gguf",
       "gb": 0.836,
       "name": "mmproj-flux3-klein-te-heretic-dhq-f16.gguf",
       "gated": false,

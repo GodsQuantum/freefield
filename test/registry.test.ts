@@ -48,6 +48,9 @@ test("current local low-memory recipe uses quantized FLUX 3, never the supersede
   assert.equal(current.graph?.["18:2"]?.inputs?.clip_name, "flux3-klein-te-heretic-dhq-Q4_K_M.gguf");
   assert.equal(current.graph?.["18:2"]?.inputs?.type, "flux3");
   assert.ok(current.models.some((m) => m.file === "mmproj-flux3-klein-te-heretic-dhq-f16.gguf"));
+  // The backend inventories GGUF text weights as clip_gguf, even though
+  // the host stores them under its shared text-encoders model directory.
+  assert.deepEqual(current.models.filter((m) => /heretic-dhq/.test(m.file)).map((m) => m.dir), ["clip_gguf", "clip_gguf"]);
   assert.deepEqual(current.graph?.["18:7"]?.inputs?.model, ["18:1", 0]);
   assert.deepEqual(current.graph?.["18:7"]?.inputs?.positive, ["18:4", 0]);
   assert.deepEqual(current.graph?.["18:7"]?.inputs?.latent_image, ["18:6", 0]);
