@@ -136,7 +136,16 @@ def external_base(request: web.Request) -> str:
     host = request.host
     name = host.rsplit(":", 1)[0] if not host.startswith("[") else host.split("]")[0] + "]"
     private = name in LOCAL_HOSTS or is_private(name)
-    scheme = forwarded or (request.scheme if private else "https")
+    # Docker/Compose callers reach the gateway over plain HTTP on its private
+    # overlay network. The old heuristic treated DNS hostname "gateway" as a
+    # public domain, generated https://gateway:8000 for SDK job links and made
+    # every wait()/resume() request fail forever with "fetch failed".
+    # Use explicit deployment scheme only when configured, keeping existing
+    # TLS behaviour on the public Modal hosted gateway.
+    explicit = os.environ.get("FREEFIELD_EXTERNAL_SCHEME", "").strip().lower()
+    if explicit and explicit not in {"http", "https"}:
+        raise ValueError("FREEFIELD_EXTERNAL_SCHEME must be http or https")
+    scheme = explicit or forwarded or (request.scheme if private else "https")
     return f"{scheme}://{host}"
 
 
