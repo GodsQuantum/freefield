@@ -31,9 +31,9 @@
     {
       "id": "expand",
       "type": "toggle",
-      "label": "Expand my prompt",
-      "default": true,
-      "help": "BFL's 9B upsampler rewrites a short prompt into a detailed caption before Klein draws it. Turn it off for long prompts or a JSON layout.",
+      "label": "Expand my prompt (extra 9B model, slower)",
+      "default": false,
+      "help": "Optional: BFL's 9B upsampler expands short prompts. On the shared Cloud9 Radeon 780M it needs substantially more memory; enable only when the host has enough free RAM. Standard generation keeps the selected resolution and all other settings.",
       "bind": [
         {
           "node": "18:16",
