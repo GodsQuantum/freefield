@@ -30,7 +30,12 @@ import { Flags } from "./flags.ts";
 import { DOOR_HTML, foreign, Guard, plainHttpToIp } from "./guard.ts";
 
 const root = repoRoot();
-const { apps, problems } = loadRegistry(root);
+const { apps: catalog, problems } = loadRegistry(root);
+// Optional operator allowlist: in a small-APU deployment expose only workflows
+// validated against the available hardware, without editing upstream manifests.
+const enabledIds = process.env.FREEFIELD_ENABLED_APPS?.split(",").map(v => v.trim()).filter(Boolean);
+const allowed = enabledIds?.length ? new Set(enabledIds) : null;
+const apps = allowed ? catalog.filter(app => allowed.has(app.id)) : catalog;
 for (const p of problems.filter((x) => x.severity === "error")) console.error(`[registry] ${p.app}: ${p.message}`);
 const byId = new Map(apps.map((a) => [a.id, a]));
 

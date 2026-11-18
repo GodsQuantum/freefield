@@ -1,0 +1,10 @@
+# Official Freefield gateway + upstream Comfy API v2 proxy only.
+# Never packages PyTorch, ComfyUI, weights, or GPU drivers.
+FROM python:3.14-slim
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+RUN python -m pip install --disable-pip-version-check --no-cache-dir \
+    'comfy-api-proxy==0.1.6' 'aiohttp==3.14.5'
+COPY --chown=1000:1000 infra/gateway.py /opt/freefield/gateway.py
+USER 1000:1000
+EXPOSE 8000 8189
+CMD ["python", "/opt/freefield/gateway.py"]

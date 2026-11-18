@@ -1,0 +1,173 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "flux2-klein-local",
+  "name": "Flux.2 Klein 4B Local",
+  "section": "image",
+  "pack": "flux2-klein-local",
+  "status": "ready",
+  "summary": "Local image generation on AMD Radeon gfx1103 using existing Flux.2 4B GGUF/ROCm; no cloud inference.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "comfyui": "0.45.0",
+    "notes": "Hardware-validated on Cloud9 Radeon 780M, 256px / three Euler steps; local model weights are reused read-only. Provider model terms apply. No auto-download. Freefield v2/API E2E generated a valid PNG 256px in 102s on 2026-11-18."
+  },
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Prompt",
+      "required": true,
+      "default": "Natural light portrait of a person in a city street, photorealistic",
+      "bind": [
+        {
+          "node": "74",
+          "field": "text"
+        }
+      ]
+    },
+    {
+      "id": "steps",
+      "type": "slider",
+      "label": "Steps",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "default": 4,
+      "bind": [
+        {
+          "node": "62",
+          "field": "steps"
+        }
+      ]
+    },
+    {
+      "id": "width",
+      "type": "select",
+      "label": "Width",
+      "default": 512,
+      "options": [
+        {
+          "value": 256,
+          "label": "256"
+        },
+        {
+          "value": 384,
+          "label": "384"
+        },
+        {
+          "value": 512,
+          "label": "512"
+        },
+        {
+          "value": 768,
+          "label": "768"
+        },
+        {
+          "value": 1024,
+          "label": "1024"
+        }
+      ],
+      "bind": [
+        {
+          "node": "66",
+          "field": "width"
+        },
+        {
+          "node": "62",
+          "field": "width"
+        }
+      ]
+    },
+    {
+      "id": "height",
+      "type": "select",
+      "label": "Height",
+      "default": 512,
+      "options": [
+        {
+          "value": 256,
+          "label": "256"
+        },
+        {
+          "value": 384,
+          "label": "384"
+        },
+        {
+          "value": 512,
+          "label": "512"
+        },
+        {
+          "value": 768,
+          "label": "768"
+        },
+        {
+          "value": 1024,
+          "label": "1024"
+        }
+      ],
+      "bind": [
+        {
+          "node": "66",
+          "field": "height"
+        },
+        {
+          "node": "62",
+          "field": "height"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": -1,
+      "help": "-1 picks a random seed",
+      "bind": [
+        {
+          "node": "73",
+          "field": "noise_seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "90",
+      "type": "image",
+      "label": "Image"
+    }
+  ],
+  "models": [
+    {
+      "repo": "unsloth/FLUX.2-klein-4B-GGUF",
+      "file": "flux-2-klein-4b-Q4_K_M.gguf",
+      "dir": "unet_gguf",
+      "gb": 2.4,
+      "phase": "denoise",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/flux2-klein",
+      "file": "split_files/text_encoders/qwen_3_4b.safetensors",
+      "dir": "text_encoders",
+      "gb": 7.49,
+      "phase": "encode",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/flux2-dev",
+      "file": "split_files/vae/flux2-vae.safetensors",
+      "dir": "vae",
+      "gb": 0.32,
+      "phase": "decode",
+      "license": "Apache-2.0"
+    }
+  ],
+  "test": {
+    "prompt": "A single red apple on a wooden table, natural light",
+    "width": 256,
+    "height": 256,
+    "steps": 3,
+    "seed": 42
+  }
+}
