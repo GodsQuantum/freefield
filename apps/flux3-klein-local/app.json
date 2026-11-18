@@ -1,15 +1,16 @@
 {
   "$schema": "../../schema/app.schema.json",
-  "id": "flux2-klein-local",
-  "name": "Flux.2 Klein 4B Local",
+  "id": "flux3-klein-local",
+  "name": "FLUX 3 Klein Q5 · Heretic Q4",
   "section": "image",
-  "pack": "flux2-klein-local",
+  "pack": "image-flux3-gguf",
   "status": "ready",
-  "summary": "Local image generation on AMD Radeon gfx1103 using existing Flux.2 4B GGUF/ROCm; no cloud inference.",
+  "summary": "FLUX 3 Klein Q5 diffusion with Heretic/DHQ Qwen3-VL Q4 text encoder and matched vision tower; local ROCm.",
   "workflow": "workflow.api.json",
   "source": {
+    "template": "image_flux3_klein_distilled_t2i.json",
     "comfyui": "0.45.0",
-    "notes": "Hardware-validated on Cloud9 Radeon 780M, 256px / three Euler steps; local model weights are reused read-only. Provider model terms apply. No auto-download. Freefield v2/API E2E generated a valid PNG 256px in 102s on 2026-11-18."
+    "notes": "Cloud9 gfx1103 ROCm E2E validated at 256x256 in 112 seconds using official GGUF-Qwen3VL-TE addon that supplies Flux3 text conditioning. FLUX Kommunity License governs diffusion weights; abliterated encoder does not guarantee unrestricted images."
   },
   "inputs": [
     {
@@ -20,7 +21,7 @@
       "default": "Natural light portrait of a person in a city street, photorealistic",
       "bind": [
         {
-          "node": "74",
+          "node": "18:4",
           "field": "text"
         }
       ]
@@ -32,10 +33,10 @@
       "min": 1,
       "max": 30,
       "step": 1,
-      "default": 4,
+      "default": 16,
       "bind": [
         {
-          "node": "62",
+          "node": "18:7",
           "field": "steps"
         }
       ]
@@ -65,15 +66,23 @@
         {
           "value": 1024,
           "label": "1024"
+        },
+        {
+          "value": 1280,
+          "label": "1280"
+        },
+        {
+          "value": 1536,
+          "label": "1536"
+        },
+        {
+          "value": 2048,
+          "label": "2048"
         }
       ],
       "bind": [
         {
-          "node": "66",
-          "field": "width"
-        },
-        {
-          "node": "62",
+          "node": "18:6",
           "field": "width"
         }
       ]
@@ -103,15 +112,23 @@
         {
           "value": 1024,
           "label": "1024"
+        },
+        {
+          "value": 1280,
+          "label": "1280"
+        },
+        {
+          "value": 1536,
+          "label": "1536"
+        },
+        {
+          "value": 2048,
+          "label": "2048"
         }
       ],
       "bind": [
         {
-          "node": "66",
-          "field": "height"
-        },
-        {
-          "node": "62",
+          "node": "18:6",
           "field": "height"
         }
       ]
@@ -124,50 +141,69 @@
       "help": "-1 picks a random seed",
       "bind": [
         {
-          "node": "73",
-          "field": "noise_seed"
+          "node": "18:7",
+          "field": "seed"
         }
       ]
     }
   ],
   "outputs": [
     {
-      "node": "90",
+      "node": "9",
       "type": "image",
       "label": "Image"
     }
   ],
   "models": [
     {
-      "repo": "unsloth/FLUX.2-klein-4B-GGUF",
-      "file": "flux-2-klein-4b-Q4_K_M.gguf",
+      "repo": "unsloth/flux-3-image-klein-GGUF",
+      "file": "flux-3-image-klein-UD-Q5_K_XL.gguf",
       "dir": "unet_gguf",
-      "gb": 2.4,
+      "gb": 4.48,
       "phase": "denoise",
+      "license": "FLUX Kommunity License v1.0"
+    },
+    {
+      "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
+      "file": "flux3-klein-te-heretic-dhq-Q4_K_M.gguf",
+      "dir": "text_encoders",
+      "gb": 2.66,
+      "phase": "encode",
       "license": "Apache-2.0"
     },
     {
-      "repo": "Comfy-Org/flux2-klein",
-      "file": "split_files/text_encoders/qwen_3_4b.safetensors",
+      "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
+      "file": "mmproj-flux3-klein-te-heretic-dhq-f16.gguf",
       "dir": "text_encoders",
-      "gb": 7.49,
-      "phase": "encode",
+      "gb": 0.836,
+      "phase": "aux",
       "license": "Apache-2.0"
     },
     {
       "repo": "Comfy-Org/flux2-dev",
       "file": "split_files/vae/flux2-vae.safetensors",
       "dir": "vae",
-      "gb": 0.32,
+      "gb": 0.34,
       "phase": "decode",
       "license": "Apache-2.0"
     }
   ],
   "test": {
-    "prompt": "A single red apple on a wooden table, natural light",
+    "prompt": "A single red apple beside two blue ceramic cups on a pale wooden table, professional studio photograph",
     "width": 256,
     "height": 256,
-    "steps": 3,
-    "seed": 42
-  }
+    "steps": 16,
+    "seed": 422026,
+    "note": "ComfyUI direct 256x256 PNG real output PASS, 112.2sec, GPU 780M, no backend retries; app route still to test"
+  },
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    },
+    {
+      "repo": "https://github.com/pottokao-dotcom/ComfyUI-GGUF-Qwen3VL-TE",
+      "commit": "3eea253"
+    }
+  ]
 }

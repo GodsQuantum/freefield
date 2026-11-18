@@ -86,6 +86,13 @@
     "download_gb": 17.76,
     "needs_hf_token": true
   },
+  "image-flux3-gguf": {
+    "apps": [
+      "flux3-klein-local"
+    ],
+    "download_gb": 8.32,
+    "needs_hf_token": false
+  },
   "image-krea2": {
     "apps": [
       "style-reference",

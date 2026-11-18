@@ -1,0 +1,68 @@
+{
+  "pack": "image-flux3-gguf",
+  "apps": [
+    "flux3-klein-local"
+  ],
+  "download_gb": 8.32,
+  "needs_hf_token": false,
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    },
+    {
+      "repo": "https://github.com/pottokao-dotcom/ComfyUI-GGUF-Qwen3VL-TE",
+      "commit": "3eea253"
+    }
+  ],
+  "models": [
+    {
+      "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
+      "file": "flux3-klein-te-heretic-dhq-Q4_K_M.gguf",
+      "dir": "text_encoders",
+      "gb": 2.66,
+      "name": "flux3-klein-te-heretic-dhq-Q4_K_M.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "flux3-klein-local"
+      ]
+    },
+    {
+      "repo": "pottokao/FLUX.3-Klein-Text-Encoder-Heretic-DHQ-GGUF",
+      "file": "mmproj-flux3-klein-te-heretic-dhq-f16.gguf",
+      "dir": "text_encoders",
+      "gb": 0.836,
+      "name": "mmproj-flux3-klein-te-heretic-dhq-f16.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "flux3-klein-local"
+      ]
+    },
+    {
+      "repo": "unsloth/flux-3-image-klein-GGUF",
+      "file": "flux-3-image-klein-UD-Q5_K_XL.gguf",
+      "dir": "unet_gguf",
+      "gb": 4.48,
+      "name": "flux-3-image-klein-UD-Q5_K_XL.gguf",
+      "gated": false,
+      "license": "FLUX Kommunity License v1.0",
+      "used_by": [
+        "flux3-klein-local"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/flux2-dev",
+      "file": "split_files/vae/flux2-vae.safetensors",
+      "dir": "vae",
+      "gb": 0.34,
+      "name": "flux2-vae.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "flux3-klein-local"
+      ]
+    }
+  ]
+}

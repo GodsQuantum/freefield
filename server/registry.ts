@@ -166,8 +166,17 @@ function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]
   const referenced = new Set<string>();
   for (const n of Object.values(g)) for (const v of Object.values(n.inputs)) if (typeof v === "string") referenced.add(v);
   for (const m of app.models) {
-    if (!m.optional && !referenced.has(basename(m.file))) {
-      problems.push({ app: app.id, severity: "warning", message: `model ${basename(m.file)} is declared but no node loads it` });
+    const name = basename(m.file);
+    // ComfyUI-GGUF implicitly loads the required Qwen3-VL mmproj vision
+    // tower matching the CLIPLoaderGGUF text encoder, with no separate node.
+    const implicitVisionTower = name.startsWith("mmproj-") && name.endsWith("-f16.gguf")
+      && Object.values(g).some((node) =>
+        node.class_type === "CLIPLoaderGGUF"
+        && typeof node.inputs.clip_name === "string"
+        && node.inputs.clip_name.startsWith(name.slice("mmproj-".length, -"-f16.gguf".length) + "-")
+      );
+    if (!m.optional && !referenced.has(name) && !implicitVisionTower) {
+      problems.push({ app: app.id, severity: "warning", message: "model " + name + " is declared but no node loads it" });
     }
   }
 }
