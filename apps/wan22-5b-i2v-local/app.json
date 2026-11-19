@@ -1,0 +1,200 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "wan22-5b-i2v-local",
+  "name": "Wan 2.2 5B Q6 · image → vidéo",
+  "section": "video",
+  "pack": "video-wan22-5b-gguf",
+  "status": "ready",
+  "summary": "Anime une image avec Wan 2.2 TI2V 5B quantifié Q6 sur Radeon 780M, en réutilisant les poids vidéo partagés.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "video_wan2_2_5B_ti2v.json",
+    "comfyui": "0.45.0",
+    "notes": "Cloud9 Radeon 780M technical E2E passed 2026-11-19 twice: native ComfyUI MP4 130.78s, then authenticated gateway via Freefield native CLI and image upload, succeeded 131.3s (job 0e7f4824-25ee-4f4d-a6c0-8ebba5eefda4). Only 256x144/9f/4 steps qualified; larger video and aesthetic quality untested."
+  },
+  "inputs": [
+    {
+      "id": "image",
+      "type": "image",
+      "label": "Image de départ",
+      "required": true,
+      "limits": {
+        "max_mb": 20
+      },
+      "bind": [
+        {
+          "node": "12",
+          "field": "image"
+        }
+      ]
+    },
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Prompt vidéo",
+      "required": true,
+      "default": "A black cat on a Paris rooftop, soft morning light, slow cinematic camera movement, detailed realistic video.",
+      "bind": [
+        {
+          "node": "4",
+          "field": "text"
+        }
+      ]
+    },
+    {
+      "id": "negative",
+      "type": "textarea",
+      "label": "Éléments à éviter",
+      "default": "blurry, low quality, distorted motion, text, subtitles, JPEG artifacts, oversaturated, still image",
+      "bind": [
+        {
+          "node": "5",
+          "field": "text"
+        }
+      ]
+    },
+    {
+      "id": "width",
+      "type": "number",
+      "label": "Largeur (multiple de 32)",
+      "min": 32,
+      "max": 16384,
+      "step": 32,
+      "default": 384,
+      "bind": [
+        {
+          "node": "6",
+          "field": "width"
+        }
+      ]
+    },
+    {
+      "id": "height",
+      "type": "number",
+      "label": "Hauteur (multiple de 32)",
+      "min": 32,
+      "max": 16384,
+      "step": 32,
+      "default": 224,
+      "bind": [
+        {
+          "node": "6",
+          "field": "height"
+        }
+      ]
+    },
+    {
+      "id": "frames",
+      "type": "number",
+      "label": "Nombre d’images (4n+1)",
+      "help": "La durée est libre selon les ressources et le temps disponible ; 33 images = 1,38 s à 24 ips.",
+      "min": 1,
+      "max": 16381,
+      "step": 4,
+      "default": 33,
+      "bind": [
+        {
+          "node": "6",
+          "field": "length"
+        }
+      ]
+    },
+    {
+      "id": "steps",
+      "type": "number",
+      "label": "Étapes de diffusion",
+      "min": 1,
+      "max": 10000,
+      "step": 1,
+      "default": 20,
+      "bind": [
+        {
+          "node": "8",
+          "field": "steps"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Graine",
+      "default": -1,
+      "help": "-1 choisit une graine aléatoire",
+      "bind": [
+        {
+          "node": "8",
+          "field": "seed"
+        }
+      ]
+    },
+    {
+      "id": "fps",
+      "type": "number",
+      "label": "Images par seconde",
+      "min": 1,
+      "max": 120,
+      "step": 1,
+      "default": 24,
+      "bind": [
+        {
+          "node": "10",
+          "field": "fps"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "11",
+      "type": "video",
+      "label": "Vidéo MP4"
+    }
+  ],
+  "models": [
+    {
+      "repo": "QuantStack/Wan2.2-TI2V-5B-GGUF",
+      "file": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "dir": "unet_gguf",
+      "gb": 4.21,
+      "phase": "denoise",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "dir": "text_encoders",
+      "gb": 6.74,
+      "phase": "encode",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "file": "split_files/vae/wan2.2_vae.safetensors",
+      "dir": "vae",
+      "gb": 1.41,
+      "phase": "decode",
+      "license": "Apache-2.0"
+    }
+  ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "test": {
+    "image": "qa-source.png",
+    "prompt": "Animate the geometric shapes with subtle motion, smooth colors",
+    "width": 256,
+    "height": 144,
+    "frames": 9,
+    "steps": 4,
+    "seed": 20261119,
+    "fps": 24
+  },
+  "modes": [
+    "wan22-5b-local",
+    "wan22-5b-i2v-local"
+  ],
+  "mode_label": "Image → vidéo"
+}

@@ -474,9 +474,9 @@
     {
       "id": "generate_audio_codes",
       "type": "toggle",
-      "label": "Planification musicale IA (qualité)",
-      "default": true,
-      "help": "Le planificateur Qwen 1,7B guide la structure musicale ; désactiver utilise moins de ressources, mais peut réduire la qualité.",
+      "label": "Planification musicale IA (qualité avancée)",
+      "default": false,
+      "help": "Mode direct par défaut : ne lance pas la planification Qwen lourde (ROCm 780M). Activez seulement pour une qualité potentiellement supérieure, au coût de RAM et d'un temps de calcul considérables.",
       "bind": [
         {
           "node": "4",
@@ -569,6 +569,7 @@
     "bpm": 110,
     "language": "fr",
     "keyscale": "C major",
-    "seed": 20261119
+    "seed": 20261119,
+    "generate_audio_codes": false
   }
 }

@@ -21,7 +21,8 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   assert.equal(music.graph?.["11"]?.class_type, "SaveAudioMP3");
   assert.equal(music.outputs[0]?.node, "11");
   assert.equal(music.inputs.find((i) => i.id === "duration")?.max, 1000, "do not add a needless short duration cap");
-  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, true);
+  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, false, "LM is opt-in to preserve AMD system RAM");
+  assert.equal(music.graph?.["4"]?.inputs?.generate_audio_codes, false);
   assert.ok((music.inputs.find((i) => i.id === "language")?.options?.length ?? 0) >= 50);
   assert.equal(music.models.length, 4);
   assert.equal(music.models.every((m) => m.license === "Apache-2.0"), true);
@@ -42,6 +43,20 @@ test("Wan 2.2 5B Q6 local validated preview reuses shared UMT5 encoder and VAE",
   assert.ok(wan.models.some((m) => m.file.endsWith("wan2.2_vae.safetensors")));
   assert.ok(wan.models.some((m) => m.file.endsWith("umt5_xxl_fp8_e4m3fn_scaled.safetensors")));
   assert.equal(problems.some((p) => p.app === wan.id && p.severity === "error"), false);
+});
+
+test("Wan2.2 image-to-video draft reuses the T2V weights and attaches a native LoadImage", () => {
+  const t2v = apps.find((a) => a.id === "wan22-5b-local");
+  const i2v = apps.find((a) => a.id === "wan22-5b-i2v-local");
+  assert.ok(t2v && i2v);
+  assert.equal(i2v.status, "ready", "image upload and Freefield gateway E2E confirmed on Radeon 780M");
+  assert.deepEqual(i2v.modes, t2v.modes);
+  assert.equal(i2v.pack, t2v.pack);
+  assert.deepEqual(i2v.models, t2v.models, "no duplicate downloads");
+  assert.equal(i2v.graph?.["12"]?.class_type, "LoadImage");
+  assert.deepEqual(i2v.graph?.["6"]?.inputs?.start_image, ["12", 0]);
+  assert.deepEqual(i2v.inputs.find((x) => x.id === "image")?.bind, [{ node: "12", field: "image" }]);
+  assert.equal(problems.some((p) => p.app === i2v.id && p.severity === "error"), false);
 });
 
 test("direct SFX does not require the optional Qwen prompt model by default", () => {

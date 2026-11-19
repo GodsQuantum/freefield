@@ -175,5 +175,10 @@
     "steps": 4,
     "seed": 20261119,
     "fps": 24
-  }
+  },
+  "modes": [
+    "wan22-5b-local",
+    "wan22-5b-i2v-local"
+  ],
+  "mode_label": "Texte → vidéo"
 }
