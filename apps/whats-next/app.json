@@ -11,7 +11,7 @@
   "source": {
     "template": "image_qwen_image_edit_2509_relight.json",
     "comfyui": "0.42.0",
-    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with next-scene_lora-v2-3000.safetensors in place of the Relight LoRA and no Relight trigger; the prompt below is fixed and \"Extra direction\" is appended to it."
+    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with next-scene_lora-v2-3000.safetensors in place of the Relight LoRA and no Relight trigger; Comfy-Org Qwen Image Edit 2509 INT8 ConvRot via native UNETLoader and per-model sub-quadratic attention; the shared Relight model chain completed one Cloud9 1024-square run on 2026-11-19, but this Next Scene variant has not been rendered separately; historical examples do not measure this INT8 profile; the prompt below is fixed and \"Extra direction\" is appended to it."
   },
   "inputs": [
     {
@@ -106,10 +106,10 @@
   ],
   "models": [
     {
-      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
-      "file": "split_files/diffusion_models/qwen_image_edit_2509_fp8_e4m3fn.safetensors",
+      "repo": "Comfy-Org/Qwen-Image-Edit",
+      "file": "split_files/diffusion_models/qwen_image_edit_2509_int8_convrot.safetensors",
       "dir": "diffusion_models",
-      "gb": 20.43,
+      "gb": 20.5,
       "phase": "denoise",
       "license": "Apache-2.0"
     },
@@ -146,6 +146,9 @@
       "license": "MIT"
     }
   ],
+  "vram": {
+    "peak_gb": null
+  },
   "credits": [
     "Qwen-Image-Edit-2509 by Alibaba Qwen (Apache-2.0)",
     "next-scene LoRA v2 by lovis93 (MIT)",

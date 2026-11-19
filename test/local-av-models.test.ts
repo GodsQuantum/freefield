@@ -133,22 +133,95 @@ for (const [id, selectorId, choices] of [["angles", "move", 10], ["shots", "shot
   });
 }
 
-test("the Qwen edit pack separates native 2511 camera apps from the unchanged 2509 apps", () => {
+for (const [id, selectorId, lora] of [
+  ["relight", "light", "Qwen-Image-Edit-2509-Relight.safetensors"],
+  ["whats-next", "next", "next-scene_lora-v2-3000.safetensors"],
+] as const) {
+  test(id + ": native Qwen Edit 2509 preserves all eight choices, LoRAs and prompt bindings", () => {
+    const app = apps.find((a) => a.id === id);
+    assert.ok(app?.graph);
+    assert.equal(app.graph["10:37"].class_type, "UNETLoader");
+    assert.deepEqual(app.graph["10:37"].inputs, {
+      unet_name: "qwen_image_edit_2509_int8_convrot.safetensors", weight_dtype: "default",
+    });
+    assert.ok(app.models.some((m) => m.repo === "Comfy-Org/Qwen-Image-Edit"
+      && m.file === "split_files/diffusion_models/qwen_image_edit_2509_int8_convrot.safetensors"
+      && m.dir === "diffusion_models" && m.gb === 20.5));
+    assert.equal(app.vram?.peak_gb, null, "the INT8 profile must not inherit a historical FP8 measurement");
+    assert.equal(problems.some((p) => p.app === id && p.severity === "error"), false);
+    assert.equal(app.inputs.find((i) => i.id === "seed")?.default, -1);
+    const selector = app.inputs.find((i) => i.id === selectorId);
+    assert.equal(selector?.options?.length, 8);
+    assert.equal(selector?.default, id === "relight"
+      ? "golden hour sunlight through a low window, warm color temperature, long soft shadows"
+      : "the camera pulls back to reveal the wider surroundings");
+    for (const option of selector!.options!) {
+      const graph: ApiWorkflow = structuredClone(app.graph);
+      applyInputs(app, resolveValues(app, {
+        image: { bytes: new Uint8Array([1, 2, 3]), name: "portrait.png" },
+        [selectorId]: option.value, details: "Keep the blue jacket.", seed: 42,
+        ...(id === "relight" ? {
+          direction: ", the light coming from the left", quality: ", soft light with blurred shadow edges",
+          brightness: ", dim and low-key", color: ", blue colored light",
+        } : {}),
+      }), { setInput: (node, field, value) => { graph[node].inputs[field] = value; } }, () => "uploaded.png");
+      assert.equal(graph["11"].inputs.image, "uploaded.png");
+      assert.deepEqual(graph["10:89"].inputs, {
+        model: ["10:37", 0], lora_name: "Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors", strength_model: 1,
+      });
+      assert.deepEqual(graph["10:118"].inputs, { model: ["10:89", 0], lora_name: lora, strength_model: 1 });
+      assert.equal(graph["10:119"]?.class_type, "ModelAttentionBackend");
+      assert.deepEqual(graph["10:119"].inputs, { model: ["10:118", 0], attention: "sub-quadratic attention" });
+      assert.deepEqual(graph["10:66"].inputs, { model: ["10:119", 0], shift: 3 });
+      assert.deepEqual(graph["10:75"].inputs, { model: ["10:66", 0], strength: 1, pre_cfg: false });
+      assert.deepEqual(graph["10:3"].inputs.model, ["10:75", 0]);
+      assert.deepEqual([graph["10:3"].inputs.steps, graph["10:3"].inputs.cfg, graph["10:3"].inputs.seed], [4, 1, 42]);
+      assert.deepEqual(graph["10:38"].inputs, {
+        clip_name: "qwen_2.5_vl_7b_fp8_scaled.safetensors", type: "qwen_image", device: "default",
+      });
+      assert.equal(graph["10:39"].inputs.vae_name, "qwen_image_vae.safetensors");
+      assert.equal(graph["10:117"].class_type, "FluxKontextImageScale");
+      assert.deepEqual(graph["10:111"].inputs.prompt, ["14", 0]);
+      assert.deepEqual(graph["14"].inputs.string_b, ["15", 0]);
+      assert.equal(graph["14"].inputs.delimiter, "");
+      if (id === "relight") {
+        assert.equal(graph["14"].inputs.string_a, "重新照明,");
+        assert.equal(graph["15"].inputs.value,
+          "relight the image using " + option.value + ", the light coming from the left, soft light with blurred shadow edges, dim and low-key, blue colored light. Keep the blue jacket.");
+      } else {
+        assert.equal(graph["14"].inputs.string_a, "");
+        assert.equal(graph["15"].inputs.value, "Next Scene: " + option.value + " Keep the blue jacket.");
+      }
+    }
+  });
+}
+
+test("the Qwen edit pack keeps the native 2509 and 2511 weights and LoRAs separate", () => {
   const pack = JSON.parse(readFileSync(new URL("../packs/image-qwen-edit.json", import.meta.url), "utf8"));
-  const native = pack.models.find((m: { name: string }) => m.name === "qwen_image_edit_2511_int8_convrot.safetensors");
-  assert.ok(native, "the pack must install the core loader's native weight file");
-  assert.equal(native.dir, "diffusion_models");
-  assert.equal(native.repo, "Comfy-Org/Qwen-Image-Edit");
-  assert.equal(native.file, "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors");
-  assert.deepEqual(native.used_by, ["angles", "shots", "zooms"]);
+  for (const [version, usedBy] of [["2509", ["relight", "whats-next"]], ["2511", ["angles", "shots", "zooms"]]] as const) {
+    const name = "qwen_image_edit_" + version + "_int8_convrot.safetensors";
+    const model = pack.models.find((m: { name: string }) => m.name === name);
+    assert.ok(model, "the pack must install the native " + version + " weight file");
+    assert.equal(model.dir, "diffusion_models");
+    assert.equal(model.repo, "Comfy-Org/Qwen-Image-Edit");
+    assert.equal(model.file, "split_files/diffusion_models/" + name);
+    assert.deepEqual(model.used_by, usedBy);
+  }
+  assert.equal(pack.models.some((m: { name: string }) => m.name === "qwen_image_edit_2509_fp8_e4m3fn.safetensors"), false);
   assert.equal(pack.models.some((m: { dir: string }) => m.dir === "unet_gguf"), false);
   assert.equal(pack.custom_nodes.some((c: { repo: string }) => c.repo === "https://github.com/city96/ComfyUI-GGUF"), false);
+  const index = JSON.parse(readFileSync(new URL("../packs/index.json", import.meta.url), "utf8"));
+  assert.deepEqual(index["image-qwen-edit"], {
+    apps: pack.apps, download_gb: pack.download_gb, needs_hf_token: pack.needs_hf_token,
+  });
+});
+
+test("the native 2509 VRAM map leaves unmeasured peaks unknown", () => {
+  const map = JSON.parse(readFileSync(new URL("../docs/vram-map.json", import.meta.url), "utf8"));
   for (const id of ["relight", "whats-next"]) {
-    const app = apps.find((a) => a.id === id)!;
-    assert.equal(app.graph?.["10:37"]?.class_type, "UNETLoader");
-    assert.match(String(app.graph?.["10:37"]?.inputs.unet_name), /2509/);
-    assert.match(String(app.graph?.["10:89"]?.inputs.lora_name), /2509-Lightning/);
-    assert.equal(app.graph?.["10:119"], undefined, "the 2511 attention override must not alter the 2509 recipes");
-    assert.deepEqual(app.graph?.["10:66"]?.inputs.model, ["10:118", 0]);
+    const row = map.apps.find((r: { id: string }) => r.id === id);
+    assert.equal(row.biggest_file.name, "qwen_image_edit_2509_int8_convrot.safetensors");
+    assert.equal(row.measured_peak_gb, null);
+    assert.equal(row.measured_on, null);
   }
 });

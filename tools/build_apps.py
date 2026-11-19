@@ -782,7 +782,12 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     put(rc, "213:177", "batch_index", 0)
     drop(rc, "213:184", "213:183")
     out["recast"] = rc
-    out["relight"] = tpl("image_qwen_image_edit_2509_relight.json")   # Qwen Image Edit 2509 + Relight + Lightning LoRAs, as shipped
+    out["relight"] = tpl("image_qwen_image_edit_2509_relight.json")
+    # Keep both 2509 LoRAs and the template's controls; use the official native INT8 weight and per-model attention.
+    put(out["relight"], "10:37", "unet_name", "qwen_image_edit_2509_int8_convrot.safetensors")
+    out["relight"]["10:119"] = {"class_type": "ModelAttentionBackend",
+                               "inputs": {"model": ["10:118", 0], "attention": "sub-quadratic attention"}}
+    put(out["relight"], "10:66", "model", ["10:119", 0])
 
     out["music"] = tpl("audio_minimax_music_3.json")
     out["sfx"] = tpl("audio_stable_audio_3_medium.json")

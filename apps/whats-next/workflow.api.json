@@ -48,7 +48,7 @@
   "10:37": {
     "class_type": "UNETLoader",
     "inputs": {
-      "unet_name": "qwen_image_edit_2509_fp8_e4m3fn.safetensors",
+      "unet_name": "qwen_image_edit_2509_int8_convrot.safetensors",
       "weight_dtype": "default"
     },
     "_meta": {
@@ -79,7 +79,7 @@
     "class_type": "ModelSamplingAuraFlow",
     "inputs": {
       "model": [
-        "10:118",
+        "10:119",
         0
       ],
       "shift": 3
@@ -246,6 +246,16 @@
     },
     "_meta": {
       "title": "Prompt"
+    }
+  },
+  "10:119": {
+    "class_type": "ModelAttentionBackend",
+    "inputs": {
+      "model": [
+        "10:118",
+        0
+      ],
+      "attention": "sub-quadratic attention"
     }
   }
 }

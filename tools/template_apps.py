@@ -14,7 +14,7 @@ these bases, all workflows built by tools/build_apps.py:
              with the second image as its only reference (with both, it copied the first face back)
   z-image    Z-Image Turbo (apps/z-image), text to image
   video      LTX-2.5 image-to-video (apps/video), with its own audio
-  qwen-edit  Qwen Image Edit camera templates: 2511 native INT8 + fal for angles, 2509 + lovis93 for next-scene
+  qwen-edit  Qwen Image Edit camera templates: native INT8 2511 + fal for angles, native INT8 2509 + lovis93 for next-scene
   morph      FLUX 3 Klein draws the last frame from the photo and LTX-2.5 + the transition LoRA moves
              the photo into it (apps/morph): for clips where the scene must change around a subject
              that has to stay the same (a face, a product); "klein" is that fixed instruction
@@ -836,7 +836,10 @@ def manifest(t: dict) -> dict:
             credits = [c.replace("Qwen-Image-Edit-2509", "Qwen-Image-Edit-2511") for c in credits]
             notes += " with Comfy-Org Qwen Image Edit 2511 INT8 ConvRot via native UNETLoader, Lightning 2511 and fal's <sks> Multiple Angles LoRA; historical examples do not measure this native INT8 profile"
         else:
-            notes += f" with {lora['file']} in place of the Relight LoRA and no Relight trigger"
+            notes += (f" with {lora['file']} in place of the Relight LoRA and no Relight trigger; "
+                      "Comfy-Org Qwen Image Edit 2509 INT8 ConvRot via native UNETLoader and per-model sub-quadratic attention; "
+                      "the shared Relight model chain completed one Cloud9 1024-square run on 2026-11-19, but this Next Scene variant has not been rendered separately; "
+                      "historical examples do not measure this INT8 profile")
     notes += "; the prompt below is fixed and \"Extra direction\" is appended to it."
     return {
         "$schema": "../../schema/app.schema.json",
@@ -850,7 +853,7 @@ def manifest(t: dict) -> dict:
         "inputs": inputs,
         "outputs": [{**base["output"], "label": "Result"}],
         "models": models,
-        **({"vram": {"peak_gb": None}} if t["lora"] == "angles" else {}),
+        **({"vram": {"peak_gb": None}} if t["lora"] in ("angles", "next-scene") else {}),
         "credits": credits,
         "test": test,
     }

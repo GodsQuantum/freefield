@@ -11,7 +11,7 @@
   "source": {
     "template": "image_qwen_image_edit_2509_relight.json",
     "comfyui": "0.42.0",
-    "notes": "Unchanged official template (Qwen Image Edit 2509 fp8 + Relight LoRA + 4-step Lightning LoRA). The Relight trigger is prepended by the workflow."
+    "notes": "Official Qwen Image Edit 2509 template with Comfy-Org INT8 ConvRot via native UNETLoader and per-model sub-quadratic attention; Relight and 4-step Lightning 2509 LoRAs, controls and prepended Relight trigger unchanged. One Cloud9 1024x1024 golden-hour run completed in 810.0 s on 2026-11-19; visual review passed with a changed background, so background preservation and other presets are not qualified. Historical examples do not measure this INT8 profile."
   },
   "inputs": [
     {
@@ -243,10 +243,10 @@
   ],
   "models": [
     {
-      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
-      "file": "split_files/diffusion_models/qwen_image_edit_2509_fp8_e4m3fn.safetensors",
+      "repo": "Comfy-Org/Qwen-Image-Edit",
+      "file": "split_files/diffusion_models/qwen_image_edit_2509_int8_convrot.safetensors",
       "dir": "diffusion_models",
-      "gb": 20.43,
+      "gb": 20.5,
       "phase": "denoise",
       "license": "Apache-2.0"
     },
@@ -291,5 +291,8 @@
   ],
   "test": {
     "image": "test/portrait.png"
+  },
+  "vram": {
+    "peak_gb": null
   }
 }

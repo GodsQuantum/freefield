@@ -94,7 +94,7 @@ the lab's GPU runs.
 | `cinema-video` | Cinema Studio (video) | Cinema Studio's still (FLUX 3 Image Klein) as the first frame of LTX-2.5 image-to-video in one graph: the same look selects plus up to 3 camera moves from Higgsfield's list of 33, written in the order picked (one move holds; the lab found the order of two is not reliable), tempo and duration; sound included | needs Modal, peak 44.3 GB on L40S | ready |
 | `edit` | Edit | FLUX 3 Image Klein (int8): a change described in words, no mask | fits whole, 11.0 GB | ready |
 | `inpaint` | Inpaint | FLUX 3 Image Klein with a noise mask: paint the area in the web UI's brush and only that area is redrawn, then pasted back over the photo | fits whole, 11.0 GB | ready |
-| `relight` | Relight | Qwen Image Edit 2509 (fp8) + Relight and Lightning LoRAs: light presets, or direction, softness, brightness and color | tight: 21.5 GB largest phase | ready |
+| `relight` | Relight | Qwen Image Edit 2509 (native INT8 ConvRot, per-model sub-quadratic attention) + Relight and Lightning LoRAs: light presets, or direction, softness, brightness and color | tight: 21.6 GB largest phase | ready |
 | `upscale`, `upscale-video` | Upscale | SeedVR2 3B (int8) | fits whole, 4.0 GB | ready |
 | `remove-bg` | Background removal | BiRefNet | fits whole, 0.4 GB | ready |
 | `video-remove-bg` | Remove Background (video), Video Background Remover | BiRefNet on every frame: the clip over a solid color with its sound, plus the matte | fits whole, 0.4 GB | ready |
@@ -177,7 +177,7 @@ reference; for `expand-image`, the photo gets a border that only Klein draws), `
 (LTX-2.5 image-to-video with its own audio), `morph` (Klein draws the last frame from a fixed instruction, LTX-2.5
 and the transition LoRA move the photo into it), `effects`' Wan 2.1 pipeline with one effect LoRA fixed (joyfox's
 Bullet Time; for `bullet-time-white` and `-splash`, Klein redraws the photo first) and `relight`'s
-Qwen Image Edit pipeline with native 2511 INT8 ConvRot and fal Multiple Angles for `angles`, `shots` and `zooms`, and the 2509 model and lovis93 Next Scene v2 for `whats-next`. `tools/template_apps.py` holds the table and writes the 72 folders (manifest + the
+Qwen Image Edit pipeline with native 2511 INT8 ConvRot and fal Multiple Angles for `angles`, `shots` and `zooms`, and native 2509 INT8 ConvRot and lovis93 Next Scene v2 for `whats-next`. `tools/template_apps.py` holds the table and writes the 72 folders (manifest + the
 base workflow, with the few edits a base needs) and their lab cases; `--readme` prints this list and `--lab` the
 command that makes every example. Add a line to the table there, not a folder by hand.
 
@@ -188,6 +188,14 @@ SHA256 `11b5af5ac601821d73930c84846c9a158e67177356daf927ce1c8d10f3963829`.
 On 19 November 2026, one Cloud9 Radeon 780M `angles` CLI run completed at 1024×1024 in 613.0 s; the default 45° left rotation was visually checked against its source.
 The local receipt is `validation/qwen2511-angles-native-subquad-cli1024-20261119.json` in the parent project. `shots` and `zooms` share this model chain but were not rendered separately in that run.
 The dedicated VRAM peak remains unmeasured (`vram.peak_gb=null`); host available memory and GTT observations are different metrics. Historical lab examples remain available and are not measurements of this profile.
+
+The `relight` and `whats-next` 2509 profiles also use native `UNETLoader` with `weight_dtype=default` and per-model `sub-quadratic attention`; their matching 2509 Lightning, Relight or Next Scene LoRAs, controls, defaults and prompt bindings are unchanged.
+Their official [2509 INT8 ConvRot weight file](https://huggingface.co/Comfy-Org/Qwen-Image-Edit/resolve/f68ace85e60b4a02a323e394253731947657b7d2/split_files/diffusion_models/qwen_image_edit_2509_int8_convrot.safetensors) is 20,499,083,752 bytes at revision `f68ace85e60b4a02a323e394253731947657b7d2`,
+SHA256 `638402843782296122f42f2ff557a63a9535c4fbc3f6978308042c8d0f4012b4`.
+On 19 November 2026, one Cloud9 Radeon 780M `relight` CLI run completed at 1024×1024 in 810.0 s with the golden-hour preset.
+Visual comparison with the source showed the intended warm side light, coherent framing and recognizable portrait features, with no obvious artifacts. The neutral studio background changed to a window scene, so this test does not establish background preservation.
+The local receipt and scoped visual review are in `validation/qwen2509-relight-native-int8-cli1024-20261119.json` in the parent project. `whats-next` shares the model chain but its Next Scene variant has not been rendered separately; the other Relight presets were not individually rendered in this run.
+Their measured VRAM peaks stay unknown (`vram.peak_gb=null`); the historical FP8 examples remain available and do not measure the new INT8 profiles.
 
 | App | Rebuilds | Base | Inputs |
 |---|---|---|---|

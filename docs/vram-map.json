@@ -2478,51 +2478,25 @@
       "section": "image",
       "pack": "image-qwen-edit",
       "status": "ready",
-      "whole_gb": 31.15,
+      "whole_gb": 31.22,
       "phases_gb": {
         "encode": 9.38,
-        "denoise": 21.52,
+        "denoise": 21.59,
         "denoise2": 0.0,
         "decode": 0.25,
         "aux": 0.0
       },
       "largest_phase": "denoise",
-      "largest_phase_gb": 21.52,
+      "largest_phase_gb": 21.59,
       "optional_gb": 0,
       "biggest_file": {
-        "name": "qwen_image_edit_2509_fp8_e4m3fn.safetensors",
-        "gb": 20.43
+        "name": "qwen_image_edit_2509_int8_convrot.safetensors",
+        "gb": 20.5
       },
       "verdict_24gb": "tight (by phases)",
       "modal_gpu": "test on L4 / A10G; L40S (48 GB) is comfortable",
-      "measured_peak_gb": 32.99,
-      "measured_on": "H100 · 20261024-164909-h100"
-    },
-    {
-      "id": "whats-next",
-      "name": "What's Next",
-      "section": "image",
-      "pack": "image-qwen-edit",
-      "status": "ready",
-      "whole_gb": 31.21,
-      "phases_gb": {
-        "encode": 9.38,
-        "denoise": 21.58,
-        "denoise2": 0.0,
-        "decode": 0.25,
-        "aux": 0.0
-      },
-      "largest_phase": "denoise",
-      "largest_phase_gb": 21.58,
-      "optional_gb": 0,
-      "biggest_file": {
-        "name": "qwen_image_edit_2509_fp8_e4m3fn.safetensors",
-        "gb": 20.43
-      },
-      "verdict_24gb": "tight (by phases)",
-      "modal_gpu": "test on L4 / A10G; L40S (48 GB) is comfortable",
-      "measured_peak_gb": 28.7,
-      "measured_on": "L40S · 20261024-230058-l40s"
+      "measured_peak_gb": null,
+      "measured_on": null
     },
     {
       "id": "angles",
@@ -2569,6 +2543,32 @@
       "optional_gb": 0,
       "biggest_file": {
         "name": "qwen_image_edit_2511_int8_convrot.safetensors",
+        "gb": 20.5
+      },
+      "verdict_24gb": "tight (by phases)",
+      "modal_gpu": "test on L4 / A10G; L40S (48 GB) is comfortable",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "whats-next",
+      "name": "What's Next",
+      "section": "image",
+      "pack": "image-qwen-edit",
+      "status": "ready",
+      "whole_gb": 31.28,
+      "phases_gb": {
+        "encode": 9.38,
+        "denoise": 21.65,
+        "denoise2": 0.0,
+        "decode": 0.25,
+        "aux": 0.0
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 21.65,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen_image_edit_2509_int8_convrot.safetensors",
         "gb": 20.5
       },
       "verdict_24gb": "tight (by phases)",

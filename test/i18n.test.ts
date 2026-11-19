@@ -146,8 +146,9 @@ test("the native 2511 camera model is distinct from the 2509 relight model in th
   Object.defineProperty(globalThis, "location", { configurable: true, value: { search: "" } });
   const { modelOf, MODELS, usesModel } = await import(new URL("../web/js/catalog.js", import.meta.url).href);
   const camera = { models: [{ name: "qwen_image_edit_2511_int8_convrot.safetensors" }] };
-  const relight = { models: [{ name: "qwen_image_edit_2509_fp8_e4m3fn.safetensors" }] };
+  const relight = { models: [{ name: "qwen_image_edit_2509_int8_convrot.safetensors" }] };
   assert.equal(modelOf(camera)?.name, "Qwen-Image-Edit 2511");
   assert.equal(modelOf(relight)?.name, "Qwen-Image-Edit 2509");
   assert.equal(usesModel(camera, MODELS.find((m: { name: string }) => m.name === "Qwen-Image-Edit 2509")), false);
+  assert.equal(usesModel(relight, MODELS.find((m: { name: string }) => m.name === "Qwen-Image-Edit 2511")), false);
 });
