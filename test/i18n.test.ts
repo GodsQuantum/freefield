@@ -141,3 +141,13 @@ test("duration units track the selected locale without a circular import", () =>
   assert.equal(fmtSeconds(125), "2 min 05 s");
   assert.equal(fmtShort(120), "~2 min");
 });
+
+test("the native 2511 camera model is distinct from the 2509 relight model in the catalog", async () => {
+  Object.defineProperty(globalThis, "location", { configurable: true, value: { search: "" } });
+  const { modelOf, MODELS, usesModel } = await import(new URL("../web/js/catalog.js", import.meta.url).href);
+  const camera = { models: [{ name: "qwen_image_edit_2511_int8_convrot.safetensors" }] };
+  const relight = { models: [{ name: "qwen_image_edit_2509_fp8_e4m3fn.safetensors" }] };
+  assert.equal(modelOf(camera)?.name, "Qwen-Image-Edit 2511");
+  assert.equal(modelOf(relight)?.name, "Qwen-Image-Edit 2509");
+  assert.equal(usesModel(camera, MODELS.find((m: { name: string }) => m.name === "Qwen-Image-Edit 2509")), false);
+});

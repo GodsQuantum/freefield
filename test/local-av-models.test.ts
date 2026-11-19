@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { loadRegistry } from "../server/registry.ts";
+import { readFileSync } from "node:fs";
+import { loadRegistry, type ApiWorkflow } from "../server/registry.ts";
 import { applyInputs, resolveValues } from "../server/runner.ts";
 
 const { apps, problems } = loadRegistry();
@@ -84,4 +85,64 @@ test("direct SFX does not require the optional Qwen prompt model by default", ()
   assert.equal(sfx.graph?.["52:35"]?.inputs?.value, false);
   assert.equal(sfx.graph?.["52:34"]?.class_type, "ComfySwitchNode");
   assert.ok(sfx.models.some((m) => m.file.endsWith("qwen3.5_2b_bf16.safetensors") && m.optional));
+});
+
+for (const [id, selectorId, choices] of [["angles", "move", 10], ["shots", "shot", 9], ["zooms", "zoom", 5]] as const) {
+  test(`${id}: all camera choices use native Qwen Edit 2511 INT8 with the matching fal and Lightning LoRAs`, () => {
+    const app = apps.find((a) => a.id === id);
+    assert.ok(app?.graph);
+    assert.equal(app.graph["10:37"]?.class_type, "UNETLoader", "native quantized tensors must use the core loader");
+    assert.deepEqual(app.graph["10:37"].inputs, {
+      unet_name: "qwen_image_edit_2511_int8_convrot.safetensors", weight_dtype: "default",
+    });
+    assert.ok(app.models.some((m) => m.repo === "Comfy-Org/Qwen-Image-Edit"
+      && m.file === "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors"
+      && m.dir === "diffusion_models"));
+    assert.equal(app.models.some((m) => m.dir === "unet_gguf"), false);
+    assert.equal(app.vram?.peak_gb, null, "the native profile has no measured VRAM peak yet");
+    assert.equal(problems.some((p) => p.app === id && p.severity === "error"), false);
+
+    const selector = app.inputs.find((i) => i.id === selectorId);
+    assert.equal(selector?.options?.length, choices);
+    for (const option of selector!.options!) {
+      const graph: ApiWorkflow = structuredClone(app.graph);
+      applyInputs(app, resolveValues(app, {
+        image: { bytes: new Uint8Array([1, 2, 3]), name: "portrait.png" },
+        [selectorId]: option.value, details: "Keep the blue jacket.", seed: 42,
+      }), { setInput: (node, field, value) => { graph[node].inputs[field] = value; } }, () => "uploaded.png");
+      assert.match(String(graph["15"].inputs.value), /^<sks> /);
+      assert.match(String(graph["15"].inputs.value), /Keep the blue jacket\.$/);
+      assert.doesNotMatch(String(graph["15"].inputs.value), /\{details\}/);
+      assert.deepEqual(graph["10:89"].inputs, {
+        lora_name: "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+        strength_model: 1, model: ["10:37", 0],
+      });
+      assert.deepEqual(graph["10:118"].inputs, {
+        lora_name: "qwen-image-edit-2511-multiple-angles-lora.safetensors",
+        strength_model: 1, model: ["10:89", 0],
+      });
+      assert.deepEqual(graph["10:66"].inputs.model, ["10:118", 0]);
+      assert.deepEqual(graph["10:75"].inputs.model, ["10:66", 0]);
+      assert.deepEqual(graph["10:3"].inputs.model, ["10:75", 0]);
+      assert.deepEqual([graph["10:3"].inputs.steps, graph["10:3"].inputs.cfg, graph["10:3"].inputs.seed], [4, 1, 42]);
+    }
+  });
+}
+
+test("the Qwen edit pack separates native 2511 camera apps from the unchanged 2509 apps", () => {
+  const pack = JSON.parse(readFileSync(new URL("../packs/image-qwen-edit.json", import.meta.url), "utf8"));
+  const native = pack.models.find((m: { name: string }) => m.name === "qwen_image_edit_2511_int8_convrot.safetensors");
+  assert.ok(native, "the pack must install the core loader's native weight file");
+  assert.equal(native.dir, "diffusion_models");
+  assert.equal(native.repo, "Comfy-Org/Qwen-Image-Edit");
+  assert.equal(native.file, "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors");
+  assert.deepEqual(native.used_by, ["angles", "shots", "zooms"]);
+  assert.equal(pack.models.some((m: { dir: string }) => m.dir === "unet_gguf"), false);
+  assert.equal(pack.custom_nodes.some((c: { repo: string }) => c.repo === "https://github.com/city96/ComfyUI-GGUF"), false);
+  for (const id of ["relight", "whats-next"]) {
+    const app = apps.find((a) => a.id === id)!;
+    assert.equal(app.graph?.["10:37"]?.class_type, "UNETLoader");
+    assert.match(String(app.graph?.["10:37"]?.inputs.unet_name), /2509/);
+    assert.match(String(app.graph?.["10:89"]?.inputs.lora_name), /2509-Lightning/);
+  }
 });

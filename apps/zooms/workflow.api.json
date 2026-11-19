@@ -46,12 +46,13 @@
     }
   },
   "10:37": {
-    "class_type": "UnetLoaderGGUF",
+    "class_type": "UNETLoader",
     "inputs": {
-      "unet_name": "qwen-image-edit-2511-Q4_K_M.gguf"
+      "unet_name": "qwen_image_edit_2511_int8_convrot.safetensors",
+      "weight_dtype": "default"
     },
     "_meta": {
-      "title": "Load Qwen Image Edit 2511 GGUF"
+      "title": "Load Qwen Image Edit 2511 INT8"
     }
   },
   "10:38": {

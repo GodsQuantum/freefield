@@ -7,14 +7,9 @@
     "whats-next",
     "zooms"
   ],
-  "download_gb": 45.84,
+  "download_gb": 53.1,
   "needs_hf_token": false,
-  "custom_nodes": [
-    {
-      "repo": "https://github.com/city96/ComfyUI-GGUF",
-      "commit": "6ea2651"
-    }
-  ],
+  "custom_nodes": [],
   "models": [
     {
       "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
@@ -27,6 +22,20 @@
       "used_by": [
         "relight",
         "whats-next"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/Qwen-Image-Edit",
+      "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 20.5,
+      "name": "qwen_image_edit_2511_int8_convrot.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "angles",
+        "shots",
+        "zooms"
       ]
     },
     {
@@ -107,20 +116,6 @@
         "relight",
         "shots",
         "whats-next",
-        "zooms"
-      ]
-    },
-    {
-      "repo": "unsloth/Qwen-Image-Edit-2511-GGUF",
-      "file": "qwen-image-edit-2511-Q4_K_M.gguf",
-      "dir": "unet_gguf",
-      "gb": 13.24,
-      "name": "qwen-image-edit-2511-Q4_K_M.gguf",
-      "gated": false,
-      "license": "Apache-2.0",
-      "used_by": [
-        "angles",
-        "shots",
         "zooms"
       ]
     },

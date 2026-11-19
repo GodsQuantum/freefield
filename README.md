@@ -167,9 +167,13 @@ reference; for `expand-image`, the photo gets a border that only Klein draws), `
 (LTX-2.5 image-to-video with its own audio), `morph` (Klein draws the last frame from a fixed instruction, LTX-2.5
 and the transition LoRA move the photo into it), `effects`' Wan 2.1 pipeline with one effect LoRA fixed (joyfox's
 Bullet Time; for `bullet-time-white` and `-splash`, Klein redraws the photo first) and `relight`'s
-Qwen Image Edit pipeline with the 2511 GGUF and fal Multiple Angles for `angles`, `shots` and `zooms`, and the 2509 model and lovis93 Next Scene v2 for `whats-next`. `tools/template_apps.py` holds the table and writes the 72 folders (manifest + the
+Qwen Image Edit pipeline with native 2511 INT8 ConvRot and fal Multiple Angles for `angles`, `shots` and `zooms`, and the 2509 model and lovis93 Next Scene v2 for `whats-next`. `tools/template_apps.py` holds the table and writes the 72 folders (manifest + the
 base workflow, with the few edits a base needs) and their lab cases; `--readme` prints this list and `--lab` the
 command that makes every example. Add a line to the table there, not a folder by hand.
+
+The native camera profile uses ComfyUI's core `UNETLoader` with `weight_dtype=default`, the existing fal 2511 LoRA and Lightning 2511 at four steps.
+Its official [INT8 ConvRot weight file](https://huggingface.co/Comfy-Org/Qwen-Image-Edit/resolve/e9e85de74a8f48c1e3e2656617626348675a2f21/split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors) is 20,499,083,824 bytes at revision `e9e85de74a8f48c1e3e2656617626348675a2f21`,
+SHA256 `11b5af5ac601821d73930c84846c9a158e67177356daf927ce1c8d10f3963829`. Cloud9 render and memory qualification of this native profile is pending; historical lab examples remain available and are not measurements of this profile.
 
 | App | Rebuilds | Base | Inputs |
 |---|---|---|---|
@@ -241,9 +245,9 @@ command that makes every example. Add a line to the table there, not a folder by
 | `bullet-time-scene` | Bullet Time Scene | `effects` | your photo, who or what is in the photo |
 | `bullet-time-white` | Bullet Time White | `edit + effects` | your photo, who or what is in the photo |
 | `bullet-time-splash` | Bullet Time Splash | `edit + effects` | your photo, who or what is in the photo |
-| `angles` | Angles 2.0 | `Qwen-Image-Edit-2511 GGUF + fal Multiple Angles` | your photo, camera move |
-| `shots` | Shots | `Qwen-Image-Edit-2511 GGUF + fal Multiple Angles` | your photo, shot |
-| `zooms` | Zooms | `Qwen-Image-Edit-2511 GGUF + fal Multiple Angles` | your photo, zoom |
+| `angles` | Angles 2.0 | `Qwen-Image-Edit-2511 native INT8 + fal Multiple Angles` | your photo, camera move |
+| `shots` | Shots | `Qwen-Image-Edit-2511 native INT8 + fal Multiple Angles` | your photo, shot |
+| `zooms` | Zooms | `Qwen-Image-Edit-2511 native INT8 + fal Multiple Angles` | your photo, zoom |
 | `whats-next` | What's Next? | `relight + next-scene-qwen-image-lora-2509` | your photo, continuation |
 
 The sizes above are weights only. Full table, with the peak VRAM measured on each app's lab example and the GPU it ran

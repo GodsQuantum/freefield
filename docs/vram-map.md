@@ -86,9 +86,6 @@ On an 80 GB H100, ComfyUI can keep models from earlier phases loaded, so measure
 | `create-image` | ready | 17.8 GB | encode 11.6 GB | qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | 15.4 GB (L40S) |
 | `style-reference` | ready | 19.1 GB | denoise 13.9 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | not measured |
 | `styles` | ready | 19.1 GB (+3.8 optional) | denoise 14.0 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | not measured |
-| `angles` | ready | 24.0 GB | denoise 14.4 GB | qwen-image-edit-2511-Q4_K_M.gguf (13.2) | fits by phases | L4 / A10G (24 GB) | not measured |
-| `shots` | ready | 24.0 GB | denoise 14.4 GB | qwen-image-edit-2511-Q4_K_M.gguf (13.2) | fits by phases | L4 / A10G (24 GB) | not measured |
-| `zooms` | ready | 24.0 GB | denoise 14.4 GB | qwen-image-edit-2511-Q4_K_M.gguf (13.2) | fits by phases | L4 / A10G (24 GB) | not measured |
 | `camera-moves` | ready | 37.6 GB (+2.5 optional) | denoise 15.3 GB | wan2.2_fun_camera_high_noise_14B_fp8_scaled.safetensors (15.3) | fits by phases | L4 / A10G (24 GB) | 41.3 GB (L40S) |
 | `bullet-time-scene` | ready | 24.6 GB (+1.1 optional) | denoise 16.4 GB | wan2.1_i2v_480p_14B_fp8_scaled.safetensors (16.4) | fits by phases | L4 / A10G (24 GB) | 30.8 GB (H100) |
 | `motion-transfer` | ready | 24.9 GB | denoise 16.6 GB | wan_animate_2_distill_int8_convrot.safetensors (16.6) | fits by phases | L4 / A10G (24 GB) | 37.3 GB (L40S) |
@@ -112,6 +109,9 @@ On an 80 GB H100, ComfyUI can keep models from earlier phases loaded, so measure
 | `video-t2v` | ready | 39.7 GB (+5.2 optional) | denoise 21.5 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 48.4 GB (H100) |
 | `relight` | ready | 31.1 GB | denoise 21.5 GB | qwen_image_edit_2509_fp8_e4m3fn.safetensors (20.4) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 33.0 GB (H100) |
 | `whats-next` | ready | 31.2 GB | denoise 21.6 GB | qwen_image_edit_2509_fp8_e4m3fn.safetensors (20.4) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 28.7 GB (L40S) |
+| `angles` | ready | 31.3 GB | denoise 21.6 GB | qwen_image_edit_2511_int8_convrot.safetensors (20.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | not measured |
+| `shots` | ready | 31.3 GB | denoise 21.6 GB | qwen_image_edit_2511_int8_convrot.safetensors (20.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | not measured |
+| `zooms` | ready | 31.3 GB | denoise 21.6 GB | qwen_image_edit_2511_int8_convrot.safetensors (20.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | not measured |
 | `vfx-clean-plate` | ready | 39.0 GB (+5.2 optional) | denoise 21.8 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 40.6 GB (L40S) |
 | `vfx-day-to-night` | ready | 39.0 GB (+5.2 optional) | denoise 21.8 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 44.0 GB (L40S) |
 | `chameleon` | ready | 50.1 GB (+5.2 optional) | denoise 21.9 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 44.1 GB (L40S) |

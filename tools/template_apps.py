@@ -14,7 +14,7 @@ these bases, all workflows built by tools/build_apps.py:
              with the second image as its only reference (with both, it copied the first face back)
   z-image    Z-Image Turbo (apps/z-image), text to image
   video      LTX-2.5 image-to-video (apps/video), with its own audio
-  qwen-edit  Qwen Image Edit camera templates: 2511 GGUF + fal for angles, 2509 + lovis93 for next-scene
+  qwen-edit  Qwen Image Edit camera templates: 2511 native INT8 + fal for angles, 2509 + lovis93 for next-scene
   morph      FLUX 3 Klein draws the last frame from the photo and LTX-2.5 + the transition LoRA moves
              the photo into it (apps/morph): for clips where the scene must change around a subject
              that has to stay the same (a face, a product); "klein" is that fixed instruction
@@ -70,8 +70,8 @@ BULLET_TRIGGER = "rw360xz，人物定在空中，相机视角围绕人物向一�
 FACE_MODEL = {"repo": "Comfy-Org/mediapipe", "file": "detection/mediapipe_face_fp32.safetensors", "dir": "detection", "gb": 0.01, "phase": "encode",
               "license": "Apache-2.0"}
 
-QWEN_2511_GGUF = {"repo": "unsloth/Qwen-Image-Edit-2511-GGUF", "file": "qwen-image-edit-2511-Q4_K_M.gguf",
-                  "dir": "unet_gguf", "gb": 13.24, "phase": "denoise", "license": "Apache-2.0"}
+QWEN_2511_INT8 = {"repo": "Comfy-Org/Qwen-Image-Edit", "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
+                  "dir": "diffusion_models", "gb": 20.50, "phase": "denoise", "license": "Apache-2.0"}
 QWEN_2511_LIGHTNING = {"repo": "lightx2v/Qwen-Image-Edit-2511-Lightning", "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
                       "dir": "loras", "gb": 0.85, "phase": "denoise", "license": "Apache-2.0"}
 
@@ -832,9 +832,9 @@ def manifest(t: dict) -> dict:
         credits.insert(1, lora["credit"])
         if t["lora"] == "angles":
             models = [m for m in models if m["dir"] != "diffusion_models" and "2509-Lightning" not in m["file"]]
-            models = [QWEN_2511_GGUF, QWEN_2511_LIGHTNING, *models]
+            models = [QWEN_2511_INT8, QWEN_2511_LIGHTNING, *models]
             credits = [c.replace("Qwen-Image-Edit-2509", "Qwen-Image-Edit-2511") for c in credits]
-            notes += " with Unsloth Qwen Image Edit 2511 Q4_K_M, Lightning 2511 and fal's <sks> Multiple Angles LoRA"
+            notes += " with Comfy-Org Qwen Image Edit 2511 INT8 ConvRot via native UNETLoader, Lightning 2511 and fal's <sks> Multiple Angles LoRA; historical examples do not measure this native INT8 profile"
         else:
             notes += f" with {lora['file']} in place of the Relight LoRA and no Relight trigger"
     notes += "; the prompt below is fixed and \"Extra direction\" is appended to it."
@@ -850,8 +850,7 @@ def manifest(t: dict) -> dict:
         "inputs": inputs,
         "outputs": [{**base["output"], "label": "Result"}],
         "models": models,
-        **({"custom_nodes": [{"repo": "https://github.com/city96/ComfyUI-GGUF", "commit": "6ea2651"}],
-            "vram": {"peak_gb": None}} if t["lora"] == "angles" else {}),
+        **({"vram": {"peak_gb": None}} if t["lora"] == "angles" else {}),
         "credits": credits,
         "test": test,
     }
@@ -934,8 +933,8 @@ def workflow(t: dict) -> dict:
         api["10:118"]["inputs"]["lora_name"] = QWEN_LORAS[t["lora"]]["file"]
         api["14"]["inputs"]["string_a"] = ""
     if t["lora"] == "angles":
-        api["10:37"] = {"class_type": "UnetLoaderGGUF", "inputs": {"unet_name": QWEN_2511_GGUF["file"]},
-                        "_meta": {"title": "Load Qwen Image Edit 2511 GGUF"}}
+        api["10:37"] = {"class_type": "UNETLoader", "inputs": {"unet_name": QWEN_2511_INT8["file"].rsplit("/", 1)[-1], "weight_dtype": "default"},
+                        "_meta": {"title": "Load Qwen Image Edit 2511 INT8"}}
         api["10:89"]["inputs"]["lora_name"] = QWEN_2511_LIGHTNING["file"]
         selector = t["inputs"][0]
         pose = next(o["label"] for o in selector["options"] if o["value"] == selector["default"])
@@ -986,7 +985,7 @@ def readme() -> str:
         ins = [x.lower() for x in (t["image_label"], t["image2_label"]) if x] + [i["label"].lower() for i in t["inputs"]]
         base = BASES[t["base"]]["app"] + (f" + {QWEN_LORAS[t['lora']]['repo'].split('/')[1]}" if t["lora"] else "")
         if t["lora"] == "angles":
-            base = "Qwen-Image-Edit-2511 GGUF + fal Multiple Angles"
+            base = "Qwen-Image-Edit-2511 native INT8 + fal Multiple Angles"
         base = "edit + effects" if t["base"] == "effect-klein" else base
         rows.append(f"| `{t['id']}` | {t['feature']} | `{base}` | {', '.join(ins)} |")
     return "\n".join(rows)

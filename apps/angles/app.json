@@ -11,7 +11,7 @@
   "source": {
     "template": "image_qwen_image_edit_2509_relight.json",
     "comfyui": "0.42.0",
-    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with Unsloth Qwen Image Edit 2511 Q4_K_M, Lightning 2511 and fal's <sks> Multiple Angles LoRA; the prompt below is fixed and \"Extra direction\" is appended to it."
+    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with Comfy-Org Qwen Image Edit 2511 INT8 ConvRot via native UNETLoader, Lightning 2511 and fal's <sks> Multiple Angles LoRA; historical examples do not measure this native INT8 profile; the prompt below is fixed and \"Extra direction\" is appended to it."
   },
   "inputs": [
     {
@@ -178,10 +178,10 @@
   ],
   "models": [
     {
-      "repo": "unsloth/Qwen-Image-Edit-2511-GGUF",
-      "file": "qwen-image-edit-2511-Q4_K_M.gguf",
-      "dir": "unet_gguf",
-      "gb": 13.24,
+      "repo": "Comfy-Org/Qwen-Image-Edit",
+      "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 20.5,
       "phase": "denoise",
       "license": "Apache-2.0"
     },
@@ -216,12 +216,6 @@
       "gb": 0.3,
       "phase": "denoise",
       "license": "Apache-2.0"
-    }
-  ],
-  "custom_nodes": [
-    {
-      "repo": "https://github.com/city96/ComfyUI-GGUF",
-      "commit": "6ea2651"
     }
   ],
   "vram": {
