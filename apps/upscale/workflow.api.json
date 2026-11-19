@@ -32,8 +32,8 @@
         "66:51",
         0
       ],
-      "tile_size": 512,
-      "overlap": 128,
+      "tile_size": 256,
+      "overlap": 64,
       "temporal_size": 4096,
       "temporal_overlap": 8
     },
@@ -58,9 +58,11 @@
     }
   },
   "66:51": {
-    "class_type": "VAELoader",
+    "class_type": "VAELoaderKJ",
     "inputs": {
-      "vae_name": "seedvr2_ema_vae_fp16.safetensors"
+      "vae_name": "seedvr2_ema_vae_fp16.safetensors",
+      "device": "main_device",
+      "weight_dtype": "fp16"
     },
     "_meta": {
       "title": "Load VAE"
@@ -117,8 +119,8 @@
         "66:51",
         0
       ],
-      "tile_size": 512,
-      "overlap": 128,
+      "tile_size": 256,
+      "overlap": 64,
       "temporal_size": 4096,
       "temporal_overlap": 8
     },

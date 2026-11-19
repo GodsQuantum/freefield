@@ -79,7 +79,7 @@
     "class_type": "ModelSamplingAuraFlow",
     "inputs": {
       "model": [
-        "10:118",
+        "10:119",
         0
       ],
       "shift": 3
@@ -246,6 +246,19 @@
     },
     "_meta": {
       "title": "Prompt"
+    }
+  },
+  "10:119": {
+    "class_type": "ModelAttentionBackend",
+    "inputs": {
+      "model": [
+        "10:118",
+        0
+      ],
+      "attention": "sub-quadratic attention"
+    },
+    "_meta": {
+      "title": "Qwen native sub-quadratic attention"
     }
   }
 }

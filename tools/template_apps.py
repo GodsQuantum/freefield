@@ -936,6 +936,9 @@ def workflow(t: dict) -> dict:
         api["10:37"] = {"class_type": "UNETLoader", "inputs": {"unet_name": QWEN_2511_INT8["file"].rsplit("/", 1)[-1], "weight_dtype": "default"},
                         "_meta": {"title": "Load Qwen Image Edit 2511 INT8"}}
         api["10:89"]["inputs"]["lora_name"] = QWEN_2511_LIGHTNING["file"]
+        api["10:119"] = {"class_type": "ModelAttentionBackend", "inputs": {"model": ["10:118", 0], "attention": "sub-quadratic attention"},
+                         "_meta": {"title": "Qwen native sub-quadratic attention"}}
+        api["10:66"]["inputs"]["model"] = ["10:119", 0]
         selector = t["inputs"][0]
         pose = next(o["label"] for o in selector["options"] if o["value"] == selector["default"])
         api["15"]["inputs"]["value"] = f"<sks> {QWEN_2511_POSES[pose]}"

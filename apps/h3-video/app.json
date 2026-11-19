@@ -11,7 +11,7 @@
   "source": {
     "template": "video_minimax_h3_t2v.json",
     "comfyui": "0.42.0",
-    "notes": "Comfy's video_minimax_h3_t2v template with the int8 text encoder in place of the NVFP4 one (it needs a Blackwell GPU) and the plain 20-step branch of its turbo switch wired in: lightx2v's turbo LoRA is left out, its model card states no license (tools/build_apps.py)."
+    "notes": "Comfy's video_minimax_h3_t2v template with the int8 text encoder retained in place of the NVFP4 one and the plain 20-step branch of its turbo switch wired in: lightx2v's turbo LoRA is left out, its model card states no license (tools/build_apps.py). Comfy-Org documents that this NVFP4 encoder does not require Blackwell (https://huggingface.co/Comfy-Org/MiniMax-H3). On Cloud9 gfx1103 the available NVFP4 path uses per-layer dequantization without native NVFP4 kernels; NVFP4 speed, memory use and output quality remain unmeasured."
   },
   "inputs": [
     {

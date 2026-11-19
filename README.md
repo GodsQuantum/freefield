@@ -145,6 +145,16 @@ needs a newer ComfyUI than the one pinned here and its weights are licensed for 
 
 ![Six prompts (a portrait, a product with text, counting, a JSON prompt, a poster, a watercolor) on Z-Image Turbo, FLUX 3 Klein with and without the upsampler, Krea 2 Turbo and MOSS-Image, with GPU seconds and peak VRAM under each](docs/media/image-models.jpg)
 
+### SeedVR2 upscaling
+
+`upscale` and `upscale-video` use the official SeedVR2 3B INT8 model with KJNodes' `VAELoaderKJ` on `main_device` in FP16. Encode and decode use 256-pixel spatial tiles with 64-pixel overlap; temporal settings stay at 4096/8 for images and 64/8 for video. The two manifests and the Upscale pack pin KJNodes to `d3cfe21625e5170126ce06fbfcfe1d88108688c3`.
+
+Cloud9 Radeon 780M qualification on 19 November 2026 used FP16 accumulation OFF and the SeedVR2 VAE fix from ComfyUI PR #17826, pinned at `1250d05b0a42822e5669cc55b9e109b0fea582e0`. One image fixture passed at 2× (1024×1024 → 2048×2048) in 207.5 s through the CLI, compared with 1023.2 s for the CPU FP32 reference. Source/CPU/GPU images were visually compared; the two outputs have SSIM 0.9613 and RGB PSNR 36.899 dB.
+
+One 33-frame, 24 fps video fixture passed at 2× (256×144 → 512×288) in 146.9 s. All 32 adjacent-frame displacements were retained, with no frozen phase in the measured sequence; contact sheets were reviewed. These single-fixture results do not qualify 4×, longer clips or arbitrary motion, and do not establish a general fix for upstream issue #16591.
+
+The receipts are `validation/seedvr2-image2x-gpu-vae-tile256-20261119.json` and `validation/seedvr2-temporal33f-gpu-20261119.json` in the parent project. Host available memory and GTT measurements are not dedicated VRAM peaks; the historical lab peaks in the VRAM map remain separate measurements.
+
 ### Soul ID without training
 
 Higgsfield's Soul ID trains a model of a person from their photos. Freefield does not train: `character` (one photo)
@@ -171,9 +181,13 @@ Qwen Image Edit pipeline with native 2511 INT8 ConvRot and fal Multiple Angles f
 base workflow, with the few edits a base needs) and their lab cases; `--readme` prints this list and `--lab` the
 command that makes every example. Add a line to the table there, not a folder by hand.
 
-The native camera profile uses ComfyUI's core `UNETLoader` with `weight_dtype=default`, the existing fal 2511 LoRA and Lightning 2511 at four steps.
+The native camera profile uses ComfyUI's core `UNETLoader` with `weight_dtype=default`, the existing fal 2511 LoRA and Lightning 2511 at four steps, with `ModelAttentionBackend` set to `sub-quadratic attention` for this model only.
+The ComfyUI backend must expose that choice: Cloud9's native node extension selects the existing `sub_quad` implementation while keeping the global attention setting unchanged.
 Its official [INT8 ConvRot weight file](https://huggingface.co/Comfy-Org/Qwen-Image-Edit/resolve/e9e85de74a8f48c1e3e2656617626348675a2f21/split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors) is 20,499,083,824 bytes at revision `e9e85de74a8f48c1e3e2656617626348675a2f21`,
-SHA256 `11b5af5ac601821d73930c84846c9a158e67177356daf927ce1c8d10f3963829`. Cloud9 render and memory qualification of this native profile is pending; historical lab examples remain available and are not measurements of this profile.
+SHA256 `11b5af5ac601821d73930c84846c9a158e67177356daf927ce1c8d10f3963829`.
+On 19 November 2026, one Cloud9 Radeon 780M `angles` CLI run completed at 1024×1024 in 613.0 s; the default 45° left rotation was visually checked against its source.
+The local receipt is `validation/qwen2511-angles-native-subquad-cli1024-20261119.json` in the parent project. `shots` and `zooms` share this model chain but were not rendered separately in that run.
+The dedicated VRAM peak remains unmeasured (`vram.peak_gb=null`); host available memory and GTT observations are different metrics. Historical lab examples remain available and are not measurements of this profile.
 
 | App | Rebuilds | Base | Inputs |
 |---|---|---|---|

@@ -121,7 +121,11 @@ for (const [id, selectorId, choices] of [["angles", "move", 10], ["shots", "shot
         lora_name: "qwen-image-edit-2511-multiple-angles-lora.safetensors",
         strength_model: 1, model: ["10:89", 0],
       });
-      assert.deepEqual(graph["10:66"].inputs.model, ["10:118", 0]);
+      assert.equal(graph["10:119"]?.class_type, "ModelAttentionBackend", "the sampler must retain the validated per-model attention override");
+      assert.deepEqual(graph["10:119"].inputs, {
+        model: ["10:118", 0], attention: "sub-quadratic attention",
+      });
+      assert.deepEqual(graph["10:66"].inputs.model, ["10:119", 0]);
       assert.deepEqual(graph["10:75"].inputs.model, ["10:66", 0]);
       assert.deepEqual(graph["10:3"].inputs.model, ["10:75", 0]);
       assert.deepEqual([graph["10:3"].inputs.steps, graph["10:3"].inputs.cfg, graph["10:3"].inputs.seed], [4, 1, 42]);
@@ -144,5 +148,7 @@ test("the Qwen edit pack separates native 2511 camera apps from the unchanged 25
     assert.equal(app.graph?.["10:37"]?.class_type, "UNETLoader");
     assert.match(String(app.graph?.["10:37"]?.inputs.unet_name), /2509/);
     assert.match(String(app.graph?.["10:89"]?.inputs.lora_name), /2509-Lightning/);
+    assert.equal(app.graph?.["10:119"], undefined, "the 2511 attention override must not alter the 2509 recipes");
+    assert.deepEqual(app.graph?.["10:66"]?.inputs.model, ["10:118", 0]);
   }
 });

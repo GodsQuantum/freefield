@@ -95,5 +95,11 @@
   "test": {
     "image": "test/portrait.png",
     "scale": 2
-  }
+  },
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/kijai/ComfyUI-KJNodes",
+      "commit": "d3cfe21625e5170126ce06fbfcfe1d88108688c3"
+    }
+  ]
 }

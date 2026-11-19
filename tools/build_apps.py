@@ -105,10 +105,12 @@ def prefix_outputs(api: Api, app_id: str) -> None:
 def h3_local(api: Api) -> None:
     """Comfy's MiniMax H3 templates on Freefield's weights, without the turbo LoRA.
 
-    The templates load an NVFP4 text encoder (it needs a Blackwell GPU); the int8 one reshoot already uses goes
-    in its place. Their turbo switch (a PrimitiveBoolean, off by default) picks lightx2v's 8-step LoRA or the
-    plain 20 steps; the plain branch is wired straight in and the LoRA goes, since its model card states no
-    license."""
+    The templates load an NVFP4 text encoder, which does not require Blackwell:
+    https://huggingface.co/Comfy-Org/MiniMax-H3. Freefield retains the int8 encoder reshoot already uses.
+    On Cloud9 gfx1103 the available NVFP4 path uses per-layer dequantization without native NVFP4 kernels;
+    NVFP4 speed, memory use and output quality remain unmeasured.
+    Their turbo switch (a PrimitiveBoolean, off by default) picks lightx2v's 8-step LoRA or the plain 20 steps;
+    the plain branch is wired straight in and the LoRA goes, since its model card states no license."""
     swap_files(api, {"qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"})
     turbo = find(api, "PrimitiveBoolean")
     switches = [i for i, n in api.items() if n["class_type"] == "ComfySwitchNode" and n["inputs"].get("switch") == [turbo, 0]]
@@ -677,6 +679,12 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     drop(u, find(u, "ImageCompare"))
     out["upscale"] = u
     out["upscale-video"] = tpl("utility_seedvr2_3b_int8_upscale_video.json")
+    for api in (out["upscale"], out["upscale-video"]):
+        vae = api[find(api, "VAELoader")]
+        vae["class_type"] = "VAELoaderKJ"
+        vae["inputs"].update(device="main_device", weight_dtype="fp16")
+        for tiled in ("VAEEncodeTiled", "VAEDecodeTiled"):
+            api[find(api, tiled)]["inputs"].update(tile_size=256, overlap=64)
 
     b = tpl("utility_birefnet_remove_background.json")
     to_save_image(b, find(b, "PreviewImage"), "freefield/remove-bg")
