@@ -4,7 +4,7 @@
 import { el, icon, store, toast, popover, closePopover, fmtSeconds, fmtShort, isMedia, extOf, masonry } from "./util.js";
 import { t } from "./i18n.js";
 import {
-  byId, layoutOf, familyOf, VIDEO_TABS, videoTabOf, tagline, iconOf, promptInput, estimate, fitOf, rememberApp, categoryOf, CATEGORIES, apps,
+  byId, layoutOf, familyOf, VIDEO_TABS, videoTabOf, tagline, iconOf, promptInput, estimate, fitOf, rememberApp, categoryOf, CATEGORIES, apps, maxUploadBodyBytes,
 } from "./catalog.js";
 import { exampleItem, thumb, hoverPlay, fullMedia, playWhenVisible, optionTile, optionThumb } from "./media.js";
 import { flags, flagButton } from "./flags.js";
@@ -56,6 +56,10 @@ function fileMatches(type, file) {
 function setFile(app, inp, file) {
   if (!fileMatches(inp.type, file)) {
     toast(`${inp.label}: ${file.name}?`, { error: true });
+    return false;
+  }
+  if (maxUploadBodyBytes && file.size > maxUploadBodyBytes) {
+    toast(t("ws.upload.toobig", { mib: maxUploadBodyBytes / 2 ** 20 }), { error: true });
     return false;
   }
   const maxMb = inp.limits?.max_mb;
@@ -427,6 +431,7 @@ function composerBar(app, rerenderBar) {
     hint,
     el("div", { class: "cmp-top" }, attach, prompt || el("div", { class: "cmp-prompt dim", style: { paddingTop: "16px" } }, app.summary)),
     el("div", { class: "cmp-row" }, ...chips, el("span", { class: "grow" }), countControl(f), gen),
+    mediaInputs.length && maxUploadBodyBytes ? el("p", { class: "faint", style: { margin: "0", padding: "0 16px 10px", fontSize: "12px" } }, t("ws.upload.budget", { mib: maxUploadBodyBytes / 2 ** 20 })) : null,
     ...Object.values(pickers));
   return bar;
 }
@@ -520,7 +525,7 @@ function dropzone(app, inp, rerender) {
   const x = f.files[inp.id];
   const input = el("input", { type: "file", accept: ACCEPT[inp.type], hidden: true });
   input.addEventListener("change", () => { if (input.files[0] && setFile(app, inp, input.files[0])) rerender(); input.value = ""; });
-  const limits = [inp.limits?.max_mb ? t("ws.drop.mb", { mb: inp.limits.max_mb }) : "", inp.limits?.seconds ? t("ws.drop.seconds", { a: inp.limits.seconds[0], b: inp.limits.seconds[1] }) : ""].filter(Boolean).join(" · ");
+  const limits = [inp.limits?.max_mb && (!maxUploadBodyBytes || inp.limits.max_mb * 1e6 < maxUploadBodyBytes) ? t("ws.drop.mb", { mb: inp.limits.max_mb }) : "", inp.limits?.seconds ? t("ws.drop.seconds", { a: inp.limits.seconds[0], b: inp.limits.seconds[1] }) : ""].filter(Boolean).join(" · ");
   let zone;
   if (!x) {
     zone = el("div", { class: "drop", role: "button", tabindex: "0", dataset: { slot: inp.id }, "aria-label": t("ws.add", { what: inp.label }),
@@ -658,7 +663,8 @@ function sidebarPanel(app, rerenderSide) {
 
   const scroll = el("div", { class: "side-scroll" }, card, modeSwitch(app), ...main, advanced);
   const note = el("p", { class: "side-note" }, !app.runnable ? (app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"))
-    : app.missing_pack ? t("ws.nopack", { pack: app.missing_pack }) : "");
+    : app.missing_pack ? t("ws.nopack", { pack: app.missing_pack })
+      : maxUploadBodyBytes && app.inputs.some((i) => isMedia(i.type)) ? t("ws.upload.budget", { mib: maxUploadBodyBytes / 2 ** 20 }) : "");
   ui.clearMissing = () => { scroll.querySelectorAll(".missing").forEach((n) => n.classList.remove("missing")); };
   ui.markMissing = (id) => {
     const n = ui.refs[id] || scroll.querySelector(`[data-slot="${id}"]`);

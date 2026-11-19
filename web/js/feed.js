@@ -2,8 +2,9 @@
 // drawn as result cards that keep their place (and their playing video) while others update.
 import { api, el, icon, fmtSeconds, masonry, toast, live } from "./util.js";
 import { t, ago } from "./i18n.js";
-import { byId, promptInput } from "./catalog.js";
+import { byId, promptInput, maxUploadBodyBytes } from "./catalog.js";
 import { entryItem, thumb, downloadName } from "./media.js";
+import { prepareUploadRequest, UploadBudgetError } from "./uploads.js";
 
 const TERMINAL = new Set(["succeeded", "failed", "canceled", "expired", "lost"]);
 export const isDone = (e) => TERMINAL.has(e.status);
@@ -48,7 +49,14 @@ class Feed {
     this.schedule();
   }
   async run(appId, formData) {
-    const entry = await api(`/api/apps/${appId}/run`, { method: "POST", body: formData });
+    let request;
+    try {
+      request = await prepareUploadRequest(new URL(`/api/apps/${appId}/run`, location.href), formData, maxUploadBodyBytes);
+    } catch (err) {
+      if (err instanceof UploadBudgetError) throw new Error(t("ws.upload.toobig", { mib: err.maxBodyBytes / 2 ** 20 }));
+      throw err;
+    }
+    const entry = await api(request);
     this.entries.set(entry.id, entry);
     this.emit();
     this.schedule();

@@ -28,6 +28,7 @@ import { explainSubmitError, InputError, resolveValues, Runner, type Values } fr
 import { History, replayValues } from "./history.ts";
 import { Flags } from "./flags.ts";
 import { DOOR_HTML, foreign, Guard, plainHttpToIp } from "./guard.ts";
+import { toRequest, uploadLimitBytes } from "./uploads.ts";
 
 const root = repoRoot();
 const { apps: catalog, problems } = loadRegistry(root);
@@ -50,7 +51,7 @@ const getRunner = () => (runner ??= new Runner());
 const draftsAllowed = process.env.FREEFIELD_DRAFTS === "1";
 const outDir = process.env.FREEFIELD_OUT || join(root, "out");
 const guard = Guard.fromEnv(join(outDir, "limits.json"));
-const maxUploadMb = Number(process.env.FREEFIELD_MAX_UPLOAD_MB || (guard.hosted ? 100 : 0));
+const maxUploadBodyBytes = uploadLimitBytes(process.env.FREEFIELD_MAX_UPLOAD_MB, guard.hosted);
 const port = Number(process.env.PORT ?? 3000);
 const host = process.env.FREEFIELD_HOST || "127.0.0.1";
 const origins = {
@@ -191,21 +192,6 @@ function sendFile(req: IncomingMessage, res: ServerResponse, file: string, cache
   return createReadStream(file).pipe(res);
 }
 
-async function toRequest(req: IncomingMessage): Promise<Request> {
-  const chunks: Buffer[] = [];
-  let size = 0;
-  for await (const c of req) {
-    size += (c as Buffer).byteLength;
-    if (maxUploadMb && size > maxUploadMb * 2 ** 20) throw new InputError(`uploads are limited to ${maxUploadMb} MB here`);
-    chunks.push(c as Buffer);
-  }
-  return new Request(`http://local${req.url}`, {
-    method: req.method,
-    headers: req.headers as Record<string, string>,
-    body: chunks.length ? Buffer.concat(chunks) : undefined,
-  });
-}
-
 async function readValues(app: App, request: Request): Promise<{ values: Values; preset?: string }> {
   const form = await request.formData();
   const values: Values = {};
@@ -332,7 +318,7 @@ const server = createServer(async (req, res) => {
         const examples = loadExamples();
         const files = await installedFiles();
         return send(res, 200, { apps: sorted.map((a) => ({ ...publicApp(a, files), example: examples[a.id] ?? null })), drafts: draftsAllowed,
-          hosted: guard.hosted });
+          hosted: guard.hosted, upload: { max_body_bytes: maxUploadBodyBytes } });
       }
       if (req.method === "GET" && area === "apps" && sub === "workflow") {
         // the app's ComfyUI workflow (API format) as a file: drag it onto ComfyUI's canvas to open the app as nodes
@@ -355,7 +341,7 @@ const server = createServer(async (req, res) => {
         admitting++;
         let view;
         try {
-          const { values, preset } = await readValues(app, await toRequest(req));
+          const { values, preset } = await readValues(app, await toRequest(req, maxUploadBodyBytes));
           view = startRun(app, resolveValues(app, values), preset, me);
         } finally {
           admitting--;
@@ -393,7 +379,7 @@ const server = createServer(async (req, res) => {
         if (req.method === "GET") return send(res, 200, { mediocre: flags.list() });
         if (req.method === "POST") {
           if (guard.hosted) return send(res, 403, { error: "lab marks are read-only on the hosted demo" });
-          const body = await (await toRequest(req)).json().catch(() => null) as { key?: unknown; mediocre?: unknown; note?: unknown } | null;
+          const body = await (await toRequest(req, maxUploadBodyBytes)).json().catch(() => null) as { key?: unknown; mediocre?: unknown; note?: unknown } | null;
           if (!body || typeof body.key !== "string" || typeof body.mediocre !== "boolean") throw new InputError("expected JSON { key, mediocre, note? }");
           try {
             return send(res, 200, { mediocre: flags.set(body.key, body.mediocre, typeof body.note === "string" ? body.note : undefined) });
