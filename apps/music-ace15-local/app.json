@@ -10,7 +10,7 @@
   "source": {
     "template": "audio_ace_step_1_5_split.json",
     "comfyui": "0.45.0",
-    "notes": "Based on official Comfy-Org split workflow and directly supported ComfyUI core nodes; avoids separate audio server. Draft until a full live E2E generation on AMD gfx1103 passes; available first-party models total 10GB. Tuned for 8-step Turbo and 1.7B music planner, no artificial duration or lyrics length restriction."
+    "notes": "Native ComfyUI split nodes on AMD Radeon 780M. A 20s/8-step instrumental with LM disabled succeeded directly (MP3 48kHz stereo mean -14.7 dB, 52.2s); a second Freefield CLI E2E at similar settings triggered host memory guard at 14:26:29 CET. The original 5s/4step no-LM preset was near silent, and LM-on also triggered the guard. Draft until safe repeatable E2E; keep guard unchanged. Optional LM-on unqualified. Avoid implying long-duration quality or memory headroom."
   },
   "inputs": [
     {
@@ -475,8 +475,8 @@
       "id": "generate_audio_codes",
       "type": "toggle",
       "label": "Planification musicale IA (qualité)",
-      "default": true,
-      "help": "Le planificateur Qwen 1,7B améliore la qualité mais exige beaucoup de RAM/CPU (non certifié sur Radeon 780M). Le mode sans planificateur est plus rapide, mais un essai court de 5s a donné un son quasi inaudible. Fonction non validée : ne pas activer ce brouillon avant qualification.",
+      "default": false,
+      "help": "Brouillon : le mode direct (sans planificateur) a genere un MP3 audible de 20 s a 8 etapes, mais une seconde tentative a declenche la protection memoire. Le mode IA Qwen consomme davantage. Non valide pour la production.",
       "bind": [
         {
           "node": "4",
@@ -564,12 +564,12 @@
   "test": {
     "style": "Soft 1970s French jazz instrumental, piano trio, no vocals",
     "lyrics": "",
-    "duration": 3,
-    "steps": 4,
+    "duration": 20,
+    "steps": 8,
     "bpm": 110,
     "language": "fr",
     "keyscale": "C major",
     "seed": 20261119,
-    "generate_audio_codes": true
+    "generate_audio_codes": false
   }
 }

@@ -9,7 +9,7 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   const music = apps.find((a) => a.id === "music-ace15-local");
   assert.ok(music, "missing low-memory native music app");
   assert.equal(music.pack, "audio-ace15");
-  assert.equal(music.status, "draft", "new model must pass hardware E2E before production");
+  assert.equal(music.status, "draft", "audible MP3 achieved but second E2E triggered host memory pressure; do not expose");
   assert.equal(music.graph?.["1"]?.class_type, "UNETLoader");
   assert.equal(music.graph?.["1"]?.inputs?.unet_name, "acestep_v1.5_turbo.safetensors");
   assert.equal(music.graph?.["2"]?.class_type, "DualCLIPLoader");
@@ -21,8 +21,9 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   assert.equal(music.graph?.["11"]?.class_type, "SaveAudioMP3");
   assert.equal(music.outputs[0]?.node, "11");
   assert.equal(music.inputs.find((i) => i.id === "duration")?.max, 1000, "do not add a needless short duration cap");
-  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, true, "retain quality mode as default; ACE remains draft until audible E2E");
-  assert.equal(music.graph?.["4"]?.inputs?.generate_audio_codes, true);
+  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, false, "use the validated audible 20-second LM-off path; LM-on exceeded host guard");
+  assert.equal(music.graph?.["4"]?.inputs?.generate_audio_codes, false);
+  assert.deepEqual([music.test?.duration, music.test?.steps, music.test?.generate_audio_codes], [20, 8, false]);
   assert.ok((music.inputs.find((i) => i.id === "language")?.options?.length ?? 0) >= 50);
   assert.equal(music.models.length, 4);
   assert.equal(music.models.every((m) => m.license === "Apache-2.0"), true);
