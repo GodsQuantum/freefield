@@ -21,8 +21,8 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   assert.equal(music.graph?.["11"]?.class_type, "SaveAudioMP3");
   assert.equal(music.outputs[0]?.node, "11");
   assert.equal(music.inputs.find((i) => i.id === "duration")?.max, 1000, "do not add a needless short duration cap");
-  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, false, "LM is opt-in to preserve AMD system RAM");
-  assert.equal(music.graph?.["4"]?.inputs?.generate_audio_codes, false);
+  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, true, "retain quality mode as default; ACE remains draft until audible E2E");
+  assert.equal(music.graph?.["4"]?.inputs?.generate_audio_codes, true);
   assert.ok((music.inputs.find((i) => i.id === "language")?.options?.length ?? 0) >= 50);
   assert.equal(music.models.length, 4);
   assert.equal(music.models.every((m) => m.license === "Apache-2.0"), true);

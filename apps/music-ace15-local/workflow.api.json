@@ -36,7 +36,7 @@
       "timesignature": "4",
       "language": "fr",
       "keyscale": "C major",
-      "generate_audio_codes": false,
+      "generate_audio_codes": true,
       "cfg_scale": 2.0,
       "temperature": 0.85,
       "top_p": 0.9,
