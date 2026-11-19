@@ -41,3 +41,13 @@ test("Wan 2.2 5B Q6 local draft reuses the shared UMT5 encoder and Wan 2.2 VAE",
   assert.ok(wan.models.some((m) => m.file.endsWith("umt5_xxl_fp8_e4m3fn_scaled.safetensors")));
   assert.equal(problems.some((p) => p.app === wan.id && p.severity === "error"), false);
 });
+
+test("direct SFX does not require the optional Qwen prompt model by default", () => {
+  const sfx = apps.find((a) => a.id === "sfx");
+  assert.ok(sfx);
+  const promptExpand = sfx.inputs.find((i) => i.id === "reprompt");
+  assert.equal(promptExpand?.default, false);
+  assert.equal(sfx.graph?.["52:35"]?.inputs?.value, false);
+  assert.equal(sfx.graph?.["52:34"]?.class_type, "ComfySwitchNode");
+  assert.ok(sfx.models.some((m) => m.file.endsWith("qwen3.5_2b_bf16.safetensors") && m.optional));
+});

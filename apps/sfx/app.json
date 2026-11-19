@@ -75,8 +75,8 @@
       "id": "reprompt",
       "type": "toggle",
       "label": "Expand description",
-      "default": true,
-      "help": "A small Qwen 3.5 model rewrites the description first",
+      "default": false,
+      "help": "AI rewrite uses an optional Qwen3.5-2B model (~4.55GB) not included in the basic Sound Effects pack. Leave off for fast direct prompts; switch on only after downloading the optional model.",
       "bind": [
         {
           "node": "52:35",
