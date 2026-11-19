@@ -7,9 +7,14 @@
     "whats-next",
     "zooms"
   ],
-  "download_gb": 31.69,
+  "download_gb": 45.84,
   "needs_hf_token": false,
-  "custom_nodes": [],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
   "models": [
     {
       "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
@@ -20,11 +25,8 @@
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
-        "angles",
         "relight",
-        "shots",
-        "whats-next",
-        "zooms"
+        "whats-next"
       ]
     },
     {
@@ -36,11 +38,8 @@
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
-        "angles",
         "relight",
-        "shots",
-        "whats-next",
-        "zooms"
+        "whats-next"
       ]
     },
     {
@@ -56,6 +55,20 @@
       ]
     },
     {
+      "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+      "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "dir": "loras",
+      "gb": 0.85,
+      "name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "angles",
+        "shots",
+        "zooms"
+      ]
+    },
+    {
       "repo": "lovis93/next-scene-qwen-image-lora-2509",
       "file": "next-scene_lora-v2-3000.safetensors",
       "dir": "loras",
@@ -68,11 +81,11 @@
       ]
     },
     {
-      "repo": "dx8152/Qwen-Edit-2509-Multiple-angles",
-      "file": "镜头转换.safetensors",
+      "repo": "fal/Qwen-Image-Edit-2511-Multiple-Angles-LoRA",
+      "file": "qwen-image-edit-2511-multiple-angles-lora.safetensors",
       "dir": "loras",
-      "gb": 0.24,
-      "name": "镜头转换.safetensors",
+      "gb": 0.3,
+      "name": "qwen-image-edit-2511-multiple-angles-lora.safetensors",
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
@@ -94,6 +107,20 @@
         "relight",
         "shots",
         "whats-next",
+        "zooms"
+      ]
+    },
+    {
+      "repo": "unsloth/Qwen-Image-Edit-2511-GGUF",
+      "file": "qwen-image-edit-2511-Q4_K_M.gguf",
+      "dir": "unet_gguf",
+      "gb": 13.24,
+      "name": "qwen-image-edit-2511-Q4_K_M.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "angles",
+        "shots",
         "zooms"
       ]
     },

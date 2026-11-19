@@ -6,9 +6,9 @@ activations are **not** included. Local target: one 24 GB card (RTX 3090 Ti) kee
 When two apps run back to back with different models, the gateway asks ComfyUI to unload everything first
 (`POST /free`), so the previous app never stays in VRAM.
 
-*Measured* is the peak VRAM of the app's lab example as published in the web UI, and the GPU it ran on. On an
-80 GB H100 ComfyUI can keep models of earlier steps loaded instead of offloading them, so a peak measured there
-is not the least the app needs.
+*Measured* records historical lab peaks on the GPU shown. Workflows without a matching measurement show
+`not measured`. The original results remain in [the lab example index](../web/examples/index.json).
+On an 80 GB H100, ComfyUI can keep models from earlier phases loaded, so measured peaks vary by device and offloading policy.
 
 | App | Status | Whole | Largest phase | Biggest file | Verdict on 24 GB | Modal GPU | Measured |
 |---|---|---:|---|---|---|---|---:|
@@ -18,6 +18,8 @@ is not the least the app needs.
 | `depth-map` | ready | 0.7 GB | encode 0.7 GB | moge_2_vitl_normal_fp16.safetensors (0.7) | fits whole | L4 / A10G (24 GB) | 6.6 GB (H100) |
 | `upscale` | ready | 4.0 GB | denoise 3.5 GB | seedvr2_3b_int8_convrot.safetensors (3.5) | fits whole | L4 / A10G (24 GB) | 6.5 GB (H100) |
 | `upscale-video` | ready | 4.0 GB | denoise 3.5 GB | seedvr2_3b_int8_convrot.safetensors (3.5) | fits whole | L4 / A10G (24 GB) | 26.1 GB (L40S) |
+| `flux3-klein-local` | ready | 8.3 GB | denoise 4.5 GB | flux-3-image-klein-UD-Q5_K_XL.gguf (4.5) | fits whole | L4 / A10G (24 GB) | not measured |
+| `music-ace15-local` | ready | 10.0 GB | encode 4.9 GB | acestep_v1.5_turbo.safetensors (4.8) | fits whole | L4 / A10G (24 GB) | not measured |
 | `ai-influencer` | ready | 11.0 GB | denoise 5.8 GB | flux3-image-klein-int8-convrot.safetensors (5.8) | fits whole | L4 / A10G (24 GB) | 9.9 GB (L40S) |
 | `ai-influencer-photo` | ready | 11.0 GB | denoise 5.8 GB | flux3-image-klein-int8-convrot.safetensors (5.8) | fits whole | L4 / A10G (24 GB) | 12.2 GB (L40S) |
 | `billboard` | ready | 11.0 GB | denoise 5.8 GB | flux3-image-klein-int8-convrot.safetensors (5.8) | fits whole | L4 / A10G (24 GB) | 11.3 GB (H100) |
@@ -76,12 +78,17 @@ is not the least the app needs.
 | `ugc-shot` | ready | 11.0 GB | denoise 5.8 GB | flux3-image-klein-int8-convrot.safetensors (5.8) | fits whole | L4 / A10G (24 GB) | 27.9 GB (H100) |
 | `victory-card` | ready | 11.0 GB | denoise 5.8 GB | flux3-image-klein-int8-convrot.safetensors (5.8) | fits whole | L4 / A10G (24 GB) | 11.3 GB (H100) |
 | `z-image` | ready | 12.2 GB | denoise 6.2 GB | z_image_turbo_int8_convrot.safetensors (6.2) | fits whole | L4 / A10G (24 GB) | 12.6 GB (H100) |
-| `moss-image` | draft | 13.0 GB | encode 7.3 GB | qwen3.5_9b_w4a8_gptq.safetensors (7.3) | fits whole | L4 / A10G (24 GB) | 13.0 GB (L40S) |
+| `wan22-5b-i2v-local` | ready | 12.4 GB | encode 6.7 GB | umt5_xxl_fp8_e4m3fn_scaled.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | not measured |
+| `wan22-5b-local` | ready | 12.4 GB | encode 6.7 GB | umt5_xxl_fp8_e4m3fn_scaled.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | not measured |
+| `moss-image` | ready | 13.0 GB | encode 7.3 GB | qwen3.5_9b_w4a8_gptq.safetensors (7.3) | fits whole | L4 / A10G (24 GB) | 13.0 GB (L40S) |
 | `music` | ready | 14.3 GB | encode 9.2 GB | minimax_music3_text_encoder_pruned_int8_convrot.safetensors (9.2) | fits whole | L4 / A10G (24 GB) | 37.1 GB (L40S) |
 | `sfx` | ready | 10.4 GB (+4.5 optional) | encode 10.4 GB | stable_audio_3_medium.safetensors (9.2) | fits whole | L4 / A10G (24 GB) | 9.2 GB (L40S) |
 | `create-image` | ready | 17.8 GB | encode 11.6 GB | qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | 15.4 GB (L40S) |
-| `style-reference` | ready | 19.4 GB | denoise 13.9 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | 19.8 GB (L40S) |
-| `styles` | ready | 19.4 GB (+3.8 optional) | denoise 14.0 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | 19.5 GB (L40S) |
+| `style-reference` | ready | 19.1 GB | denoise 13.9 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | not measured |
+| `styles` | ready | 19.1 GB (+3.8 optional) | denoise 14.0 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | not measured |
+| `angles` | ready | 24.0 GB | denoise 14.4 GB | qwen-image-edit-2511-Q4_K_M.gguf (13.2) | fits by phases | L4 / A10G (24 GB) | not measured |
+| `shots` | ready | 24.0 GB | denoise 14.4 GB | qwen-image-edit-2511-Q4_K_M.gguf (13.2) | fits by phases | L4 / A10G (24 GB) | not measured |
+| `zooms` | ready | 24.0 GB | denoise 14.4 GB | qwen-image-edit-2511-Q4_K_M.gguf (13.2) | fits by phases | L4 / A10G (24 GB) | not measured |
 | `camera-moves` | ready | 37.6 GB (+2.5 optional) | denoise 15.3 GB | wan2.2_fun_camera_high_noise_14B_fp8_scaled.safetensors (15.3) | fits by phases | L4 / A10G (24 GB) | 41.3 GB (L40S) |
 | `bullet-time-scene` | ready | 24.6 GB (+1.1 optional) | denoise 16.4 GB | wan2.1_i2v_480p_14B_fp8_scaled.safetensors (16.4) | fits by phases | L4 / A10G (24 GB) | 30.8 GB (H100) |
 | `motion-transfer` | ready | 24.9 GB | denoise 16.6 GB | wan_animate_2_distill_int8_convrot.safetensors (16.6) | fits by phases | L4 / A10G (24 GB) | 37.3 GB (L40S) |
@@ -103,10 +110,7 @@ is not the least the app needs.
 | `truck-ad` | ready | 39.7 GB (+5.2 optional) | denoise 21.5 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 41.8 GB (H100) |
 | `video` | ready | 39.7 GB (+5.2 optional) | denoise 21.5 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 41.8 GB (H100) |
 | `video-t2v` | ready | 39.7 GB (+5.2 optional) | denoise 21.5 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 48.4 GB (H100) |
-| `angles` | ready | 31.1 GB | denoise 21.5 GB | qwen_image_edit_2509_fp8_e4m3fn.safetensors (20.4) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 38.2 GB (H100) |
 | `relight` | ready | 31.1 GB | denoise 21.5 GB | qwen_image_edit_2509_fp8_e4m3fn.safetensors (20.4) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 33.0 GB (H100) |
-| `shots` | ready | 31.1 GB | denoise 21.5 GB | qwen_image_edit_2509_fp8_e4m3fn.safetensors (20.4) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 38.2 GB (H100) |
-| `zooms` | ready | 31.1 GB | denoise 21.5 GB | qwen_image_edit_2509_fp8_e4m3fn.safetensors (20.4) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 29.3 GB (H100) |
 | `whats-next` | ready | 31.2 GB | denoise 21.6 GB | qwen_image_edit_2509_fp8_e4m3fn.safetensors (20.4) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 28.7 GB (L40S) |
 | `vfx-clean-plate` | ready | 39.0 GB (+5.2 optional) | denoise 21.8 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 40.6 GB (L40S) |
 | `vfx-day-to-night` | ready | 39.0 GB (+5.2 optional) | denoise 21.8 GB | ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (21.5) | tight (by phases) | test on L4 / A10G; L40S (48 GB) is comfortable | 44.0 GB (L40S) |

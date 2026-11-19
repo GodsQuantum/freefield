@@ -1,6 +1,7 @@
 {
   "pack": "video-wan22-5b-gguf",
   "apps": [
+    "wan22-5b-i2v-local",
     "wan22-5b-local"
   ],
   "download_gb": 12.36,
@@ -13,18 +14,6 @@
   ],
   "models": [
     {
-      "repo": "QuantStack/Wan2.2-TI2V-5B-GGUF",
-      "file": "Wan2.2-TI2V-5B-Q6_K.gguf",
-      "dir": "unet_gguf",
-      "gb": 4.21,
-      "name": "Wan2.2-TI2V-5B-Q6_K.gguf",
-      "gated": false,
-      "license": "Apache-2.0",
-      "used_by": [
-        "wan22-5b-local"
-      ]
-    },
-    {
       "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
       "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
       "dir": "text_encoders",
@@ -33,6 +22,20 @@
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
+        "wan22-5b-i2v-local",
+        "wan22-5b-local"
+      ]
+    },
+    {
+      "repo": "QuantStack/Wan2.2-TI2V-5B-GGUF",
+      "file": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "dir": "unet_gguf",
+      "gb": 4.21,
+      "name": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "wan22-5b-i2v-local",
         "wan22-5b-local"
       ]
     },
@@ -45,6 +48,7 @@
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
+        "wan22-5b-i2v-local",
         "wan22-5b-local"
       ]
     }

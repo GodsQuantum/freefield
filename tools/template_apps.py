@@ -14,7 +14,7 @@ these bases, all workflows built by tools/build_apps.py:
              with the second image as its only reference (with both, it copied the first face back)
   z-image    Z-Image Turbo (apps/z-image), text to image
   video      LTX-2.5 image-to-video (apps/video), with its own audio
-  qwen-edit  Qwen-Image-Edit-2509 (apps/relight) with a different LoRA: Multiple Angles or next-scene
+  qwen-edit  Qwen Image Edit camera templates: 2511 GGUF + fal for angles, 2509 + lovis93 for next-scene
   morph      FLUX 3 Klein draws the last frame from the photo and LTX-2.5 + the transition LoRA moves
              the photo into it (apps/morph): for clips where the scene must change around a subject
              that has to stay the same (a face, a product); "klein" is that fixed instruction
@@ -70,10 +70,15 @@ BULLET_TRIGGER = "rw360xz，人物定在空中，相机视角围绕人物向一�
 FACE_MODEL = {"repo": "Comfy-Org/mediapipe", "file": "detection/mediapipe_face_fp32.safetensors", "dir": "detection", "gb": 0.01, "phase": "encode",
               "license": "Apache-2.0"}
 
+QWEN_2511_GGUF = {"repo": "unsloth/Qwen-Image-Edit-2511-GGUF", "file": "qwen-image-edit-2511-Q4_K_M.gguf",
+                  "dir": "unet_gguf", "gb": 13.24, "phase": "denoise", "license": "Apache-2.0"}
+QWEN_2511_LIGHTNING = {"repo": "lightx2v/Qwen-Image-Edit-2511-Lightning", "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+                      "dir": "loras", "gb": 0.85, "phase": "denoise", "license": "Apache-2.0"}
+
 # LoRAs the qwen-edit templates load instead of Relight (file name as ComfyUI sees it)
 QWEN_LORAS = {
-    "angles": {"repo": "dx8152/Qwen-Edit-2509-Multiple-angles", "file": "镜头转换.safetensors", "gb": 0.24, "license": "Apache-2.0",
-               "credit": "Multiple Angles LoRA by dx8152 (Apache-2.0)"},
+    "angles": {"repo": "fal/Qwen-Image-Edit-2511-Multiple-Angles-LoRA", "file": "qwen-image-edit-2511-multiple-angles-lora.safetensors",
+               "gb": 0.30, "license": "Apache-2.0", "credit": "Qwen Image Edit 2511 Multiple Angles LoRA by fal (Apache-2.0)"},
     "next-scene": {"repo": "lovis93/next-scene-qwen-image-lora-2509", "file": "next-scene_lora-v2-3000.safetensors", "gb": 0.3, "license": "MIT",
                    "credit": "next-scene LoRA v2 by lovis93 (MIT)"},
 }
@@ -664,7 +669,30 @@ A("bullet-time-splash", "Bullet Time Splash", "Bullet Time Splash", "camera", "e
         "same place and light. Keep the face, hair and outfit identical.")
 
 
-# ---------------------------------------------------------------- camera LoRAs on Qwen-Image-Edit-2509 (the relight pipeline, other LoRA)
+# Keep the original option values for saved jobs and send fal's <sks> pose syntax to the model.
+QWEN_2511_POSES = {
+    "Move forward": "front view eye-level shot close-up. Move the camera forward.",
+    "Move back": "front view eye-level shot wide shot. Move the camera backward.",
+    "Move left": "front-left quarter view eye-level shot medium shot. Translate the camera left.",
+    "Move right": "front-right quarter view eye-level shot medium shot. Translate the camera right.",
+    "Move up": "front view elevated shot medium shot. Raise the camera.",
+    "Move down": "front view low-angle shot medium shot. Lower the camera.",
+    "Rotate 45° left": "front-left quarter view eye-level shot medium shot.",
+    "Rotate 45° right": "front-right quarter view eye-level shot medium shot.",
+    "Top-down view": "front view high-angle shot medium shot. Look straight down from overhead.",
+    "Top-down": "front view high-angle shot medium shot. Frame the scene directly from overhead.",
+    "Low angle": "front view low-angle shot medium shot.",
+    "Wide-angle": "front view eye-level shot wide shot. Use a wide-angle lens.",
+    "Close-up": "front view eye-level shot close-up.",
+    "Extreme close-up": "front view eye-level shot close-up. Frame only the closest detail.",
+    "Rotate 90° left": "left side view eye-level shot medium shot.",
+    "From behind": "back view eye-level shot medium shot.",
+    "Much wider": "front view eye-level shot wide shot. Pull much farther back with a wide-angle lens.",
+    "Wider": "front view eye-level shot wide shot. Pull the camera back slightly.",
+    "Closer": "front view eye-level shot medium shot. Move the camera a little closer.",
+}
+
+# ---------------------------------------------------------------- camera LoRAs on Qwen Image Edit
 MOVES = [("Move forward", "将镜头向前移动 Move the camera forward."), ("Move back", "将镜头向后移动 Move the camera backward."),
          ("Move left", "将镜头向左移动 Move the camera left."), ("Move right", "将镜头向右移动 Move the camera right."),
          ("Move up", "将镜头向上移动 Move the camera up."), ("Move down", "将镜头向下移动 Move the camera down."),
@@ -750,6 +778,14 @@ def manifest(t: dict) -> dict:
     inputs += t["inputs"]
     # the default "" matters: an optional input with no value is skipped everywhere, and the template with it
     binds = [{"node": base["prompt"][0], "field": base["prompt"][1], "template": t["prompt"] + " {details}"}]
+    if t["lora"] == "angles":
+        selector = t["inputs"][0]
+        inputs[-1] = {**selector, "options": [
+            {**o, "sets": [{"node": base["prompt"][0], "field": base["prompt"][1],
+                            "value": f"<sks> {QWEN_2511_POSES[o['label']]} {{details}}"}]}
+            for o in selector["options"]
+        ]}
+        binds = []  # Each pose supplies the prompt and applies Extra direction as part of its option.
     if t["klein"] and re.search(r"\{[a-z]", t["klein"]):   # the Klein instruction takes the template's own inputs too
         binds.append({"node": base["klein"][0], "field": base["klein"][1], "template": t["klein"]})
     # sidebar: a one-line field, so a text-to-image template with many selects opens with its controls in a side column
@@ -794,7 +830,13 @@ def manifest(t: dict) -> dict:
         models = [m for m in models if "Relight" not in m["file"]] + [{"repo": lora["repo"], "file": lora["file"], "dir": "loras", "gb": lora["gb"], "phase": "denoise", "license": lora["license"]}]
         credits = [c for c in credits if "Relight" not in c]
         credits.insert(1, lora["credit"])
-        notes += f" with {lora['file']} in place of the Relight LoRA and no Relight trigger"
+        if t["lora"] == "angles":
+            models = [m for m in models if m["dir"] != "diffusion_models" and "2509-Lightning" not in m["file"]]
+            models = [QWEN_2511_GGUF, QWEN_2511_LIGHTNING, *models]
+            credits = [c.replace("Qwen-Image-Edit-2509", "Qwen-Image-Edit-2511") for c in credits]
+            notes += " with Unsloth Qwen Image Edit 2511 Q4_K_M, Lightning 2511 and fal's <sks> Multiple Angles LoRA"
+        else:
+            notes += f" with {lora['file']} in place of the Relight LoRA and no Relight trigger"
     notes += "; the prompt below is fixed and \"Extra direction\" is appended to it."
     return {
         "$schema": "../../schema/app.schema.json",
@@ -808,6 +850,8 @@ def manifest(t: dict) -> dict:
         "inputs": inputs,
         "outputs": [{**base["output"], "label": "Result"}],
         "models": models,
+        **({"custom_nodes": [{"repo": "https://github.com/city96/ComfyUI-GGUF", "commit": "6ea2651"}],
+            "vram": {"peak_gb": None}} if t["lora"] == "angles" else {}),
         "credits": credits,
         "test": test,
     }
@@ -889,6 +933,13 @@ def workflow(t: dict) -> dict:
     if t["lora"]:   # the relight pipeline with another LoRA; node 14 prepends the Relight trigger, so it is blanked
         api["10:118"]["inputs"]["lora_name"] = QWEN_LORAS[t["lora"]]["file"]
         api["14"]["inputs"]["string_a"] = ""
+    if t["lora"] == "angles":
+        api["10:37"] = {"class_type": "UnetLoaderGGUF", "inputs": {"unet_name": QWEN_2511_GGUF["file"]},
+                        "_meta": {"title": "Load Qwen Image Edit 2511 GGUF"}}
+        api["10:89"]["inputs"]["lora_name"] = QWEN_2511_LIGHTNING["file"]
+        selector = t["inputs"][0]
+        pose = next(o["label"] for o in selector["options"] if o["value"] == selector["default"])
+        api["15"]["inputs"]["value"] = f"<sks> {QWEN_2511_POSES[pose]}"
     for n in api.values():
         if n["class_type"] == "SaveImage" or n["class_type"] == "SaveVideo" or n["class_type"] == "CreateVideo":
             if "filename_prefix" in n["inputs"]:
@@ -934,6 +985,8 @@ def readme() -> str:
     for t in T:
         ins = [x.lower() for x in (t["image_label"], t["image2_label"]) if x] + [i["label"].lower() for i in t["inputs"]]
         base = BASES[t["base"]]["app"] + (f" + {QWEN_LORAS[t['lora']]['repo'].split('/')[1]}" if t["lora"] else "")
+        if t["lora"] == "angles":
+            base = "Qwen-Image-Edit-2511 GGUF + fal Multiple Angles"
         base = "edit + effects" if t["base"] == "effect-klein" else base
         rows.append(f"| `{t['id']}` | {t['feature']} | `{base}` | {', '.join(ins)} |")
     return "\n".join(rows)

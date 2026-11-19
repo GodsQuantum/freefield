@@ -105,7 +105,7 @@
       "style-reference",
       "styles"
     ],
-    "download_gb": 23.67,
+    "download_gb": 23.29,
     "needs_hf_token": false
   },
   "image-moss": {
@@ -123,7 +123,7 @@
       "whats-next",
       "zooms"
     ],
-    "download_gb": 31.69,
+    "download_gb": 45.84,
     "needs_hf_token": false
   },
   "upscale": {
@@ -219,6 +219,7 @@
   },
   "video-wan22-5b-gguf": {
     "apps": [
+      "wan22-5b-i2v-local",
       "wan22-5b-local"
     ],
     "download_gb": 12.36,

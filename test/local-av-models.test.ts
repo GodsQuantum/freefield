@@ -9,7 +9,7 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   const music = apps.find((a) => a.id === "music-ace15-local");
   assert.ok(music, "missing low-memory native music app");
   assert.equal(music.pack, "audio-ace15");
-  assert.equal(music.status, "draft", "audible MP3 achieved but second E2E triggered host memory pressure; do not expose");
+  assert.equal(music.status, "ready", "30-second tiled decode passed the actual Freefield CLI without a memory-guard trip");
   assert.equal(music.graph?.["1"]?.class_type, "UNETLoader");
   assert.equal(music.graph?.["1"]?.inputs?.unet_name, "acestep_v1.5_turbo.safetensors");
   assert.equal(music.graph?.["2"]?.class_type, "DualCLIPLoader");
@@ -18,12 +18,15 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   assert.equal(music.graph?.["2"]?.inputs?.type, "ace");
   assert.equal(music.graph?.["7"]?.class_type, "ModelSamplingAuraFlow");
   assert.deepEqual(music.graph?.["8"]?.inputs?.model, ["7", 0]);
+  assert.equal(music.graph?.["9"]?.class_type, "VAEDecodeAudioTiled");
+  assert.deepEqual([music.graph?.["9"]?.inputs?.tile_size, music.graph?.["9"]?.inputs?.overlap], [128, 32], "preserve the validated bounded audio decoder");
+  assert.deepEqual(music.graph?.["11"]?.inputs?.audio, ["9", 0]);
   assert.equal(music.graph?.["11"]?.class_type, "SaveAudioMP3");
   assert.equal(music.outputs[0]?.node, "11");
   assert.equal(music.inputs.find((i) => i.id === "duration")?.max, 1000, "do not add a needless short duration cap");
-  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, false, "use the validated audible 20-second LM-off path; LM-on exceeded host guard");
+  assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, false, "use the validated 30-second direct-conditioning path; the musical planner remains optional");
   assert.equal(music.graph?.["4"]?.inputs?.generate_audio_codes, false);
-  assert.deepEqual([music.test?.duration, music.test?.steps, music.test?.generate_audio_codes], [20, 8, false]);
+  assert.deepEqual([music.test?.duration, music.test?.steps, music.test?.generate_audio_codes], [30, 8, false]);
   assert.ok((music.inputs.find((i) => i.id === "language")?.options?.length ?? 0) >= 50);
   assert.equal(music.models.length, 4);
   assert.equal(music.models.every((m) => m.license === "Apache-2.0"), true);

@@ -46,13 +46,12 @@
     }
   },
   "10:37": {
-    "class_type": "UNETLoader",
+    "class_type": "UnetLoaderGGUF",
     "inputs": {
-      "unet_name": "qwen_image_edit_2509_fp8_e4m3fn.safetensors",
-      "weight_dtype": "default"
+      "unet_name": "qwen-image-edit-2511-Q4_K_M.gguf"
     },
     "_meta": {
-      "title": "Load Diffusion Model"
+      "title": "Load Qwen Image Edit 2511 GGUF"
     }
   },
   "10:38": {
@@ -125,7 +124,7 @@
         "10:37",
         0
       ],
-      "lora_name": "Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors",
+      "lora_name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
       "strength_model": 1
     },
     "_meta": {
@@ -196,7 +195,7 @@
         "10:89",
         0
       ],
-      "lora_name": "镜头转换.safetensors",
+      "lora_name": "qwen-image-edit-2511-multiple-angles-lora.safetensors",
       "strength_model": 1
     },
     "_meta": {
@@ -242,7 +241,7 @@
   "15": {
     "class_type": "PrimitiveStringMultiline",
     "inputs": {
-      "value": " relight the image using twilight light (with a warm color temperature, soft light, and blurred shadows)"
+      "value": "<sks> front-left quarter view eye-level shot medium shot."
     },
     "_meta": {
       "title": "Prompt"

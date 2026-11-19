@@ -11,7 +11,7 @@
   "source": {
     "template": "image_qwen_image_edit_2509_relight.json",
     "comfyui": "0.42.0",
-    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with 镜头转换.safetensors in place of the Relight LoRA and no Relight trigger; the prompt below is fixed and \"Extra direction\" is appended to it."
+    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with Unsloth Qwen Image Edit 2511 Q4_K_M, Lightning 2511 and fal's <sks> Multiple Angles LoRA; the prompt below is fixed and \"Extra direction\" is appended to it."
   },
   "inputs": [
     {
@@ -37,23 +37,58 @@
       "options": [
         {
           "value": "将镜头大幅向后移动并转为广角镜头 Move the camera far back and turn it to a wide-angle lens.",
-          "label": "Much wider"
+          "label": "Much wider",
+          "sets": [
+            {
+              "node": "15",
+              "field": "value",
+              "value": "<sks> front view eye-level shot wide shot. Pull much farther back with a wide-angle lens. {details}"
+            }
+          ]
         },
         {
           "value": "将镜头向后移动 Move the camera backward.",
-          "label": "Wider"
+          "label": "Wider",
+          "sets": [
+            {
+              "node": "15",
+              "field": "value",
+              "value": "<sks> front view eye-level shot wide shot. Pull the camera back slightly. {details}"
+            }
+          ]
         },
         {
           "value": "将镜头向前移动 Move the camera forward.",
-          "label": "Closer"
+          "label": "Closer",
+          "sets": [
+            {
+              "node": "15",
+              "field": "value",
+              "value": "<sks> front view eye-level shot medium shot. Move the camera a little closer. {details}"
+            }
+          ]
         },
         {
           "value": "将镜头转为特写镜头 Turn the camera to a close-up.",
-          "label": "Close-up"
+          "label": "Close-up",
+          "sets": [
+            {
+              "node": "15",
+              "field": "value",
+              "value": "<sks> front view eye-level shot close-up. {details}"
+            }
+          ]
         },
         {
           "value": "将镜头转为极特写镜头 Turn the camera to an extreme close-up.",
-          "label": "Extreme close-up"
+          "label": "Extreme close-up",
+          "sets": [
+            {
+              "node": "15",
+              "field": "value",
+              "value": "<sks> front view eye-level shot close-up. Frame only the closest detail. {details}"
+            }
+          ]
         }
       ]
     },
@@ -63,13 +98,7 @@
       "label": "Extra direction",
       "default": "",
       "help": "Added at the end of the app's prompt.",
-      "bind": [
-        {
-          "node": "15",
-          "field": "value",
-          "template": "{zoom} {details}"
-        }
-      ]
+      "bind": []
     },
     {
       "id": "seed",
@@ -94,10 +123,18 @@
   ],
   "models": [
     {
-      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
-      "file": "split_files/diffusion_models/qwen_image_edit_2509_fp8_e4m3fn.safetensors",
-      "dir": "diffusion_models",
-      "gb": 20.43,
+      "repo": "unsloth/Qwen-Image-Edit-2511-GGUF",
+      "file": "qwen-image-edit-2511-Q4_K_M.gguf",
+      "dir": "unet_gguf",
+      "gb": 13.24,
+      "phase": "denoise",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+      "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "dir": "loras",
+      "gb": 0.85,
       "phase": "denoise",
       "license": "Apache-2.0"
     },
@@ -118,25 +155,26 @@
       "license": "Apache-2.0"
     },
     {
-      "repo": "lightx2v/Qwen-Image-Lightning",
-      "file": "Qwen-Image-Edit-2509/Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors",
+      "repo": "fal/Qwen-Image-Edit-2511-Multiple-Angles-LoRA",
+      "file": "qwen-image-edit-2511-multiple-angles-lora.safetensors",
       "dir": "loras",
-      "gb": 0.85,
-      "phase": "denoise",
-      "license": "Apache-2.0"
-    },
-    {
-      "repo": "dx8152/Qwen-Edit-2509-Multiple-angles",
-      "file": "镜头转换.safetensors",
-      "dir": "loras",
-      "gb": 0.24,
+      "gb": 0.3,
       "phase": "denoise",
       "license": "Apache-2.0"
     }
   ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "vram": {
+    "peak_gb": null
+  },
   "credits": [
-    "Qwen-Image-Edit-2509 by Alibaba Qwen (Apache-2.0)",
-    "Multiple Angles LoRA by dx8152 (Apache-2.0)",
+    "Qwen-Image-Edit-2511 by Alibaba Qwen (Apache-2.0)",
+    "Qwen Image Edit 2511 Multiple Angles LoRA by fal (Apache-2.0)",
     "Lightning LoRA by lightx2v",
     "Workflow: ComfyUI official template"
   ],

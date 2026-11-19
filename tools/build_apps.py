@@ -591,7 +591,9 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
 
     ms = tpl("image_moss_image_t2i.json")
     # MOSS-Image SFT (OpenMOSS, Apache-2.0). Its Qwen3.5-9B text encoder also rewrites a short prompt into a caption
-    # (TextGenerate, behind the template's switch, on); a layout JSON typed as the prompt needs the rewrite off.
+    # Keep optional caption expansion off by default: direct prompting is validated on the local CPU encoder.
+    # A layout JSON also needs the rewrite off.
+    put(ms, "18:16", "switch", False)
     drop(ms, "19")
     put(ms, "18:6", "width", 1024)
     put(ms, "18:6", "height", 1024)
@@ -754,6 +756,9 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
 
     out["style-reference"] = tpl("image_krea2_turbo_int8_image_style_reference.json")   # Krea 2 Turbo + ostris' style LoRA, as shipped
     st = tpl("image_krea2_turbo_t2i_int8.json")
+    krea2_encoder = {"qwen3vl_4b_fp8_scaled.safetensors": "qwen3vl_4b_int8_convrot.safetensors"}
+    swap_files(out["style-reference"], krea2_encoder)
+    swap_files(st, krea2_encoder)
     # the template's own "use LoRA" switch (it also appends the trigger to the prompt) goes on;
     # the app's style picker writes the trigger and swaps the LoRA file
     put(st, find(st, "PrimitiveBoolean", value=False), "value", True)

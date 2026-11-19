@@ -208,7 +208,7 @@
         "18:11",
         0
       ],
-      "switch": true
+      "switch": false
     },
     "_meta": {
       "title": "If/Else Switch"

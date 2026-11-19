@@ -4,13 +4,13 @@
   "name": "ACE-Step 1.5 Turbo · musique locale",
   "section": "audio",
   "pack": "audio-ace15",
-  "status": "draft",
+  "status": "ready",
   "summary": "Génération musicale native ComfyUI sur Radeon 780M, ACE-Step 1.5 Turbo 2B, encodeurs Qwen 0,6B + 1,7B et VAE.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "audio_ace_step_1_5_split.json",
     "comfyui": "0.45.0",
-    "notes": "Native ComfyUI split nodes on AMD Radeon 780M. A 20s/8-step instrumental with LM disabled succeeded directly (MP3 48kHz stereo mean -14.7 dB, 52.2s); a second Freefield CLI E2E at similar settings triggered host memory guard at 14:26:29 CET. The original 5s/4step no-LM preset was near silent, and LM-on also triggered the guard. Draft until safe repeatable E2E; keep guard unchanged. Optional LM-on unqualified. Avoid implying long-duration quality or memory headroom."
+    "notes": "Native ComfyUI split workflow for ACE-Step 1.5 Turbo on Radeon 780M. Native audio decoding uses 128-frame tiles with 32-frame overlap. The 30-second default, eight Turbo steps and direct conditioning passed the Freefield CLI end to end on Cloud9 (80.6 s; 48 kHz stereo MP3). The optional Qwen musical planner and longer durations have not been qualified by this test."
   },
   "inputs": [
     {
@@ -476,7 +476,7 @@
       "type": "toggle",
       "label": "Planification musicale IA (qualité)",
       "default": false,
-      "help": "Brouillon : le mode direct (sans planificateur) a genere un MP3 audible de 20 s a 8 etapes, mais une seconde tentative a declenche la protection memoire. Le mode IA Qwen consomme davantage. Non valide pour la production.",
+      "help": "Le planificateur Qwen structure le morceau avant la diffusion. Il augmente le temps de préparation et la mémoire ; sa validation sur Cloud9 reste à terminer.",
       "bind": [
         {
           "node": "4",
@@ -562,14 +562,14 @@
     "ACE-Step v1.5 by ACE Studio / StepFun (Apache-2.0), native ComfyUI split workflow"
   ],
   "test": {
-    "style": "Soft 1970s French jazz instrumental, piano trio, no vocals",
+    "style": "Instrumental jazz-funk français chaleureux, basse ronde, Rhodes électrique, batterie acoustique souple, production studio",
     "lyrics": "",
-    "duration": 20,
+    "duration": 30,
     "steps": 8,
     "bpm": 110,
     "language": "fr",
     "keyscale": "C major",
-    "seed": 20261119,
+    "seed": 202611191545,
     "generate_audio_codes": false
   }
 }

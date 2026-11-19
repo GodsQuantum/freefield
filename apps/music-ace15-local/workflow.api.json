@@ -98,7 +98,7 @@
     }
   },
   "9": {
-    "class_type": "VAEDecodeAudio",
+    "class_type": "VAEDecodeAudioTiled",
     "inputs": {
       "samples": [
         "8",
@@ -107,7 +107,9 @@
       "vae": [
         "3",
         0
-      ]
+      ],
+      "tile_size": 128,
+      "overlap": 32
     }
   },
   "11": {

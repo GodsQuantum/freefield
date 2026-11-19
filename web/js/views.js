@@ -220,11 +220,11 @@ export function libraryView() {
 // ------------------------------------------------------------------ VRAM map
 export function vramView(gpu) {
   const list = apps.filter((a) => a.vram).sort((a, b) => b.vram.largest_phase_gb - a.vram.largest_phase_gb);
-  const max = Math.max(48, ...list.map((a) => Math.max(a.vram.whole_gb, a.example?.peak_vram_gb || 0))) * 1.04;
+  const max = Math.max(48, ...list.map((a) => Math.max(a.vram.whole_gb, a.vram.measured_gb || 0))) * 1.04;
   const pct = (gb) => `${Math.min(100, (gb / max) * 100)}%`;
   const rows = list.map((a) => {
     const fit = fitOf(a);
-    const peak = a.example?.peak_vram_gb;
+    const peak = a.vram.measured_gb;
     return el("a", { class: "vrow", href: `#/app/${a.id}` },
       el("div", { class: "nm" }, el("b", {}, a.name), el("small", {}, `${a.pack} · ${a.vram.whole_gb} ${t("unit.gb")}`)),
       el("div", { class: "vbar", title: `${t("vram.whole")} ${a.vram.whole_gb} ${t("unit.gb")} · ${t("vram.phase")} ${a.vram.largest_phase_gb} ${t("unit.gb")}${peak ? ` · ${t("vram.measured")} ${peak} ${t("unit.gb")}` : ""}` },

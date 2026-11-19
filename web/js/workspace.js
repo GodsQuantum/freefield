@@ -774,7 +774,8 @@ function libraryTab(app) {
 function vramBars(app) {
   const v = app.vram;
   if (!v) return null;
-  const peak = app.example?.peak_vram_gb ?? null;
+  const peak = v.measured_gb ?? null;
+  const measuredOn = v.measured_on?.split(" · ")[0];
   const max = Math.max(48, v.whole_gb, peak || 0) * 1.05;
   const pct = (gb) => `${Math.min(100, (gb / max) * 100)}%`;
   const ticks = [24, 48].map((g) => el("u", { style: { left: pct(g) }, title: `${g} ${t("unit.gb")}` }));
@@ -784,7 +785,7 @@ function vramBars(app) {
   const fit = fitOf(app);
   return el("div", { class: "card" }, el("h3", {}, icon("chip"), t("how.vram"), fit ? el("span", { class: `fit ${fit[1]}`, style: { marginLeft: "auto" } }, t(fit[0])) : null),
     row(t("how.whole"), v.whole_gb, "whole"), row(t("how.phase"), v.largest_phase_gb, ""),
-    peak ? row(`${t("how.measured")} (${(app.example.gpu || "").split(",")[0]})`, peak, "whole") : null,
+    peak ? row(measuredOn ? `${t("how.measured")} (${measuredOn})` : t("how.measured"), peak, "whole") : null,
     el("div", { class: "vscale" }, el("span", { style: { left: pct(24) } }, `24 ${t("unit.gb")}`), el("span", { style: { left: pct(48) } }, `48 ${t("unit.gb")}`)));
 }
 

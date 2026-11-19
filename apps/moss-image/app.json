@@ -4,14 +4,14 @@
   "name": "Layout Image",
   "section": "image",
   "pack": "image-moss",
-  "status": "draft",
+  "status": "ready",
   "higgsfield_feature": "Create Image",
   "summary": "Text to image with MOSS-Image (Apache-2.0); also takes a layout JSON that places each text and object in its own box.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "image_moss_image_t2i.json",
     "comfyui": "0.42.0",
-    "notes": "MOSS-Image SFT, int8. Its Qwen3.5-9B text encoder also rewrites a short prompt into a caption. A layout prompt is the JSON MOSSImageLayoutPrompt writes: {\"summary\": {\"caption\": ...}, \"items\": [{\"label\": \"text\"|\"object\"|\"character\", \"caption\": ..., \"text\": ..., \"bbox\": [y0, x0, y1, x1]}], \"bbox_coord_space\": \"abs_centralized\", \"bbox_format\": \"yxyx\"} (pixels, origin at the centre); turn the rewrite off for it."
+    "notes": "MOSS-Image SFT, int8. Its Qwen3.5-9B text encoder also rewrites a short prompt into a caption. A layout prompt is the JSON MOSSImageLayoutPrompt writes: {\"summary\": {\"caption\": ...}, \"items\": [{\"label\": \"text\"|\"object\"|\"character\", \"caption\": ..., \"text\": ..., \"bbox\": [y0, x0, y1, x1]}], \"bbox_coord_space\": \"abs_centralized\", \"bbox_format\": \"yxyx\"} (pixels, origin at the centre); turn the rewrite off for it. Cloud9 validation: native INT8 diffusion and W4A8 Qwen3.5-9B, direct prompt, 1024x1024, 25 er_sde steps; complete Freefield CLI render in 1112.4 seconds without a memory-guard trip. Optional prompt rewriting and larger sizes were not qualified by that test."
   },
   "inputs": [
     {
@@ -31,8 +31,8 @@
       "id": "rewrite",
       "type": "toggle",
       "label": "Rewrite my prompt",
-      "default": true,
-      "help": "MOSS-Image's own text encoder turns a short prompt into a detailed caption. Turn it off for a layout JSON.",
+      "default": false,
+      "help": "Optional caption expansion adds CPU preparation time on Cloud9. Direct prompting is the validated default; keep rewrite off for a layout JSON.",
       "bind": [
         {
           "node": "18:16",
@@ -166,7 +166,11 @@
     "MOSS-Image by OpenMOSS (Apache-2.0)"
   ],
   "test": {
-    "prompt": "a red bicycle against a white wall",
-    "rewrite": false
+    "prompt": "A documentary photograph of a red bicycle leaning against a clean white stucco wall, soft daylight, side view, natural shadows, fine details of spokes and paint.",
+    "rewrite": false,
+    "seed": 202611191454,
+    "width": 1024,
+    "height": 1024,
+    "steps": 25
   }
 }

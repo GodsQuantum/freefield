@@ -40,7 +40,7 @@ for (const p of problems.filter((x) => x.severity === "error")) console.error(`[
 const byId = new Map(apps.map((a) => [a.id, a]));
 
 // VRAM verdicts from tools/catalog.py (optional: the UI just shows less without it)
-type VramRow = { id: string; whole_gb: number; largest_phase_gb: number; verdict_24gb: string; measured_peak_gb: number | null };
+type VramRow = { id: string; whole_gb: number; largest_phase_gb: number; verdict_24gb: string; measured_peak_gb: number | null; measured_on: string | null };
 const vramFile = join(root, "docs", "vram-map.json");
 const vram = new Map<string, VramRow>(
   existsSync(vramFile) ? (JSON.parse(readFileSync(vramFile, "utf-8")).apps as VramRow[]).map((r) => [r.id, r]) : [],
@@ -158,6 +158,7 @@ function publicApp(a: App, files: Set<string> | null = null) {
     vram: vram.has(a.id) ? {
       whole_gb: vram.get(a.id)!.whole_gb, largest_phase_gb: vram.get(a.id)!.largest_phase_gb,
       verdict: vram.get(a.id)!.verdict_24gb, measured_gb: vram.get(a.id)!.measured_peak_gb,
+      measured_on: vram.get(a.id)!.measured_on,
     } : null,
     credits: a.credits ?? [],
     notes: a.notes ?? null,

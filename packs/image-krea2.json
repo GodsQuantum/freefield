@@ -4,7 +4,7 @@
     "style-reference",
     "styles"
   ],
-  "download_gb": 23.67,
+  "download_gb": 23.29,
   "needs_hf_token": false,
   "custom_nodes": [],
   "models": [
@@ -143,10 +143,10 @@
     },
     {
       "repo": "Comfy-Org/Krea-2",
-      "file": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors",
+      "file": "text_encoders/qwen3vl_4b_int8_convrot.safetensors",
       "dir": "text_encoders",
-      "gb": 5.24,
-      "name": "qwen3vl_4b_fp8_scaled.safetensors",
+      "gb": 4.86,
+      "name": "qwen3vl_4b_int8_convrot.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
       "used_by": [
