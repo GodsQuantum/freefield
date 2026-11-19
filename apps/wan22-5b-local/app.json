@@ -4,13 +4,13 @@
   "name": "Wan 2.2 TI2V 5B Q6 local",
   "section": "video",
   "pack": "video-wan22-5b-gguf",
-  "status": "draft",
+  "status": "ready",
   "summary": "Texte vers vidéo local sur Radeon 780M, Wan 2.2 TI2V 5B Q6 GGUF. Réutilise UMT5 et Wan VAE partagés.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "video_wan2_2_5B_ti2v.json",
     "comfyui": "0.45.0",
-    "notes": "Based on Comfy-Org official 5B video workflow and QuantStack Q6_K GGUF. Waiting for actual gfx1103 E2E smoke test before marking ready. The Wan2.2 5B VAE differs from Wan2.1 14B VAE."
+    "notes": "Based on Comfy-Org official 5B video workflow and QuantStack Q6_K GGUF. gfx1103 technical E2E passed on 2026-11-19: 256x144, 9 frames, 4 steps, 24fps MP4 in 250.57s; larger renders and visual quality not yet certified. The Wan2.2 5B VAE differs from Wan2.1 14B VAE."
   },
   "inputs": [
     {
@@ -168,12 +168,12 @@
     }
   ],
   "test": {
-    "prompt": "A blue balloon floating over a quiet river, cinematic realistic motion",
-    "width": 128,
-    "height": 128,
-    "frames": 5,
+    "prompt": "A black cat on a Paris rooftop, soft morning light, slow cinematic camera movement, detailed realistic video.",
+    "width": 256,
+    "height": 144,
+    "frames": 9,
     "steps": 4,
     "seed": 20261119,
-    "fps": 12
+    "fps": 24
   }
 }

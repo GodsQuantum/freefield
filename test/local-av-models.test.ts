@@ -28,10 +28,11 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   assert.equal(problems.some((p) => p.app === music.id && p.severity === "error"), false);
 });
 
-test("Wan 2.2 5B Q6 local draft reuses the shared UMT5 encoder and Wan 2.2 VAE", () => {
+test("Wan 2.2 5B Q6 local validated preview reuses shared UMT5 encoder and VAE", () => {
   const wan = apps.find((a) => a.id === "wan22-5b-local");
   assert.ok(wan);
-  assert.equal(wan.status, "draft", "hardware E2E required before exposing as usable");
+  assert.equal(wan.status, "ready", "256x144 9-frame 4-step E2E MP4 is verified on Radeon 780M");
+  assert.deepEqual([wan.test?.width,wan.test?.height,wan.test?.frames,wan.test?.steps,wan.test?.fps],[256,144,9,4,24]);
   assert.equal(wan.graph?.["1"]?.class_type, "UnetLoaderGGUF");
   assert.equal(wan.graph?.["1"]?.inputs?.unet_name, "Wan2.2-TI2V-5B-Q6_K.gguf");
   assert.equal(wan.graph?.["6"]?.class_type, "Wan22ImageToVideoLatent");
