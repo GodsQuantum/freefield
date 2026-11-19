@@ -109,7 +109,7 @@
     "class_type": "MiniMaxMusic3TextEncode",
     "inputs": {
       "clip": [
-        "37:3",
+        "37:44",
         0
       ],
       "seed": [
@@ -181,6 +181,19 @@
     },
     "_meta": {
       "title": "If/Else Switch"
+    }
+  },
+  "37:44": {
+    "class_type": "SelectCLIPDevice",
+    "inputs": {
+      "clip": [
+        "37:3",
+        0
+      ],
+      "device": "gpu:0"
+    },
+    "_meta": {
+      "title": "Music3 text encoder on gpu:0"
     }
   }
 }

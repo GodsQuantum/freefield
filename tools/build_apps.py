@@ -790,6 +790,10 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     put(out["relight"], "10:66", "model", ["10:119", 0])
 
     out["music"] = tpl("audio_minimax_music_3.json")
+    # The native selector keeps Music3's autoregressive encoder on the first GPU under low-VRAM profiles.
+    out["music"]["37:44"] = {"class_type": "SelectCLIPDevice", "inputs": {"clip": ["37:3", 0], "device": "gpu:0"},
+                            "_meta": {"title": "Music3 text encoder on gpu:0"}}
+    put(out["music"], "37:13", "clip", ["37:44", 0])
     out["sfx"] = tpl("audio_stable_audio_3_medium.json")
     out["motion-transfer"] = tpl("video_wan_animate2_distilled.json")
     dm = tpl("utility_moge_depth_estimation.json")

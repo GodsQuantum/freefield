@@ -81,7 +81,7 @@ On an 80 GB H100, ComfyUI can keep models from earlier phases loaded, so measure
 | `wan22-5b-i2v-local` | ready | 12.4 GB | encode 6.7 GB | umt5_xxl_fp8_e4m3fn_scaled.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | not measured |
 | `wan22-5b-local` | ready | 12.4 GB | encode 6.7 GB | umt5_xxl_fp8_e4m3fn_scaled.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | not measured |
 | `moss-image` | ready | 13.0 GB | encode 7.3 GB | qwen3.5_9b_w4a8_gptq.safetensors (7.3) | fits whole | L4 / A10G (24 GB) | 13.0 GB (L40S) |
-| `music` | ready | 14.3 GB | encode 9.2 GB | minimax_music3_text_encoder_pruned_int8_convrot.safetensors (9.2) | fits whole | L4 / A10G (24 GB) | 37.1 GB (L40S) |
+| `music` | ready | 14.3 GB | encode 9.2 GB | minimax_music3_text_encoder_pruned_int8_convrot.safetensors (9.2) | fits whole | L4 / A10G (24 GB) | not measured |
 | `sfx` | ready | 10.4 GB (+4.5 optional) | encode 10.4 GB | stable_audio_3_medium.safetensors (9.2) | fits whole | L4 / A10G (24 GB) | 9.2 GB (L40S) |
 | `create-image` | ready | 17.8 GB | encode 11.6 GB | qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | 15.4 GB (L40S) |
 | `style-reference` | ready | 19.1 GB | denoise 13.9 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | not measured |

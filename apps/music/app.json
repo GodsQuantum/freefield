@@ -10,7 +10,8 @@
   "workflow": "workflow.api.json",
   "source": {
     "template": "audio_minimax_music_3.json",
-    "comfyui": "0.42.0"
+    "comfyui": "0.42.0",
+    "notes": "Official Music3 template with native SelectCLIPDevice on gpu:0 between CLIPLoader and MiniMaxMusic3TextEncode; requires the CLIP model-rebinding fix from ComfyUI PR #16970. FP16 DiT, 30 steps, stock audio decode and all user controls/defaults are unchanged. One Cloud9 10-second run completed in 373.8 s on 2026-11-19 with native compiler dependencies installed; MP3 technical checks passed, without listening or musical-quality assessment. The 60-second default and longer durations remain unqualified."
   },
   "inputs": [
     {
@@ -106,5 +107,8 @@
   "test": {
     "style": "lofi piano",
     "seconds": 10
+  },
+  "vram": {
+    "peak_gb": null
   }
 }

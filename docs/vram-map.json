@@ -1819,8 +1819,8 @@
       },
       "verdict_24gb": "fits whole",
       "modal_gpu": "L4 / A10G (24 GB)",
-      "measured_peak_gb": 37.06,
-      "measured_on": "L40S · 20261020-133620-l40s"
+      "measured_peak_gb": null,
+      "measured_on": null
     },
     {
       "id": "sfx",

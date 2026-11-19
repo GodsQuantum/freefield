@@ -155,6 +155,17 @@ One 33-frame, 24 fps video fixture passed at 2× (256×144 → 512×288) in 146.
 
 The receipts are `validation/seedvr2-image2x-gpu-vae-tile256-20261119.json` and `validation/seedvr2-temporal33f-gpu-20261119.json` in the parent project. Host available memory and GTT measurements are not dedicated VRAM peaks; the historical lab peaks in the VRAM map remain separate measurements.
 
+### MiniMax Music 3 audio
+
+`music` uses the native `SelectCLIPDevice` node to route its INT8 ConvRot text encoder to `gpu:0` before `MiniMaxMusic3TextEncode`. The FP16 DiT, 30 diffusion steps, stock audio decode, controls and 60-second default remain unchanged.
+The ComfyUI backend must include the CLIP model-rebinding fix from [PR #16970](https://github.com/Comfy-Org/ComfyUI/pull/16970), pinned at `0259dcb969473faec6eb5e645822be37e6cd27f7` (Cloud9 core commit `df74083a675517846ca6ad8c24fa340facb187f7`). On Cloud9's ROCm/Triton path, the native C compiler and matching libc/Python development headers are also required.
+
+On 19 November 2026, one Cloud9 Radeon 780M run with a 10-second cap completed through the CLI in 373.8 s. Its MP3 is 9.99619 s, 44.1 kHz stereo, and passed full software decode and technical signal checks. No listening or musical-quality assessment was performed. The 60-second default, longer durations and other prompts remain unqualified.
+The CPU reference was interrupted after 1836.25 s at 17 of 251 autoregressive frames; it was not a completed render, so no full-render speedup ratio is established.
+
+Receipts in the parent project: `validation/minimax-music3-10s-gpu-te-native-build-20261119.json`, `validation/clip-device-pr16970-20261119.json` and `validation/music3-native-build-dependencies-20261119.json`.
+The native GPU profile's dedicated VRAM peak remains unmeasured (`vram.peak_gb=null`); host available memory and GTT are different metrics. Historical lab examples remain available and are not measurements of this profile.
+
 ### Soul ID without training
 
 Higgsfield's Soul ID trains a model of a person from their photos. Freefield does not train: `character` (one photo)
