@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { loadRegistry } from "../server/registry.ts";
+import { applyInputs, resolveValues } from "../server/runner.ts";
 
 const { apps, problems } = loadRegistry();
 
@@ -47,6 +48,19 @@ test("direct SFX does not require the optional Qwen prompt model by default", ()
   assert.ok(sfx);
   const promptExpand = sfx.inputs.find((i) => i.id === "reprompt");
   assert.equal(promptExpand?.default, false);
+  assert.equal(promptExpand?.type, "select");
+  const graphFor = (choice: string) => {
+    const sets: Record<string, unknown> = {};
+    const wf = { setInput: (node: string, field: string, value: unknown) => { sets[`${node}.${field}`] = value; } };
+    applyInputs(sfx, resolveValues(sfx, { description: "gentle rain", seconds: 3, reprompt: choice, seed: 42 }), wf, () => null);
+    return sets;
+  };
+  const direct = graphFor("false");
+  assert.deepEqual(direct["52:34.on_true"], ["52:31", 0], "unused Qwen branch must be unreachable");
+  assert.equal(direct["52:35.value"], false);
+  const expanded = graphFor("true");
+  assert.deepEqual(expanded["52:34.on_true"], ["52:28", 0], "expanded mode must preserve Qwen branch");
+  assert.equal(expanded["52:35.value"], true);
   assert.equal(sfx.graph?.["52:35"]?.inputs?.value, false);
   assert.equal(sfx.graph?.["52:34"]?.class_type, "ComfySwitchNode");
   assert.ok(sfx.models.some((m) => m.file.endsWith("qwen3.5_2b_bf16.safetensors") && m.optional));

@@ -73,10 +73,22 @@
     },
     {
       "id": "reprompt",
-      "type": "toggle",
+      "type": "select",
       "label": "Expand description",
       "default": false,
-      "help": "AI rewrite uses an optional Qwen3.5-2B model (~4.55GB) not included in the basic Sound Effects pack. Leave off for fast direct prompts; switch on only after downloading the optional model.",
+      "help": "Direct mode skips the optional Qwen encoder entirely. Expanded mode needs the optional Qwen3.5-2B model (~4.55 GB).",
+      "options": [
+        {
+          "value": false,
+          "label": "Direct (fast, no extra model)",
+          "sets": [{ "node": "52:34", "field": "on_true", "value": ["52:31", 0] }]
+        },
+        {
+          "value": true,
+          "label": "Expand with Qwen (optional model)",
+          "sets": [{ "node": "52:34", "field": "on_true", "value": ["52:28", 0] }]
+        }
+      ],
       "bind": [
         {
           "node": "52:35",
