@@ -1,0 +1,574 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "music-ace15-local",
+  "name": "ACE-Step 1.5 Turbo · musique locale",
+  "section": "audio",
+  "pack": "audio-ace15",
+  "status": "draft",
+  "summary": "Génération musicale native ComfyUI sur Radeon 780M, ACE-Step 1.5 Turbo 2B, encodeurs Qwen 0,6B + 1,7B et VAE.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "audio_ace_step_1_5_split.json",
+    "comfyui": "0.45.0",
+    "notes": "Based on official Comfy-Org split workflow and directly supported ComfyUI core nodes; avoids separate audio server. Draft until a full live E2E generation on AMD gfx1103 passes; available first-party models total 10GB. Tuned for 8-step Turbo and 1.7B music planner, no artificial duration or lyrics length restriction."
+  },
+  "inputs": [
+    {
+      "id": "style",
+      "type": "textarea",
+      "label": "Style et instruments",
+      "required": true,
+      "default": "Instrumental jazz-funk français chaleureux, basse ronde, Rhodes électrique, batterie acoustique souple, production studio",
+      "bind": [
+        {
+          "node": "4",
+          "field": "tags"
+        }
+      ]
+    },
+    {
+      "id": "lyrics",
+      "type": "textarea",
+      "label": "Paroles (facultatif)",
+      "default": "",
+      "bind": [
+        {
+          "node": "4",
+          "field": "lyrics"
+        }
+      ]
+    },
+    {
+      "id": "duration",
+      "type": "number",
+      "label": "Durée en secondes",
+      "min": 1,
+      "max": 1000,
+      "step": 1,
+      "default": 30,
+      "help": "Durée demandée; les longs morceaux prennent davantage de temps et de mémoire, sans limite ajoutée par Freefield.",
+      "bind": [
+        {
+          "node": "6",
+          "field": "seconds"
+        },
+        {
+          "node": "4",
+          "field": "duration"
+        }
+      ]
+    },
+    {
+      "id": "bpm",
+      "type": "number",
+      "label": "Tempo (BPM)",
+      "min": 10,
+      "max": 300,
+      "step": 1,
+      "default": 110,
+      "bind": [
+        {
+          "node": "4",
+          "field": "bpm"
+        }
+      ]
+    },
+    {
+      "id": "timesignature",
+      "type": "select",
+      "label": "Mesure",
+      "default": "4",
+      "options": [
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "bind": [
+        {
+          "node": "4",
+          "field": "timesignature"
+        }
+      ]
+    },
+    {
+      "id": "language",
+      "type": "select",
+      "label": "Langue des paroles",
+      "default": "fr",
+      "options": [
+        {
+          "value": "ar",
+          "label": "ar"
+        },
+        {
+          "value": "az",
+          "label": "az"
+        },
+        {
+          "value": "bg",
+          "label": "bg"
+        },
+        {
+          "value": "bn",
+          "label": "bn"
+        },
+        {
+          "value": "ca",
+          "label": "ca"
+        },
+        {
+          "value": "cs",
+          "label": "cs"
+        },
+        {
+          "value": "da",
+          "label": "da"
+        },
+        {
+          "value": "de",
+          "label": "de"
+        },
+        {
+          "value": "el",
+          "label": "el"
+        },
+        {
+          "value": "en",
+          "label": "en"
+        },
+        {
+          "value": "es",
+          "label": "es"
+        },
+        {
+          "value": "fa",
+          "label": "fa"
+        },
+        {
+          "value": "fi",
+          "label": "fi"
+        },
+        {
+          "value": "fr",
+          "label": "fr"
+        },
+        {
+          "value": "he",
+          "label": "he"
+        },
+        {
+          "value": "hi",
+          "label": "hi"
+        },
+        {
+          "value": "hr",
+          "label": "hr"
+        },
+        {
+          "value": "ht",
+          "label": "ht"
+        },
+        {
+          "value": "hu",
+          "label": "hu"
+        },
+        {
+          "value": "id",
+          "label": "id"
+        },
+        {
+          "value": "is",
+          "label": "is"
+        },
+        {
+          "value": "it",
+          "label": "it"
+        },
+        {
+          "value": "ja",
+          "label": "ja"
+        },
+        {
+          "value": "ko",
+          "label": "ko"
+        },
+        {
+          "value": "la",
+          "label": "la"
+        },
+        {
+          "value": "lt",
+          "label": "lt"
+        },
+        {
+          "value": "ms",
+          "label": "ms"
+        },
+        {
+          "value": "ne",
+          "label": "ne"
+        },
+        {
+          "value": "nl",
+          "label": "nl"
+        },
+        {
+          "value": "no",
+          "label": "no"
+        },
+        {
+          "value": "pa",
+          "label": "pa"
+        },
+        {
+          "value": "pl",
+          "label": "pl"
+        },
+        {
+          "value": "pt",
+          "label": "pt"
+        },
+        {
+          "value": "ro",
+          "label": "ro"
+        },
+        {
+          "value": "ru",
+          "label": "ru"
+        },
+        {
+          "value": "sa",
+          "label": "sa"
+        },
+        {
+          "value": "sk",
+          "label": "sk"
+        },
+        {
+          "value": "sr",
+          "label": "sr"
+        },
+        {
+          "value": "sv",
+          "label": "sv"
+        },
+        {
+          "value": "sw",
+          "label": "sw"
+        },
+        {
+          "value": "ta",
+          "label": "ta"
+        },
+        {
+          "value": "te",
+          "label": "te"
+        },
+        {
+          "value": "th",
+          "label": "th"
+        },
+        {
+          "value": "tl",
+          "label": "tl"
+        },
+        {
+          "value": "tr",
+          "label": "tr"
+        },
+        {
+          "value": "uk",
+          "label": "uk"
+        },
+        {
+          "value": "ur",
+          "label": "ur"
+        },
+        {
+          "value": "vi",
+          "label": "vi"
+        },
+        {
+          "value": "yue",
+          "label": "yue"
+        },
+        {
+          "value": "zh",
+          "label": "zh"
+        },
+        {
+          "value": "unknown",
+          "label": "unknown"
+        }
+      ],
+      "bind": [
+        {
+          "node": "4",
+          "field": "language"
+        }
+      ]
+    },
+    {
+      "id": "keyscale",
+      "type": "select",
+      "label": "Tonalité",
+      "default": "C major",
+      "options": [
+        {
+          "value": "C major",
+          "label": "C major"
+        },
+        {
+          "value": "C# major",
+          "label": "C# major"
+        },
+        {
+          "value": "Db major",
+          "label": "Db major"
+        },
+        {
+          "value": "D major",
+          "label": "D major"
+        },
+        {
+          "value": "D# major",
+          "label": "D# major"
+        },
+        {
+          "value": "Eb major",
+          "label": "Eb major"
+        },
+        {
+          "value": "E major",
+          "label": "E major"
+        },
+        {
+          "value": "F major",
+          "label": "F major"
+        },
+        {
+          "value": "F# major",
+          "label": "F# major"
+        },
+        {
+          "value": "Gb major",
+          "label": "Gb major"
+        },
+        {
+          "value": "G major",
+          "label": "G major"
+        },
+        {
+          "value": "G# major",
+          "label": "G# major"
+        },
+        {
+          "value": "Ab major",
+          "label": "Ab major"
+        },
+        {
+          "value": "A major",
+          "label": "A major"
+        },
+        {
+          "value": "A# major",
+          "label": "A# major"
+        },
+        {
+          "value": "Bb major",
+          "label": "Bb major"
+        },
+        {
+          "value": "B major",
+          "label": "B major"
+        },
+        {
+          "value": "C minor",
+          "label": "C minor"
+        },
+        {
+          "value": "C# minor",
+          "label": "C# minor"
+        },
+        {
+          "value": "Db minor",
+          "label": "Db minor"
+        },
+        {
+          "value": "D minor",
+          "label": "D minor"
+        },
+        {
+          "value": "D# minor",
+          "label": "D# minor"
+        },
+        {
+          "value": "Eb minor",
+          "label": "Eb minor"
+        },
+        {
+          "value": "E minor",
+          "label": "E minor"
+        },
+        {
+          "value": "F minor",
+          "label": "F minor"
+        },
+        {
+          "value": "F# minor",
+          "label": "F# minor"
+        },
+        {
+          "value": "Gb minor",
+          "label": "Gb minor"
+        },
+        {
+          "value": "G minor",
+          "label": "G minor"
+        },
+        {
+          "value": "G# minor",
+          "label": "G# minor"
+        },
+        {
+          "value": "Ab minor",
+          "label": "Ab minor"
+        },
+        {
+          "value": "A minor",
+          "label": "A minor"
+        },
+        {
+          "value": "A# minor",
+          "label": "A# minor"
+        },
+        {
+          "value": "Bb minor",
+          "label": "Bb minor"
+        },
+        {
+          "value": "B minor",
+          "label": "B minor"
+        }
+      ],
+      "bind": [
+        {
+          "node": "4",
+          "field": "keyscale"
+        }
+      ]
+    },
+    {
+      "id": "generate_audio_codes",
+      "type": "toggle",
+      "label": "Planification musicale IA (qualité)",
+      "default": true,
+      "help": "Le planificateur Qwen 1,7B guide la structure musicale ; désactiver utilise moins de ressources, mais peut réduire la qualité.",
+      "bind": [
+        {
+          "node": "4",
+          "field": "generate_audio_codes"
+        }
+      ]
+    },
+    {
+      "id": "steps",
+      "type": "number",
+      "label": "Étapes de diffusion Turbo",
+      "min": 1,
+      "max": 10000,
+      "step": 1,
+      "default": 8,
+      "bind": [
+        {
+          "node": "8",
+          "field": "steps"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Graine",
+      "default": -1,
+      "help": "-1 génère une graine aléatoire",
+      "bind": [
+        {
+          "node": "4",
+          "field": "seed"
+        },
+        {
+          "node": "8",
+          "field": "seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "11",
+      "type": "audio",
+      "label": "Musique MP3"
+    }
+  ],
+  "models": [
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/diffusion_models/acestep_v1.5_turbo.safetensors",
+      "dir": "diffusion_models",
+      "gb": 4.79,
+      "phase": "denoise",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/text_encoders/qwen_0.6b_ace15.safetensors",
+      "dir": "text_encoders",
+      "gb": 1.19,
+      "phase": "encode",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/text_encoders/qwen_1.7b_ace15.safetensors",
+      "dir": "text_encoders",
+      "gb": 3.71,
+      "phase": "encode",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/vae/ace_1.5_vae.safetensors",
+      "dir": "vae",
+      "gb": 0.34,
+      "phase": "decode",
+      "license": "Apache-2.0"
+    }
+  ],
+  "credits": [
+    "ACE-Step v1.5 by ACE Studio / StepFun (Apache-2.0), native ComfyUI split workflow"
+  ],
+  "test": {
+    "style": "Soft 1970s French jazz instrumental, piano trio, no vocals",
+    "lyrics": "",
+    "duration": 3,
+    "steps": 4,
+    "bpm": 110,
+    "language": "fr",
+    "keyscale": "C major",
+    "seed": 20261119
+  }
+}

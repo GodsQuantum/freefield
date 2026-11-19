@@ -1,0 +1,179 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "wan22-5b-local",
+  "name": "Wan 2.2 TI2V 5B Q6 local",
+  "section": "video",
+  "pack": "video-wan22-5b-gguf",
+  "status": "draft",
+  "summary": "Texte vers vidéo local sur Radeon 780M, Wan 2.2 TI2V 5B Q6 GGUF. Réutilise UMT5 et Wan VAE partagés.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "video_wan2_2_5B_ti2v.json",
+    "comfyui": "0.45.0",
+    "notes": "Based on Comfy-Org official 5B video workflow and QuantStack Q6_K GGUF. Waiting for actual gfx1103 E2E smoke test before marking ready. The Wan2.2 5B VAE differs from Wan2.1 14B VAE."
+  },
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Prompt vidéo",
+      "required": true,
+      "default": "A black cat on a Paris rooftop, soft morning light, slow cinematic camera movement, detailed realistic video.",
+      "bind": [
+        {
+          "node": "4",
+          "field": "text"
+        }
+      ]
+    },
+    {
+      "id": "negative",
+      "type": "textarea",
+      "label": "Éléments à éviter",
+      "default": "blurry, low quality, distorted motion, text, subtitles, JPEG artifacts, oversaturated, still image",
+      "bind": [
+        {
+          "node": "5",
+          "field": "text"
+        }
+      ]
+    },
+    {
+      "id": "width",
+      "type": "number",
+      "label": "Largeur (multiple de 32)",
+      "min": 32,
+      "max": 16384,
+      "step": 32,
+      "default": 384,
+      "bind": [
+        {
+          "node": "6",
+          "field": "width"
+        }
+      ]
+    },
+    {
+      "id": "height",
+      "type": "number",
+      "label": "Hauteur (multiple de 32)",
+      "min": 32,
+      "max": 16384,
+      "step": 32,
+      "default": 224,
+      "bind": [
+        {
+          "node": "6",
+          "field": "height"
+        }
+      ]
+    },
+    {
+      "id": "frames",
+      "type": "number",
+      "label": "Nombre d’images (4n+1)",
+      "help": "La durée est libre selon les ressources et le temps disponible ; 33 images = 1,38 s à 24 ips.",
+      "min": 1,
+      "max": 16381,
+      "step": 4,
+      "default": 33,
+      "bind": [
+        {
+          "node": "6",
+          "field": "length"
+        }
+      ]
+    },
+    {
+      "id": "steps",
+      "type": "number",
+      "label": "Étapes de diffusion",
+      "min": 1,
+      "max": 10000,
+      "step": 1,
+      "default": 20,
+      "bind": [
+        {
+          "node": "8",
+          "field": "steps"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Graine",
+      "default": -1,
+      "help": "-1 choisit une graine aléatoire",
+      "bind": [
+        {
+          "node": "8",
+          "field": "seed"
+        }
+      ]
+    },
+    {
+      "id": "fps",
+      "type": "number",
+      "label": "Images par seconde",
+      "min": 1,
+      "max": 120,
+      "step": 1,
+      "default": 24,
+      "bind": [
+        {
+          "node": "10",
+          "field": "fps"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "11",
+      "type": "video",
+      "label": "Vidéo MP4"
+    }
+  ],
+  "models": [
+    {
+      "repo": "QuantStack/Wan2.2-TI2V-5B-GGUF",
+      "file": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "dir": "unet_gguf",
+      "gb": 4.21,
+      "phase": "denoise",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "dir": "text_encoders",
+      "gb": 6.74,
+      "phase": "encode",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "file": "split_files/vae/wan2.2_vae.safetensors",
+      "dir": "vae",
+      "gb": 1.41,
+      "phase": "decode",
+      "license": "Apache-2.0"
+    }
+  ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "test": {
+    "prompt": "A blue balloon floating over a quiet river, cinematic realistic motion",
+    "width": 128,
+    "height": 128,
+    "frames": 5,
+    "steps": 4,
+    "seed": 20261119,
+    "fps": 12
+  }
+}

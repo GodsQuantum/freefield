@@ -7,6 +7,13 @@
     "download_gb": 29.29,
     "needs_hf_token": false
   },
+  "audio-ace15": {
+    "apps": [
+      "music-ace15-local"
+    ],
+    "download_gb": 10.03,
+    "needs_hf_token": false
+  },
   "core": {
     "apps": [
       "smoke",
@@ -209,5 +216,12 @@
     ],
     "download_gb": 45.06,
     "needs_hf_token": true
+  },
+  "video-wan22-5b-gguf": {
+    "apps": [
+      "wan22-5b-local"
+    ],
+    "download_gb": 12.36,
+    "needs_hf_token": false
   }
 }

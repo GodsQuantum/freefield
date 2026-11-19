@@ -1,0 +1,52 @@
+{
+  "pack": "video-wan22-5b-gguf",
+  "apps": [
+    "wan22-5b-local"
+  ],
+  "download_gb": 12.36,
+  "needs_hf_token": false,
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "models": [
+    {
+      "repo": "QuantStack/Wan2.2-TI2V-5B-GGUF",
+      "file": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "dir": "unet_gguf",
+      "gb": 4.21,
+      "name": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "wan22-5b-local"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "dir": "text_encoders",
+      "gb": 6.74,
+      "name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "wan22-5b-local"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "file": "split_files/vae/wan2.2_vae.safetensors",
+      "dir": "vae",
+      "gb": 1.41,
+      "name": "wan2.2_vae.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "wan22-5b-local"
+      ]
+    }
+  ]
+}

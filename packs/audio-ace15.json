@@ -1,0 +1,59 @@
+{
+  "pack": "audio-ace15",
+  "apps": [
+    "music-ace15-local"
+  ],
+  "download_gb": 10.03,
+  "needs_hf_token": false,
+  "custom_nodes": [],
+  "models": [
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/diffusion_models/acestep_v1.5_turbo.safetensors",
+      "dir": "diffusion_models",
+      "gb": 4.79,
+      "name": "acestep_v1.5_turbo.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "music-ace15-local"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/text_encoders/qwen_0.6b_ace15.safetensors",
+      "dir": "text_encoders",
+      "gb": 1.19,
+      "name": "qwen_0.6b_ace15.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "music-ace15-local"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/text_encoders/qwen_1.7b_ace15.safetensors",
+      "dir": "text_encoders",
+      "gb": 3.71,
+      "name": "qwen_1.7b_ace15.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "music-ace15-local"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/ACE-Step-1.5",
+      "file": "split_files/vae/ace_1.5_vae.safetensors",
+      "dir": "vae",
+      "gb": 0.34,
+      "name": "ace_1.5_vae.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "music-ace15-local"
+      ]
+    }
+  ]
+}
