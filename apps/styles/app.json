@@ -11,7 +11,7 @@
   "source": {
     "template": "image_krea2_turbo_t2i_int8.json",
     "comfyui": "0.42.0",
-    "notes": "The template's LoRA switch is turned on; each style option writes its trigger phrase and swaps the LoRA file. The optional 3-step path uses native ComfyUI lazy model/step switches and preserves the original 8-step path as default."
+    "notes": "The template's LoRA switch is turned on; each style option writes its trigger phrase and swaps the LoRA file. The optional 3-step path uses native ComfyUI lazy model/step switches and preserves the original 8-step path as default. An additional lazy native 2-step ultra-fast branch uses the already shared base weights; if both opt-ins are true, ultra-fast takes precedence, preserving Fast and quality paths."
   },
   "inputs": [
     {
@@ -164,6 +164,19 @@
       "bind": [
         {
           "node": "ff_krea_fast_enabled",
+          "field": "value"
+        }
+      ]
+    },
+    {
+      "id": "ultra_fast_mode",
+      "type": "toggle",
+      "label": "Ultra-fast preview (2 steps)",
+      "default": false,
+      "help": "Optional Krea Turbo 2-step distillation. Cloud9 native 1024x1024 rendered in 212 s; 3-step Freefield baseline was 293 s. Single-scene fidelity comparable, but detail may vary; ultra-fast takes priority when Fast is also on. Quality 8-step remains default.",
+      "bind": [
+        {
+          "node": "ff_krea_ultra_enabled",
           "field": "value"
         }
       ]
@@ -376,12 +389,22 @@
       "phase": "denoise",
       "license": "Krea 2 Community License",
       "optional": true
+    },
+    {
+      "repo": "lvladikov/Krea2-Turbo-Distill-2step-LoRA",
+      "file": "loras/krea2_turbo_2step_rank_64_lora_comfyui.safetensors",
+      "dir": "loras",
+      "gb": 0.438,
+      "phase": "denoise",
+      "license": "Krea 2 Community License",
+      "optional": true
     }
   ],
   "credits": [
     "Krea 2 Turbo and the style LoRAs by Krea (Krea 2 Community License)",
     "Workflow: ComfyUI official template",
-    "Optional 3-step Krea Turbo distillation by lvladikov (Krea 2 Community License)."
+    "Optional 3-step Krea Turbo distillation by lvladikov (Krea 2 Community License).",
+    "Optional 2-step Krea Turbo ultra-fast preview LoRA by lvladikov; same INT8 base and text encoder as Quality/Fast."
   ],
   "test": {
     "style": "vintage tarot style"

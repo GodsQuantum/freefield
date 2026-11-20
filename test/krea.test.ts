@@ -9,7 +9,7 @@ const { apps, problems } = loadRegistry();
 const specs = [
   { id: "styles", consumers: ["30:16", "30:6"],
     graphBefore: "69de6ecef0cd28cebf48f6316f9105d53a9bce8c97a82bd9e3361abad7581731",
-    manifest: "7de214f0b746fa43e791b8530944de1cac7bbd5fd1b6451c382cd167df7e4a30" },
+    manifest: "9c3a11977fb27245aa26383128ee6be6da0b5878430dac054334cb5ae3a27ef5" },
 
 ];
 const sha = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
@@ -43,6 +43,8 @@ for (const spec of specs) {
       for (const extra of [
         "ff_krea_fast_enabled", "ff_krea_fast_lora", "ff_krea_fast_model",
         "ff_krea_steps_quality", "ff_krea_steps_fast", "ff_krea_steps_selected",
+        "ff_krea_ultra_enabled", "ff_krea_ultra_lora", "ff_krea_ultra_model",
+        "ff_krea_steps_ultra", "ff_krea_steps_ultra_selected",
       ]) delete restored[extra];
       restored["30:15"].inputs.model = ["30:10", 0];
       restored["30:3"].inputs.steps = 8;
@@ -94,7 +96,8 @@ test("styles: optional three-step LoRA is lazy, model/steps stay synchronized, d
   assert.deepEqual(app.inputs.find((field) => field.id === "fast_mode")?.bind, [
     { node: "ff_krea_fast_enabled", field: "value" },
   ]);
-  assert.deepEqual(app.inputs.map((field) => field.id).filter((id) => id !== "fast_mode"), [
+  assert.deepEqual(app.inputs.map((field) => field.id).filter((id) =>
+    id !== "fast_mode" && id !== "ultra_fast_mode"), [
     "prompt", "style", "strength", "enhance", "aspect", "megapixels", "seed",
   ]);
   assert.deepEqual(graph["ff_krea_fast_lora"].inputs, {
@@ -104,7 +107,7 @@ test("styles: optional three-step LoRA is lazy, model/steps stay synchronized, d
     on_false: ["30:10", 0], on_true: ["ff_krea_fast_lora", 0],
     switch: ["ff_krea_fast_enabled", 0],
   });
-  assert.deepEqual(graph["30:15"].inputs.model, ["ff_krea_fast_model", 0]);
+  assert.deepEqual(graph["30:15"].inputs.model, ["ff_krea_ultra_model", 0]);
   assert.deepEqual(graph["ff_krea_steps_quality"].inputs, { value: 8 });
   assert.deepEqual(graph["ff_krea_steps_fast"].inputs, { value: 3 });
   assert.deepEqual(graph["ff_krea_steps_selected"].inputs, {
@@ -112,7 +115,7 @@ test("styles: optional three-step LoRA is lazy, model/steps stay synchronized, d
     on_true: ["ff_krea_steps_fast", 0],
     switch: ["ff_krea_fast_enabled", 0],
   });
-  assert.deepEqual(graph["30:3"].inputs.steps, ["ff_krea_steps_selected", 0]);
+  assert.deepEqual(graph["30:3"].inputs.steps, ["ff_krea_steps_ultra_selected", 0]);
   assert.equal(graph["30:3"].inputs.cfg, 1);
   assert.equal(graph["30:3"].inputs.scheduler, "simple");
   assert.equal(graph["30:3"].inputs.sampler_name, "euler");
@@ -132,6 +135,54 @@ test("styles: optional three-step LoRA is lazy, model/steps stay synchronized, d
     assert.deepEqual(copy["ff_krea_fast_model"].inputs.switch, ["ff_krea_fast_enabled", 0]);
     assert.deepEqual(copy["ff_krea_steps_selected"].inputs.switch, ["ff_krea_fast_enabled", 0]);
     assert.equal(copy["30:3"].inputs.seed, 20261120);
+  }
+});
+
+test("styles: native 2-step Ultra preview remains optional, lazily overrides 3-step Fast, and preserves 8-step defaults", () => {
+  const app = apps.find((a) => a.id === "styles")!;
+  assert.ok(app.graph);
+  const g = app.graph;
+  const ultra = app.inputs.find((x) => x.id === "ultra_fast_mode")!;
+  assert.equal(ultra.type, "toggle");
+  assert.equal(ultra.default, false);
+  assert.deepEqual(ultra.bind, [{ node: "ff_krea_ultra_enabled", field: "value" }]);
+  assert.deepEqual(g["ff_krea_ultra_lora"].inputs, {
+    model: ["30:10", 0],
+    lora_name: "krea2_turbo_2step_rank_64_lora_comfyui.safetensors",
+    strength_model: 1,
+  });
+  assert.deepEqual(g["ff_krea_ultra_model"].inputs, {
+    on_false: ["ff_krea_fast_model", 0],
+    on_true: ["ff_krea_ultra_lora", 0],
+    switch: ["ff_krea_ultra_enabled", 0],
+  });
+  assert.deepEqual(g["ff_krea_steps_ultra"].inputs, { value: 2 });
+  assert.deepEqual(g["ff_krea_steps_ultra_selected"].inputs, {
+    on_false: ["ff_krea_steps_selected", 0],
+    on_true: ["ff_krea_steps_ultra", 0],
+    switch: ["ff_krea_ultra_enabled", 0],
+  });
+  assert.deepEqual(g["30:15"].inputs.model, ["ff_krea_ultra_model", 0]);
+  assert.deepEqual(g["30:3"].inputs.steps, ["ff_krea_steps_ultra_selected", 0]);
+  assert.equal(app.models.filter(m => m.file.endsWith("2step_rank_64_lora_comfyui.safetensors")).length, 1);
+  assert.equal(app.models.find(m => m.file.endsWith("2step_rank_64_lora_comfyui.safetensors"))?.optional, true);
+  for (const fast_mode of [false, true]) for (const ultra_fast_mode of [false, true]) {
+    const graph: ApiWorkflow = structuredClone(g);
+    const values = resolveValues(app, {
+      prompt: "A jazz club with a grand piano.", fast_mode, ultra_fast_mode, seed: 202611201600,
+    });
+    applyInputs(app, values,
+      { setInput: (node, field, value) => { graph[node].inputs[field] = value; } },
+      () => { throw new Error("unexpected media upload"); });
+    assert.equal(graph["ff_krea_fast_enabled"].inputs.value, fast_mode);
+    assert.equal(graph["ff_krea_ultra_enabled"].inputs.value, ultra_fast_mode);
+    // Both true means Ultra wins, without loading the inactive 3-step branch.
+    const steps = ultra_fast_mode ? 2 : (fast_mode ? 3 : 8);
+    assert.equal(steps, ultra_fast_mode ? g["ff_krea_steps_ultra"].inputs.value :
+      fast_mode ? g["ff_krea_steps_fast"].inputs.value : g["ff_krea_steps_quality"].inputs.value);
+    assert.deepEqual(graph["30:15"].inputs.model, ["ff_krea_ultra_model", 0]);
+    assert.deepEqual(graph["30:3"].inputs.steps, ["ff_krea_steps_ultra_selected", 0]);
+    assert.equal(graph["30:3"].inputs.seed, 202611201600);
   }
 });
 

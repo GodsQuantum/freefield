@@ -33,7 +33,7 @@
       ],
       "seed": 45862206397178,
       "steps": [
-        "ff_krea_steps_selected",
+        "ff_krea_steps_ultra_selected",
         0
       ],
       "cfg": 1,
@@ -140,7 +140,7 @@
     "class_type": "LoraLoaderModelOnly",
     "inputs": {
       "model": [
-        "ff_krea_fast_model",
+        "ff_krea_ultra_model",
         0
       ],
       "lora_name": "krea2_softwatercolor.safetensors",
@@ -413,6 +413,75 @@
     },
     "_meta": {
       "title": "Match 8/3 steps to LoRA"
+    }
+  },
+  "ff_krea_ultra_enabled": {
+    "class_type": "PrimitiveBoolean",
+    "inputs": {
+      "value": false
+    },
+    "_meta": {
+      "title": "Ultra-fast mode (2-step, opt-in)"
+    }
+  },
+  "ff_krea_ultra_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "30:10",
+        0
+      ],
+      "lora_name": "krea2_turbo_2step_rank_64_lora_comfyui.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "Krea2 Turbo 2-step distillation - opt in"
+    }
+  },
+  "ff_krea_ultra_model": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "on_false": [
+        "ff_krea_fast_model",
+        0
+      ],
+      "on_true": [
+        "ff_krea_ultra_lora",
+        0
+      ],
+      "switch": [
+        "ff_krea_ultra_enabled",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Lazy choose 8/3-step or ultra 2-step model"
+    }
+  },
+  "ff_krea_steps_ultra": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": 2
+    }
+  },
+  "ff_krea_steps_ultra_selected": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "on_false": [
+        "ff_krea_steps_selected",
+        0
+      ],
+      "on_true": [
+        "ff_krea_steps_ultra",
+        0
+      ],
+      "switch": [
+        "ff_krea_ultra_enabled",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Match 8/3/2 steps to selected LoRA"
     }
   }
 }

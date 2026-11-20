@@ -100,6 +100,53 @@ def krea_clip_gpu(api: Api) -> None:
                      "_meta": {"title": "Qwen3-VL on GPU"}}
 
 
+def krea_styles_fast_modes(api: Api) -> None:
+    """Recreate the native lazy 8-step quality / 3-step Fast / 2-step Ultra paths.
+
+    Both LoRAs share the existing Krea2 INT8/CLIP/VAE model.  Ultra takes
+    precedence if Fast and Ultra are both enabled; the default is unchanged
+    from the official 8-step quality workflow.  ComfySwitchNode is lazy.
+    """
+    if api["30:10"]["class_type"] != "UNETLoader" or api["30:15"]["class_type"] != "LoraLoaderModelOnly":
+        raise LookupError("Krea style workflow changed native UNET/LoRA node layout")
+    if api["30:15"]["inputs"]["model"] != ["30:10", 0]:
+        raise LookupError("Krea style LoRA no longer receives unmodified base model")
+    if api["30:3"]["class_type"] != "KSampler" or api["30:3"]["inputs"]["steps"] != 8:
+        raise LookupError("Krea official eight-step quality path changed")
+    new = {
+        "ff_krea_fast_enabled": {"class_type":"PrimitiveBoolean","inputs":{"value":False},
+                                 "_meta":{"title":"Fast mode (quality 8-step default)"}},
+        "ff_krea_fast_lora": {"class_type":"LoraLoaderModelOnly",
+                              "inputs":{"model":["30:10",0],"lora_name":"krea2_turbo_3step_rank_64_lora_comfyui.safetensors","strength_model":1.0},
+                              "_meta":{"title":"Krea2 Turbo 3-step distillation - opt in"}},
+        "ff_krea_fast_model": {"class_type":"ComfySwitchNode",
+                               "inputs":{"on_false":["30:10",0],"on_true":["ff_krea_fast_lora",0],"switch":["ff_krea_fast_enabled",0]},
+                               "_meta":{"title":"Krea base / 3-step LoRA"}},
+        "ff_krea_steps_quality": {"class_type":"PrimitiveInt","inputs":{"value":8}},
+        "ff_krea_steps_fast": {"class_type":"PrimitiveInt","inputs":{"value":3}},
+        "ff_krea_steps_selected": {"class_type":"ComfySwitchNode",
+                                   "inputs":{"on_false":["ff_krea_steps_quality",0],"on_true":["ff_krea_steps_fast",0],"switch":["ff_krea_fast_enabled",0]},
+                                   "_meta":{"title":"Match 8/3 steps to LoRA"}},
+        "ff_krea_ultra_enabled": {"class_type":"PrimitiveBoolean","inputs":{"value":False},
+                                  "_meta":{"title":"Ultra-fast mode (2-step, opt-in)"}},
+        "ff_krea_ultra_lora": {"class_type":"LoraLoaderModelOnly",
+                               "inputs":{"model":["30:10",0],"lora_name":"krea2_turbo_2step_rank_64_lora_comfyui.safetensors","strength_model":1.0},
+                               "_meta":{"title":"Krea2 Turbo 2-step distillation - opt in"}},
+        "ff_krea_ultra_model": {"class_type":"ComfySwitchNode",
+                                "inputs":{"on_false":["ff_krea_fast_model",0],"on_true":["ff_krea_ultra_lora",0],"switch":["ff_krea_ultra_enabled",0]},
+                                "_meta":{"title":"Lazy choose 8/3-step or ultra 2-step model"}},
+        "ff_krea_steps_ultra": {"class_type":"PrimitiveInt","inputs":{"value":2}},
+        "ff_krea_steps_ultra_selected": {"class_type":"ComfySwitchNode",
+                                         "inputs":{"on_false":["ff_krea_steps_selected",0],"on_true":["ff_krea_steps_ultra",0],"switch":["ff_krea_ultra_enabled",0]},
+                                         "_meta":{"title":"Match 8/3/2 steps to selected LoRA"}},
+    }
+    if any(k in api for k in new):
+        raise ValueError("Krea style native fast option already present or collided")
+    api.update(new)
+    put(api, "30:15", "model", ["ff_krea_ultra_model",0])
+    put(api, "30:3", "steps", ["ff_krea_steps_ultra_selected",0])
+
+
 def krea_reference_low_memory(api: Api) -> None:
     """Offer the native VAE reference-latent path without making it run on small shared GPUs.
 
@@ -857,6 +904,7 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     # the app's style picker writes the trigger and swaps the LoRA file
     put(st, find(st, "PrimitiveBoolean", value=False), "value", True)
     put(st, find(st, "LoraLoaderModelOnly"), "lora_name", "krea2_softwatercolor.safetensors")
+    krea_styles_fast_modes(st)
     out["styles"] = st
     out["smooth"] = tpl("utility_video_frame_interpolation.json")       # FILM frame interpolation, as shipped
     rc = tpl("video_wan21_scail2_character_replacement_int8.json")
