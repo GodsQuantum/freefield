@@ -73,17 +73,72 @@ test("styles: all nine looks retain their triggers, LoRAs and user settings thro
   }
 });
 
-test("style-reference remains on its original CPU/default encoder path", () => {
+test("style-reference: native lazy switch defaults to verified vision-only conditioning", () => {
   const app = apps.find((a) => a.id === "style-reference")!;
   assert.ok(app.graph);
   assert.equal(problems.some((p) => p.app === "style-reference" && p.severity === "error"), false);
-  assert.equal(Object.values(app.graph).filter((node) => node.class_type === "SelectCLIPDevice").length, 0);
-  assert.deepEqual(app.graph["30:11"].inputs, {
+  const graph = app.graph;
+  assert.equal(Object.values(graph).filter((node) => node.class_type === "SelectCLIPDevice").length, 0);
+  assert.deepEqual(graph["30:11"].inputs, {
     clip_name: "qwen3vl_4b_int8_convrot.safetensors", type: "krea2", device: "default",
   });
-  assert.deepEqual(app.graph["30:16"].inputs.clip, ["30:11", 0]);
-  assert.deepEqual(app.graph["30:52"].inputs.clip, ["30:11", 0]);
-  assert.equal(sha(JSON.stringify(app.graph)), "742307660e9f34570d8639f2ba6eed70a1b5d0e310829fc196614653d6bd13ba");
-  assert.equal(sha(readFileSync(new URL("../apps/style-reference/app.json", import.meta.url))),
-    "3c106125bcbc464776307605993a869624302ae2ed17d850de82ad0c85d27443");
+  assert.deepEqual(graph["30:16"].inputs.clip, ["30:11", 0]);
+
+  // The original high-detail image+VAE conditioning remains unchanged for GPUs with sufficient RAM.
+  assert.deepEqual(graph["30:52"].inputs, {
+    clip: ["30:11", 0], vae: ["30:12", 0], image1: ["69", 0], prompt: ["30:20", 0],
+  });
+  const vision = graph["ff_krea_ref_vision"];
+  assert.equal(vision.class_type, "TextEncodeQwenImageEditPlus");
+  assert.deepEqual(vision.inputs, {
+    clip: ["30:11", 0], image1: ["69", 0], prompt: ["30:20", 0],
+  });
+  assert.equal(graph["ff_krea_ref_full"].class_type, "PrimitiveBoolean");
+  assert.deepEqual(graph["ff_krea_ref_full"].inputs, { value: false });
+  assert.equal(graph["ff_krea_ref_switch"].class_type, "ComfySwitchNode");
+  assert.deepEqual(graph["ff_krea_ref_switch"].inputs, {
+    switch: ["ff_krea_ref_full", 0], on_false: ["ff_krea_ref_vision", 0], on_true: ["30:52", 0],
+  });
+  assert.deepEqual(graph["30:53"].inputs.conditioning, ["ff_krea_ref_switch", 0]);
+
+  // Remove only the new nodes to recover the pinned, already released 26-node graph.
+  const restored = structuredClone(graph);
+  delete restored["ff_krea_ref_vision"];
+  delete restored["ff_krea_ref_full"];
+  delete restored["ff_krea_ref_switch"];
+  restored["30:53"].inputs.conditioning = ["30:52", 0];
+  assert.equal(Object.keys(restored).length, 26);
+  assert.equal(sha(JSON.stringify(restored)), "742307660e9f34570d8639f2ba6eed70a1b5d0e310829fc196614653d6bd13ba");
+
+  const toggle = app.inputs.find((i) => i.id === "full_reference");
+  assert.ok(toggle, "the costly mode must remain opt-in");
+  assert.equal(toggle.type, "toggle");
+  assert.equal(toggle.default, false);
+  assert.deepEqual(toggle.bind, [{ node: "ff_krea_ref_full", field: "value" }]);
+  assert.match(toggle.help!, /(?:memory|mémoire|GPU)/i);
+  const controls = app.inputs.map((i) => i.id);
+  assert.deepEqual(controls.filter((id) => id !== "full_reference"), [
+    "style", "prompt", "enhance", "aspect", "megapixels", "seed",
+  ]);
+  assert.equal(app.models.length, 4, "same diffusion, encoder, VAE and style LoRA weights");
+});
+
+test("style-reference: opt-in flag maps only to the branch boolean", () => {
+  const app = apps.find((a) => a.id === "style-reference")!;
+  assert.ok(app.graph);
+  for (const full of [false, true]) {
+    const graph: ApiWorkflow = structuredClone(app.graph);
+    const values = resolveValues(app, {
+      prompt: "a red teapot",
+      style: { name: "reference.png", bytes: new Uint8Array([0x89, 0x50, 0x4e, 0x47]), type: "image/png" },
+      enhance: false, aspect: "1:1 (Square)", megapixels: 1, seed: 20261120, full_reference: full,
+    });
+    applyInputs(app, values, {
+      setInput: (node, field, value) => { graph[node].inputs[field] = value; },
+    }, (f) => f.name);
+    assert.equal(graph["ff_krea_ref_full"].inputs.value, full);
+    assert.deepEqual(graph["ff_krea_ref_switch"].inputs.on_false, ["ff_krea_ref_vision", 0]);
+    assert.deepEqual(graph["ff_krea_ref_switch"].inputs.on_true, ["30:52", 0]);
+    assert.deepEqual(graph["30:52"].inputs.vae, ["30:12", 0]);
+  }
 });

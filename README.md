@@ -89,7 +89,7 @@ the lab's GPU runs.
 | `z-image` | Create Image, fast drafts | Z-Image Turbo (int8); the lab makes its reference photos with it | fits whole, 12.2 GB | ready |
 | `moss-image` | Create Image with a layout | MOSS-Image SFT (int8), Apache-2.0; also takes a layout JSON with a box per text and object | fits whole, 13.0 GB | ready |
 | `styles` | Image styles | Krea 2 Turbo (int8) + Krea's nine official style LoRAs, picked from a list | fits whole, 19.1 GB | ready |
-| `style-reference` | Style transfer | Krea 2 Turbo (int8) + style-reference LoRA | fits whole, 19.1 GB | ready |
+| `style-reference` | Style transfer | Krea 2 Turbo (int8) + style-reference LoRA; visual-only conditioning by default, optional full VAE reference latents | 19.1 GB model weight estimate; runtime memory varies | ready |
 | `cinema-studio` | Cinematic Cameras | FLUX 3 Image Klein + genre, era, camera body, lens, focal length, aperture, lighting and color palette, written as the look they give; 6 aspect ratios, 1K to 2K | fits whole, 11.0 GB | ready |
 | `cinema-video` | Cinema Studio (video) | Cinema Studio's still (FLUX 3 Image Klein) as the first frame of LTX-2.5 image-to-video in one graph: the same look selects plus up to 3 camera moves from Higgsfield's list of 33, written in the order picked (one move holds; the lab found the order of two is not reliable), tempo and duration; sound included | needs Modal, peak 44.3 GB on L40S | ready |
 | `edit` | Edit | FLUX 3 Image Klein (int8): a change described in words, no mask | fits whole, 11.0 GB | ready |
@@ -144,6 +144,28 @@ validated at 1024 × 1024 with 25 steps. Caption expansion remains optional. Fib
 needs a newer ComfyUI than the one pinned here and its weights are licensed for non-commercial use only.
 
 ![Six prompts (a portrait, a product with text, counting, a JSON prompt, a poster, a watercolor) on Z-Image Turbo, FLUX 3 Klein with and without the upsampler, Krea 2 Turbo and MOSS-Image, with GPU seconds and peak VRAM under each](docs/media/image-models.jpg)
+
+### Krea style references on integrated GPUs
+
+The `style-reference` app now defaults to **visual reference only**: the Qwen3-VL
+encoder receives the reference image and the official style-reference LoRA remains
+active, but its optional 1024-pixel VAE *reference latent* is not created. The
+final image still uses the original VAE for decoding. A native **lazy**
+`ComfySwitchNode` preserves the official full-latent branch behind the
+**Detailed reference (high memory)** toggle; an unselected branch is not
+evaluated, and no additional checkpoint is downloaded.
+
+On Cloud9's Radeon 780M, the original full-latent path exhausted host memory in
+both 1 MP trials (18.4–20.3 GiB peak shared GPU memory, with the safety guard
+stopping ComfyUI). The visual-only path completed two real 1024 × 1024
+Freefield CLI renders in 564 and 670 seconds using 9.13 and 8.85 GiB peak
+shared GPU memory. Changing *only* the input style reference from a neutral
+photograph to a blue/orange watercolor altered the resulting teapot's texture
+and palette despite identical text and seed. This verifies a reference signal
+for those two examples, not perfect transfer for all styles. The optional full
+mode is retained for systems with substantially more available GPU memory;
+it is **not qualified on Radeon 780M**. The host guard and ROCm configuration
+are unchanged.
 
 ### SeedVR2 upscaling
 

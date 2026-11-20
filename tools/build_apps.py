@@ -19,6 +19,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from copy import deepcopy
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ui2api import convert  # noqa: E402
@@ -97,6 +98,72 @@ def krea_clip_gpu(api: Api) -> None:
     api[selector] = {"class_type": "SelectCLIPDevice",
                      "inputs": {"clip": [clip, 0], "device": "gpu:0"},
                      "_meta": {"title": "Qwen3-VL on GPU"}}
+
+
+def krea_reference_low_memory(api: Api) -> None:
+    """Offer the native VAE reference-latent path without making it run on small shared GPUs.
+
+    On Radeon 780M, TextEncodeQwenImageEditPlus with the VAE input spikes GTT
+    above 18 GiB and trips the host memory guard at 1 MP. Without that optional
+    VAE input, Qwen3VL still sees the reference image; two controlled 1 MP
+    renders (photographic vs watercolor reference, identical seed/prompt)
+    verified both a style signal and < 10 GiB GTT. A native lazy switch preserves
+    the full official conditioning as an explicit opt-in, without duplicating
+    model weights or loading its inactive branch.
+    """
+    full_candidates = [nid for nid, n in api.items()
+                       if n["class_type"] == "TextEncodeQwenImageEditPlus"
+                       and "vae" in n["inputs"]]
+    if len(full_candidates) != 1:
+        raise LookupError(f"expected one full Krea image-conditioning node: {full_candidates}")
+    full = full_candidates[0]
+    original = api[full]
+    inputs = original["inputs"]
+    if not all(is_link(inputs.get(field)) for field in ("clip", "vae", "image1", "prompt")):
+        raise LookupError("Krea image conditioning lost an expected native model/reference link")
+    if api.get(inputs["vae"][0], {}).get("class_type") != "VAELoader":
+        raise LookupError("Krea high-fidelity reference requires a native VAELoader")
+    method = find(api, "FluxKontextMultiReferenceLatentMethod")
+    current = api[method]["inputs"]["conditioning"]
+    vision = deepcopy(original)
+    del vision["inputs"]["vae"]
+    if current != [full, 0]:
+        # Already transformed: verify the exact structure instead of appending
+        # new switches on repeated generator runs.
+        if not is_link(current) or current[0] not in api:
+            raise LookupError("Krea reference conditioning has an unexpected upstream branch")
+        selected = api[current[0]]
+        if selected["class_type"] != "ComfySwitchNode":
+            raise LookupError("Krea reference conditioning no longer comes from a lazy switch")
+        bound = selected["inputs"]
+        bool_link, low_link = bound.get("switch"), bound.get("on_false")
+        if (bound.get("on_true") != [full, 0]
+                or not is_link(bool_link) or not is_link(low_link)
+                or api.get(bool_link[0], {}).get("class_type") != "PrimitiveBoolean"
+                or api[bool_link[0]]["inputs"] != {"value": False}
+                or api.get(low_link[0]) != vision):
+            raise LookupError("Krea reference native lazy switch differs from the expected safe graph")
+        return
+    unexpected = [(nid, key) for nid, node in api.items()
+                  for key, value in node["inputs"].items()
+                  if value == [full, 0] and (nid, key) != (method, "conditioning")]
+    if unexpected:
+        raise LookupError(f"Krea full reference has unexpected consumers: {unexpected}")
+    # Fixed names keep the Freefield form binding stable when upstream templates
+    # insert or reorder numeric node IDs in a future ComfyUI release.
+    low_id, bool_id, switch_id = ("ff_krea_ref_vision", "ff_krea_ref_full", "ff_krea_ref_switch")
+    if any(nid in api for nid in (low_id, bool_id, switch_id)):
+        raise LookupError("Krea reference node name is already used by the upstream template")
+    api[low_id] = vision
+    api[bool_id] = {"class_type": "PrimitiveBoolean",
+                    "inputs": {"value": False},
+                    "_meta": {"title": "Detailed reference latents (high memory)"}}
+    api[switch_id] = {"class_type": "ComfySwitchNode",
+                      "inputs": {"switch": [bool_id, 0],
+                                 "on_false": [low_id, 0],
+                                 "on_true": [full, 0]},
+                      "_meta": {"title": "Visual-only or detailed reference (lazy)"}}
+    put(api, method, "conditioning", [switch_id, 0])
 
 
 def to_save_image(api: Api, node: str, prefix: str) -> None:
@@ -783,6 +850,7 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     st = tpl("image_krea2_turbo_t2i_int8.json")
     krea2_encoder = {"qwen3vl_4b_fp8_scaled.safetensors": "qwen3vl_4b_int8_convrot.safetensors"}
     swap_files(out["style-reference"], krea2_encoder)
+    krea_reference_low_memory(out["style-reference"])
     swap_files(st, krea2_encoder)
     krea_clip_gpu(st)
     # the template's own "use LoRA" switch (it also appends the trigger to the prompt) goes on;

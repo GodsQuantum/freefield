@@ -216,7 +216,7 @@
     "class_type": "FluxKontextMultiReferenceLatentMethod",
     "inputs": {
       "conditioning": [
-        "30:52",
+        "ff_krea_ref_switch",
         0
       ],
       "reference_latents_method": "index_timestep_zero"
@@ -380,6 +380,55 @@
     },
     "_meta": {
       "title": "Resolution Selector"
+    }
+  },
+  "ff_krea_ref_vision": {
+    "class_type": "TextEncodeQwenImageEditPlus",
+    "inputs": {
+      "clip": [
+        "30:11",
+        0
+      ],
+      "image1": [
+        "69",
+        0
+      ],
+      "prompt": [
+        "30:20",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Text Encode Qwen Image Edit Plus"
+    }
+  },
+  "ff_krea_ref_full": {
+    "class_type": "PrimitiveBoolean",
+    "inputs": {
+      "value": false
+    },
+    "_meta": {
+      "title": "Detailed reference latents (high memory)"
+    }
+  },
+  "ff_krea_ref_switch": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "switch": [
+        "ff_krea_ref_full",
+        0
+      ],
+      "on_false": [
+        "ff_krea_ref_vision",
+        0
+      ],
+      "on_true": [
+        "30:52",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Visual-only or detailed reference (lazy)"
     }
   }
 }

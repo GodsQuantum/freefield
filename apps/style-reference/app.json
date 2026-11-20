@@ -30,6 +30,19 @@
       ]
     },
     {
+      "id": "full_reference",
+      "type": "toggle",
+      "label": "Detailed reference (high memory)",
+      "default": false,
+      "help": "Off (default): the reference influences Qwen3-VL visually, without 1024px VAE reference latents. On: original higher-detail VAE reference conditioning, which can exceed the memory of integrated GPUs such as Radeon 780M. Use only with sufficient dedicated GPU memory.",
+      "bind": [
+        {
+          "node": "ff_krea_ref_full",
+          "field": "value"
+        }
+      ]
+    },
+    {
       "id": "prompt",
       "type": "textarea",
       "label": "What to paint",
