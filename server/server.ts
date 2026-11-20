@@ -29,6 +29,7 @@ import { History, replayValues } from "./history.ts";
 import { Flags } from "./flags.ts";
 import { DOOR_HTML, foreign, Guard, plainHttpToIp } from "./guard.ts";
 import { toRequest, uploadLimitBytes } from "./uploads.ts";
+import { handleFreefieldMcp } from "./mcp.ts";
 
 const root = repoRoot();
 const { apps: catalog, problems } = loadRegistry(root);
@@ -301,7 +302,7 @@ const server = createServer(async (req, res) => {
         return res.end();
       }
       if (!guard.admits(req.headers.cookie)) {
-        if (parts[0] === "api") return send(res, 401, { error: "this demo needs its passcode: open the link you were given" });
+        if (parts[0] === "api" || parts[0] === "mcp") return send(res, 401, { error: "authentication required" });
         res.writeHead(401, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
         return res.end(DOOR_HTML);
       }
@@ -309,6 +310,44 @@ const server = createServer(async (req, res) => {
     const visitor = guard.visitor(req.headers.cookie, !plainHttpToIp(req));   // hosted: this browser's id; locally undefined (no filter)
     if (visitor.setCookie) res.setHeader("set-cookie", visitor.setCookie);
     const me = visitor.id;
+    if (parts.length === 1 && parts[0] === "mcp") {
+      return handleFreefieldMcp(req, res, {
+        apps: async () => {
+          const files = await installedFiles();
+          return apps.map((a) => publicApp(a, files));
+        },
+        app: async (id) => {
+          const app = byId.get(id);
+          return app ? publicApp(app, await installedFiles()) : null;
+        },
+        run: async (id, values, preset) => {
+          const app = byId.get(id);
+          if (!app) throw new InputError("Unknown Freefield app: " + id);
+          if (!runnable(app)) throw new InputError(id + " is not runnable");
+          // Reserve the one admission slot *before* async model discovery.
+          const refused = guard.refuse(activeRuns());
+          if (refused) throw new InputError(refused);
+          admitting++;
+          try {
+            const lacking = missingPack(app, await installedFiles());
+            if (lacking) throw new InputError(id + " requires unavailable model pack " + lacking);
+            const resolved = resolveValues(app, values);
+            const view = startRun(app, resolved, preset, me);
+            guard.record();
+            return view;
+          } finally { admitting--; }
+        },
+        runs: (app, limit) => history.list(app, limit, me),
+        job: (id) => history.get(id, me),
+        cancel: (id) => history.cancel(id, me),
+        output: (id, filename) => {
+          const entry = history.get(id, me);
+          if (!entry?.outputs.some((o) => o.file === filename)) return null;
+          return history.file(id, filename, me);
+        },
+        gpu: () => gpuStatus(),
+      });
+    }
     if (parts[0] === "api") {
       const [, area, id, sub, arg] = parts;
       if (req.method === "GET" && area === "apps" && parts.length === 2) {
