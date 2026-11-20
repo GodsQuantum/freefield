@@ -63,7 +63,7 @@
     "class_type": "CLIPTextEncode",
     "inputs": {
       "clip": [
-        "30:11",
+        "50",
         0
       ],
       "text": [
@@ -151,7 +151,7 @@
     "class_type": "TextGenerate",
     "inputs": {
       "clip": [
-        "30:11",
+        "50",
         0
       ],
       "prompt": [
@@ -322,6 +322,19 @@
     },
     "_meta": {
       "title": "Resolution Selector"
+    }
+  },
+  "50": {
+    "class_type": "SelectCLIPDevice",
+    "inputs": {
+      "clip": [
+        "30:11",
+        0
+      ],
+      "device": "gpu:0"
+    },
+    "_meta": {
+      "title": "Qwen3-VL on GPU"
     }
   }
 }

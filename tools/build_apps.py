@@ -82,6 +82,23 @@ def swap_files(api: Api, mapping: dict[str, str]) -> None:
                 node["inputs"][k] = mapping[v]
 
 
+def krea_clip_gpu(api: Api) -> None:
+    """Share the native GPU selector between Krea prompt generation and conditioning."""
+    clip = find(api, "CLIPLoader", type="krea2")
+    consumers = sorted((node["class_type"], field) for node in api.values()
+                       for field, value in node["inputs"].items() if value == [clip, 0])
+    if consumers not in (
+        [("CLIPTextEncode", "clip"), ("TextGenerate", "clip")],
+        [("TextEncodeQwenImageEditPlus", "clip"), ("TextGenerate", "clip")],
+    ):
+        raise LookupError(f"unexpected Krea CLIP consumers: {consumers}")
+    selector = str(max((int(i) for i in api if i.isdigit()), default=0) + 1)
+    rewire(api, [clip, 0], [selector, 0])
+    api[selector] = {"class_type": "SelectCLIPDevice",
+                     "inputs": {"clip": [clip, 0], "device": "gpu:0"},
+                     "_meta": {"title": "Qwen3-VL on GPU"}}
+
+
 def to_save_image(api: Api, node: str, prefix: str) -> None:
     api[node]["class_type"] = "SaveImage"
     api[node]["inputs"]["filename_prefix"] = prefix
@@ -767,6 +784,7 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     krea2_encoder = {"qwen3vl_4b_fp8_scaled.safetensors": "qwen3vl_4b_int8_convrot.safetensors"}
     swap_files(out["style-reference"], krea2_encoder)
     swap_files(st, krea2_encoder)
+    krea_clip_gpu(st)
     # the template's own "use LoRA" switch (it also appends the trigger to the prompt) goes on;
     # the app's style picker writes the trigger and swaps the LoRA file
     put(st, find(st, "PrimitiveBoolean", value=False), "value", True)
