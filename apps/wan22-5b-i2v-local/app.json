@@ -5,12 +5,12 @@
   "section": "video",
   "pack": "video-wan22-5b-gguf",
   "status": "ready",
-  "summary": "Anime une image avec Wan 2.2 TI2V 5B quantifié Q6 sur Radeon 780M, en réutilisant les poids vidéo partagés.",
+  "summary": "Expérimental : Wan 2.2 TI2V 5B Q6 sur Radeon 780M. MP4 techniquement validé ; vidéos avec artefacts, qualité non validée pour publication.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "video_wan2_2_5B_ti2v.json",
     "comfyui": "0.45.0",
-    "notes": "Cloud9 Radeon 780M technical E2E passed 2026-11-19 twice: native ComfyUI MP4 130.78s, then authenticated gateway via Freefield native CLI and image upload, succeeded 131.3s (job 0e7f4824-25ee-4f4d-a6c0-8ebba5eefda4). Only 256x144/9f/4 steps qualified; larger video and aesthetic quality untested."
+    "notes": "Cloud9 Radeon 780M technical E2E passed 2026-11-19 twice: native ComfyUI MP4 130.78s, then authenticated gateway via Freefield native CLI and image upload, succeeded 131.3s (job 0e7f4824-25ee-4f4d-a6c0-8ebba5eefda4). Only 256x144/9f/4 steps qualified; larger video and aesthetic quality untested. Visual-quality update (2026-11-21): six separate 384x384/33f Q6/INT8/UniPC/ComfyKitchen/W4A8/Turbo experiments all showed colored rectangles and geometric artifacts after initial frames (review: validation/wan5b-existing-384px-visual-review-20261121.json). A higher-resolution 576x768/9f/5step Turbo Q6 attempt stopped without MP4 after 366.42s by the Cloud9 memory guard (min host MemAvailable 9.98 GiB; validation/wan22-i2v-turbo-q6-res576x768-9f-5steps-20261121.json); not an aesthetic success. Keep native low-resolution E2E technical compatibility, existing models, graph and all controls intact. Avoid choosing this as reliable video production default."
   },
   "inputs": [
     {

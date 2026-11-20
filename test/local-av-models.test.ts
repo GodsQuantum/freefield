@@ -55,6 +55,11 @@ test("Wan2.2 image-to-video draft reuses the T2V weights and attaches a native L
   const i2v = apps.find((a) => a.id === "wan22-5b-i2v-local");
   assert.ok(t2v && i2v);
   assert.equal(i2v.status, "ready", "image upload and Freefield gateway E2E confirmed on Radeon 780M");
+  assert.match(i2v.summary ?? "", /qualité non validée pour publication/i,
+    "technical MP4 compatibility must not be presented as production-quality video");
+  const wanCard = JSON.parse(readFileSync(new URL("../apps/wan22-5b-i2v-local/app.json", import.meta.url), "utf8"));
+  assert.match(wanCard.source.notes, /validation\/wan22-i2v-turbo-q6-res576x768-9f-5steps-20261121\.json/);
+
   assert.deepEqual(i2v.modes, t2v.modes);
   assert.equal(i2v.pack, t2v.pack);
   assert.deepEqual(i2v.models, t2v.models, "no duplicate downloads");
