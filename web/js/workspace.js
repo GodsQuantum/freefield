@@ -165,6 +165,10 @@ export function pickOption(app, inputId, value) {
 
 /** Load a result's settings and input files into its app's form (and optionally run it again). */
 export async function recreate(item, { run = false } = {}) {
+  if (item.validation?.replayable === false) {
+    toast(t("lib.nonreplay"), { error: true });
+    return;
+  }
   const app = byId.get(item.app);
   if (!app) return;
   const f = formFor(app);

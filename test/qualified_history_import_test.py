@@ -92,6 +92,29 @@ class QualifiedHistoryImportTest(unittest.TestCase):
                          imp.import_one(name, self.history, self.outputs, True)["result"])
         self.assertEqual(1, len(list(self.history.iterdir())))
 
+    def test_reviewed_override_as_read_only_benchmark(self):
+        name, image = self.fixture(workflow_override=True)
+        result = imp.import_one(name, self.history, self.outputs, True, benchmark=True)
+        self.assertEqual("IMPORTED", result["result"])
+        record = json.loads((self.history / result["id"] / "meta.json").read_text())
+        self.assertTrue(record["validation"]["benchmark_only"])
+        self.assertFalse(record["validation"]["replayable"])
+        self.assertTrue(record["validation"]["workflow_override"])
+        self.assertEqual(record["validation"]["quality_status"], "PASS_SINGLE_SCENE")
+        self.assertEqual(image.stat().st_ino, (self.history / result["id"] / "out-01.png").stat().st_ino)
+        again = imp.import_one(name, self.history, self.outputs, True, benchmark=True)
+        self.assertEqual("ALREADY_IMPORTED", again["result"])
+
+    def test_benchmark_rejects_failed_qa_and_unreviewed_output(self):
+        name, _ = self.fixture(quality="VISUAL_QUALITY_FAIL", workflow_override=True)
+        with self.assertRaisesRegex(ValueError, "not a qualified"):
+            imp.import_one(name, self.history, self.outputs, False, benchmark=True)
+        payload = json.loads((self.receipts / name).read_text())
+        payload["visual_review"] = {}
+        (self.receipts / name).write_text(json.dumps(payload))
+        with self.assertRaisesRegex(ValueError, "not a qualified"):
+            imp.import_one(name, self.history, self.outputs, False, benchmark=True)
+
     def test_dry_run_never_adds_history(self):
         name, _ = self.fixture()
         result = imp.import_one(name, self.history, self.outputs, False)

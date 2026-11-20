@@ -4,7 +4,7 @@
 import { createMcpHandler, McpServer } from "@modelcontextprotocol/server";
 import { toNodeHandler } from "@modelcontextprotocol/node";
 import * as z from "zod/v4";
-import { readFileSync, statSync } from "node:fs";
+import { readFileSync, statSync, openSync, readSync, closeSync } from "node:fs";
 import { extname } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { FileValue, Values } from "./runner.ts";
@@ -109,13 +109,30 @@ export function createFreefieldMcp(backend: McpBackend): McpServer {
 
     mcp.registerTool("list_runs", {
       title: "List Freefield history",
-      description: "Show recent runs in the Freefield gallery, including status and URLs (no duplicate model files).",
+      description: "List recent Freefield inference jobs with status, run IDs and output names. Use get_job for details. Read-only, no GPU wake-up.",
       inputSchema: z.object({
         app_id: z.string().max(100).optional(),
+        offset: z.number().int().min(0).max(250).default(0),
         limit: z.number().int().min(1).max(50).default(10),
       }),
       annotations: { readOnlyHint: true, openWorldHint: false },
-    }, async ({ app_id, limit }) => text({ entries: await backend.runs(app_id, limit) }));
+    }, async ({ app_id, offset, limit }) => {
+      // MCPProxy has a small text-response budget. Full history entries
+      // contain source prompts and inputs; leave those to get_job.
+      const all = await backend.runs(app_id, offset + limit + 1) as Record<string, any>[];
+      const entries = all.slice(offset, offset + limit).map((run) => ({
+        id: run.id, app: run.app, status: run.status, created: run.created,
+        seconds: run.seconds ?? null, total: run.total ?? null,
+        outputs: (run.outputs || []).map((o: Record<string, unknown>) => ({
+          file: o.file, type: o.type, name: o.name,
+        })),
+        ...(run.validation?.benchmark_only ? { benchmark: {
+          quality_status: run.validation.quality_status, replayable: false,
+        } } : {}),
+        ...(run.error ? { error: run.error.message } : {}),
+      }));
+      return text({ offset, limit, entries, next_offset: all.length > offset + limit ? offset + limit : null });
+    });
 
     mcp.registerTool("get_job", {
       title: "Check Freefield generation",
@@ -129,7 +146,7 @@ export function createFreefieldMcp(backend: McpBackend): McpServer {
 
     mcp.registerTool("get_output", {
       title: "Read Freefield media output",
-      description: "Return image bytes as MCP image content (up to 2 MiB), or a base64-encoded small audio/video file. Large files are available through authenticated Freefield history HTTP API.",
+      description: "Return small images inline as MCP image content. Large images and audio/video over 10KB return a get_output_chunk hint to avoid MCPProxy response truncation.",
       inputSchema: z.object({ run_id: z.string().min(1).max(100), filename: z.string().min(1).max(160) }),
       annotations: { readOnlyHint: true, openWorldHint: false },
     }, async ({ run_id, filename }) => {
@@ -137,19 +154,54 @@ export function createFreefieldMcp(backend: McpBackend): McpServer {
       if (!path) return text({ error: "Output not found or not authorized" }, true);
       const size = statSync(path).size;
       if (size > 2_000_000) {
-        return text({ too_large_for_mcp: true, bytes: size,
+        return text({ too_large_for_inline: true, bytes: size, next_tool: "get_output_chunk",
           api_path: "/api/history/" + run_id + "/files/" + filename,
-          note: "Use the authenticated Freefield HTTP API for this media." });
+          note: "MCP clients can fetch bounded chunks; authenticated HTTP clients can stream directly." });
       }
       const mime = ({ ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
         ".webp": "image/webp", ".gif": "image/gif", ".mp3": "audio/mpeg",
         ".wav": "audio/wav", ".mp4": "video/mp4", ".webm": "video/webm",
         ".ogg": "audio/ogg", ".flac": "audio/flac" } as Record<string, string>)[extname(filename).toLowerCase()] || "application/octet-stream";
+      if (!mime.startsWith("image/") && size > 10_000) {
+        return text({ too_large_for_inline: true, bytes: size, mime_type: mime,
+          next_tool: "get_output_chunk",
+          note: "Use bounded get_output_chunk calls or authenticated Freefield HTTP media streaming." });
+      }
       const data = readFileSync(path).toString("base64");
       if (mime.startsWith("image/")) {
         return { content: [{ type: "image" as const, mimeType: mime, data }] };
       }
       return text({ mime_type: mime, bytes: size, base64: data });
+    });
+
+    mcp.registerTool("get_output_chunk", {
+      title: "Fetch a bounded Freefield media chunk",
+      description: "Retrieve up to 8192 raw bytes of an authenticated image, video or audio output as base64. Use next_offset until done. Bounded to avoid MCPProxy truncation.",
+      inputSchema: z.object({
+        run_id: z.string().min(1).max(100),
+        filename: z.string().min(1).max(160),
+        offset: z.number().int().min(0).max(1_000_000_000_000).default(0),
+        max_bytes: z.number().int().min(1).max(8192).default(8192),
+      }),
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    }, async ({ run_id, filename, offset, max_bytes }) => {
+      const path = await backend.output(run_id, filename);
+      if (!path) return text({ error: "Output not found or not authorized" }, true);
+      const size = statSync(path).size;
+      if (offset > size) return text({ error: "Offset exceeds media size", size }, true);
+      const bytes = Buffer.alloc(Math.min(max_bytes, size - offset));
+      if (bytes.length > 0) {
+        const fd = openSync(path, "r");
+        try {
+          const read = readSync(fd, bytes, 0, bytes.length, offset);
+          if (read !== bytes.length) return text({ error: "Incomplete media read" }, true);
+        } finally {
+          closeSync(fd);
+        }
+      }
+      return text({ run_id, filename, offset, bytes: bytes.length, size,
+        next_offset: offset + bytes.length, done: offset + bytes.length >= size,
+        base64: bytes.toString("base64") });
     });
 
     mcp.registerTool("cancel_job", {

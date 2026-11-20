@@ -172,13 +172,14 @@ function doneCard(e, list) {
     media,
     el("div", { class: "ov" },
       el("div", { class: "row" }, el("span", { class: "tag dark" }, app?.name ?? e.app),
+        e.validation?.benchmark_only ? el("span", { class: "tag" }, t("lib.bench")) : null,
         el("div", { class: "acts" }, dl,
           item.type !== "audio" && hooks.useIn ? el("button", { class: "mini", type: "button", title: t("act.usein"), "aria-label": t("act.usein"),
             onclick: (ev) => { ev.stopPropagation(); hooks.useIn(ev.currentTarget, item); } }, icon("send")) : null,
           el("button", { class: "mini", type: "button", title: t("act.compare"), "aria-label": t("act.compare"), onclick: stop(() => hooks.compare?.(item)) }, icon("compare")),
           deleteButton(() => feed.remove(e.id)))),
       el("div", { class: "row" }, el("span", { class: "meta" }, prompt || `${ago(e.created)}${e.seconds ? ` · ${fmtSeconds(e.seconds)}` : ""}`),
-        app ? el("button", { class: "mini lime", type: "button", title: t("act.recreate"), "aria-label": t("act.recreate"), onclick: stop(() => hooks.recreate?.(item)) }, icon("redo")) : null)));
+        app && e.validation?.replayable !== false ? el("button", { class: "mini lime", type: "button", title: t("act.recreate"), "aria-label": t("act.recreate"), onclick: stop(() => hooks.recreate?.(item)) }, icon("redo")) : null)));
   return { node };
 }
 
@@ -186,14 +187,14 @@ function doneCard(e, list) {
  * Draw the feed for one app (or all) into host and keep it current.
  * empty(): what to show when there is nothing yet. Returns a cleanup function.
  */
-export function feedView(host, { app = null, empty = null, dense = false } = {}) {
+export function feedView(host, { app = null, empty = null, dense = false, filterEntry = null } = {}) {
   const grid = el("div", { class: `feed${dense ? " dense" : ""}` });
   const cards = new Map();
   let lastOrder = null;
-  const list = () => feed.list(app).filter((e) => e.status === "succeeded" && e.outputs.length);
+  const list = () => feed.list(app).filter((e) => (!filterEntry || filterEntry(e)) && e.status === "succeeded" && e.outputs.length);
   const kindOf = (e) => (!isDone(e) ? "pending" : e.status === "succeeded" && e.outputs.length ? "done" : "failed");
   const render = () => {
-    const entries = feed.list(app);
+    const entries = feed.list(app).filter((e) => !filterEntry || filterEntry(e));
     if (!entries.length && !feed.isLoaded(app)) return;   // first load still on its way: no flash of the empty state
     if (!entries.length) {
       if (lastOrder !== "") host.replaceChildren(empty ? empty() : el("div", { class: "empty" }, t("ws.empty.hist")));

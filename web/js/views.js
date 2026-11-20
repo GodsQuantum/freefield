@@ -184,15 +184,17 @@ export function libraryView() {
   const body = el("div", { style: { display: "flex", flexDirection: "column", minHeight: "40vh" } });
   let disposeFeed = null;
   const draw = () => {
-    tabs.replaceChildren(...[["mine", "clock"], ["lab", "film"]].map(([id, ic]) => el("button", { type: "button", role: "tab", "aria-selected": String(libTab === id),
-      onclick: () => { libTab = id; draw(); } }, icon(ic), t(`lib.${id}`))));
+    tabs.replaceChildren(...[["mine", "clock"], ["bench", "chip"], ["lab", "film"]].map(([id, ic]) => el("button", { type: "button", role: "tab", "aria-selected": String(libTab === id),
+      onclick: () => { libTab = id; libApp = ""; draw(); } }, icon(ic), t(`lib.${id}`))));
     disposeFeed?.();
     disposeFeed = null;
-    if (libTab === "mine") {
-      const used = [...new Set(feed.list().map((e) => e.app))].map((id) => byId.get(id)).filter(Boolean);
+    if (libTab === "mine" || libTab === "bench") {
+      const isBenchmark = (e) => Boolean(e.validation?.benchmark_only);
+      const inTab = (e) => isBenchmark(e) === (libTab === "bench");
+      const used = [...new Set(feed.list().filter(inTab).map((e) => e.app))].map((id) => byId.get(id)).filter(Boolean);
       filter.replaceChildren(...(used.length > 1 ? [["", t("lib.allapps")], ...used.map((a) => [a.id, a.name])] : []).map(([id, label]) =>
         el("button", { type: "button", "aria-pressed": String(libApp === id), onclick: () => { libApp = id; draw(); } }, label)));
-      disposeFeed = feedView(body, { app: libApp || null, empty: () => el("div", { class: "empty" }, t("lib.empty"), " ", el("a", { class: "more", href: "#/image" }, t("explore.start"), icon("chevR"))) });
+      disposeFeed = feedView(body, { app: libApp || null, filterEntry: inTab, empty: () => el("div", { class: "empty" }, t(libTab === "bench" ? "lib.emptybench" : "lib.empty"), " ", el("a", { class: "more", href: "#/image" }, t("explore.start"), icon("chevR"))) });
     } else {
       const n = flags.count();
       filter.replaceChildren(...(n || libFlagged ? [[false, t("lib.allex")], [true, t("lib.flagged", { n })]].map(([on, label]) =>
@@ -207,8 +209,8 @@ export function libraryView() {
   draw();
   const offFlags = flags.on(() => { if (libTab === "lab") draw(); });
   // the app filter appears once two apps have history; entries of apps outside the catalog (the smoke apps without ?dev) do not count
-  const usedApps = () => new Set(feed.list().map((e) => e.app).filter((id) => byId.has(id))).size;
-  const off = feed.on(() => { if (libTab === "mine" && filter.childElementCount === 0 && usedApps() > 1) draw(); });
+  const usedApps = () => new Set(feed.list().filter((e) => Boolean(e.validation?.benchmark_only) === (libTab === "bench")).map((e) => e.app).filter((id) => byId.has(id))).size;
+  const off = feed.on(() => { if ((libTab === "mine" || libTab === "bench") && filter.childElementCount === 0 && usedApps() > 1) draw(); });
   feed.load().catch(() => {});
   const node = el("div", { class: "page" },
     el("div", { class: "sec-head", style: { marginTop: "6px" } }, el("div", {}, el("h2", { class: "display", style: { fontSize: "34px" } }, t("lib.title")), el("p", {}, t("lib.sub")))),

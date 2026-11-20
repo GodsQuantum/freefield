@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Import verified Freefield CLI results into the existing gallery without new GPU work.
 
-Only a SUCCESS receipt with an explicit positive visual review, complete
-replayable media inputs and no temporary workflow override qualifies.
-Qualified files remain in validation/ and are hard-linked without extra media
-bytes. A deterministic id and atomic rename make reruns safe.
+Default import requires a SUCCESS receipt with a positive visual review,
+complete replayable inputs, and no temporary workflow override.
+The explicit --benchmark option archives only reviewed, successful native
+benchmarks with immutable provenance and replayable=False, including legitimate
+temporary workflow overrides. Visually rejected samples are excluded.
+Files remain in validation/ and are hard-linked without extra media bytes.
+Deterministic IDs and atomic rename make retries safe.
 """
 import argparse
 import datetime as dt
@@ -31,6 +34,15 @@ EXT_KIND = {".png": "image", ".jpg": "image", ".jpeg": "image",
             ".webp": "image", ".mp4": "video", ".webm": "video",
             ".mp3": "audio", ".wav": "audio", ".flac": "audio"}
 ENTRY_ID = re.compile(r"^[0-9]{8}-[0-9]{9}-[0-9a-f]{4}$")
+# A benchmark's GPU output may have been generated using a temporary node
+# substitution, a different quantization or a special GPU-memory profile.
+# Keep it for human comparison, but never offer "Recreate" as if the saved
+# values were a complete recipe. Exclude visual failures and unknown QA.
+BENCHMARK_REVIEW = VALID_VISUAL | {
+    "PASS_WITH_LIMITATION", "PASS_STATIC_CONTACT",
+    "TECHNICAL_PASS_STATIC_CONTACT_PASS", "FUNCTIONAL_AUDIO_PASS_NO_LISTENING",
+}
+
 
 
 def sha(path):
@@ -41,7 +53,7 @@ def sha(path):
     return h.hexdigest()
 
 
-def plan(name, history, validation_out):
+def plan(name, history, validation_out, benchmark=False):
     filename = Path(name).name
     if not re.fullmatch(r"[a-z0-9][a-z0-9_-]*\.json", filename):
         raise ValueError("Invalid receipt filename")
@@ -50,15 +62,26 @@ def plan(name, history, validation_out):
     summary = data.get("summary", {})
     if summary.get("status") != "SUCCESS":
         raise ValueError(f"{filename}: no successful GPU job")
-    review = data.get("visual_review", {})
+    review = data.get("visual_review", {}) or {}
+    effective_review = review or (data.get("review", {}) if benchmark else {})
     quality = str(review.get("status") or review.get("result") or "")
-    if quality not in VALID_VISUAL:
+    if benchmark:
+        # Music tests include structural proof but no perceptual listening;
+        # explicitly label that limitation, never call it a quality pass.
+        if not quality:
+            other = data.get("review") or {}
+            quality = str(other.get("status") or other.get("result") or "")
+        if not quality and data.get("audio_review", {}).get("listened") is False:
+            quality = "AUDIO_FUNCTIONAL_ONLY_NO_LISTENING"
+        if quality not in BENCHMARK_REVIEW | {"AUDIO_FUNCTIONAL_ONLY_NO_LISTENING"}:
+            raise ValueError(f"{filename}: benchmark is not a qualified, explicitly labeled success ({quality})")
+    elif quality not in VALID_VISUAL:
         raise ValueError(f"{filename}: missing positive visual review ({quality})")
     config = data.get("config", {})
     app = summary["app"]
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", app) or not (APP_ROOT / app / "app.json").is_file():
         raise ValueError(f"{filename}: unknown app")
-    if config.get("workflow_override"):
+    if config.get("workflow_override") and not benchmark:
         raise ValueError(f"{filename}: temporary workflow override not reproducible from saved UI values")
     if not isinstance(config.get("values"), dict):
         raise ValueError(f"{filename}: no original run values")
@@ -92,7 +115,7 @@ def plan(name, history, validation_out):
         if src.suffix.lower() not in EXT_KIND or EXT_KIND[src.suffix.lower()] != input_types[key]:
             raise ValueError(f"{filename}: input media kind mismatch")
         checksum = sha(src)
-        reference_sha = data.get("visual_review", {}).get("source_sha256")
+        reference_sha = effective_review.get("source_sha256")
         if reference_sha and reference_sha != checksum:
             raise ValueError(f"{filename}: source-image SHA256 differs from visual review")
         filename_for_history = "input-" + key + src.suffix.lower()
@@ -119,6 +142,10 @@ def plan(name, history, validation_out):
         checksum = sha(source)
         if expected.get(rel.name, {}).get("sha256") not in (None, checksum):
             raise ValueError(f"{filename}: SHA256 mismatch: {rel}")
+        if benchmark and len(candidates) == 1:
+            reviewed_sha = (effective_review.get("output_sha256") or effective_review.get("new_output_sha256"))
+            if reviewed_sha and reviewed_sha != checksum:
+                raise ValueError(f"{filename}: verified review output SHA256 mismatch")
         output = f"out-{i:02d}{rel.suffix.lower()}"
         outputs.append((source, output, {
             "file": output, "type": EXT_KIND[rel.suffix.lower()],
@@ -137,13 +164,24 @@ def plan(name, history, validation_out):
         "validation": {"origin": "cloud9-cli-qualification",
                        "receipt": filename, "receipt_sha256": receipt_digest,
                        "visual_review": quality, "input_replay_complete": True,
-                       "media_sha256": {x[1]: x[3] for x in outputs + inputs}},
+                       "media_sha256": {x[1]: x[3] for x in outputs + inputs},
+                       **({
+                           "origin": "cloud9-native-benchmark",
+                           "benchmark_only": True,
+                           "replayable": False,
+                           "quality_status": quality,
+                           "workflow_override": bool(config.get("workflow_override")),
+                           "source_graph_sha256": hashlib.sha256(
+                               json.dumps(config["workflow_override"], sort_keys=True, default=str).encode("utf-8")
+                           ).hexdigest() if config.get("workflow_override") else None,
+                           "method": "verified-success-with-review; original media hardlinked",
+                       } if benchmark else {})},
     }
     return record, outputs + inputs, history / ident
 
 
-def import_one(name, history, validation_out, apply):
-    record, outputs, target = plan(name, history, validation_out)
+def import_one(name, history, validation_out, apply, benchmark=False):
+    record, outputs, target = plan(name, history, validation_out, benchmark=benchmark)
     if target.exists():
         existing = json.loads((target / "meta.json").read_text())
         if (existing.get("validation", {}).get("receipt") == record["validation"]["receipt"]
@@ -181,6 +219,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("receipt", nargs="+", help="Existing qualified validation receipts")
     parser.add_argument("--apply", action="store_true", help="Actually add history entries")
+    parser.add_argument("--benchmark", action="store_true", help="Import named, reviewed technical benchmarks as non-replayable (never production-quality claims)")
     parser.add_argument("--history-dir", type=Path, default=OUT / "history")
     parser.add_argument("--validation-out", type=Path, default=OUT / "validation")
     a = parser.parse_args()
@@ -188,7 +227,7 @@ def main():
         parser.error("History or validation output folder is missing")
     results = []
     for name in a.receipt:
-        results.append(import_one(name, a.history_dir, a.validation_out, a.apply))
+        results.append(import_one(name, a.history_dir, a.validation_out, a.apply, benchmark=a.benchmark))
     print(json.dumps(results, indent=2))
 
 
