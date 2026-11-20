@@ -2490,7 +2490,7 @@
       "largest_phase_gb": 21.59,
       "optional_gb": 0,
       "biggest_file": {
-        "name": "qwen_image_edit_2509_int8_convrot.safetensors",
+        "name": "qwen_image_edit_2511_int8_convrot.safetensors",
         "gb": 20.5
       },
       "verdict_24gb": "tight (by phases)",

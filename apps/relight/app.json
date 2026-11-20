@@ -11,7 +11,7 @@
   "source": {
     "template": "image_qwen_image_edit_2509_relight.json",
     "comfyui": "0.42.0",
-    "notes": "Official Qwen Image Edit 2509 template with Comfy-Org INT8 ConvRot via native UNETLoader and per-model sub-quadratic attention; Relight and 4-step Lightning 2509 LoRAs, controls and prepended Relight trigger unchanged. One Cloud9 1024x1024 golden-hour run completed in 810.0 s on 2026-11-19; visual review passed with a changed background, so background preservation and other presets are not qualified. Historical examples do not measure this INT8 profile."
+    "notes": "Native Qwen Image Edit 2511 INT8 ConvRot with 2511 four-step Lightning; the specialized 2509 Relight LoRA and all original prompt/lighting controls are preserved. Verified on Cloud9 gfx1103 using exact same source/seed/1024-square golden-hour portrait: 618.58s versus 814.8s for 2509 (24.08% faster), visual PASS_WITH_LIMITATIONS: subject and light coherent, background can recompose. Proof: validation/qwen2511-relight-2509lora-native-substitution-20261120.json. Other presets and strict background preservation are not certified. Whats Next still uses 2509; do not remove 2509 model."
   },
   "inputs": [
     {
@@ -244,7 +244,7 @@
   "models": [
     {
       "repo": "Comfy-Org/Qwen-Image-Edit",
-      "file": "split_files/diffusion_models/qwen_image_edit_2509_int8_convrot.safetensors",
+      "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
       "dir": "diffusion_models",
       "gb": 20.5,
       "phase": "denoise",
@@ -267,8 +267,8 @@
       "license": "Apache-2.0"
     },
     {
-      "repo": "lightx2v/Qwen-Image-Lightning",
-      "file": "Qwen-Image-Edit-2509/Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors",
+      "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+      "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
       "dir": "loras",
       "gb": 0.85,
       "phase": "denoise",

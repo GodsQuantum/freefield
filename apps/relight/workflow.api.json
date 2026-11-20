@@ -48,7 +48,7 @@
   "10:37": {
     "class_type": "UNETLoader",
     "inputs": {
-      "unet_name": "qwen_image_edit_2509_int8_convrot.safetensors",
+      "unet_name": "qwen_image_edit_2511_int8_convrot.safetensors",
       "weight_dtype": "default"
     },
     "_meta": {
@@ -125,7 +125,7 @@
         "10:37",
         0
       ],
-      "lora_name": "Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors",
+      "lora_name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
       "strength_model": 1
     },
     "_meta": {

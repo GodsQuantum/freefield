@@ -157,6 +157,40 @@ def krea_styles_fast_modes(api: Api) -> None:
     put(api, "30:21", "switch", ["ff_krea_effective_enhance",0])
 
 
+def moss_fast_modes(api: Api) -> None:
+    """Retain the Cloud9-qualified four-step MOSS preview after rebuilding templates.
+
+    This alters only the optional fast branch. The native 25-step er_sde
+    quality graph remains byte-for-byte unchanged except for its final switch.
+    The LoRA stays on XFS and shares the installed MOSS INT8 transformer.
+    """
+    assert api["18:7"]["inputs"]["model"] == ["18:24", 0]
+    assert api["18:8"]["inputs"]["samples"] == ["18:7", 0]
+    nodes = ("ff_moss_fast_lora", "ff_moss_fast_sampler", "ff_moss_fast_switch")
+    assert not any(n in api for n in nodes)
+    api["ff_moss_fast_lora"] = {
+        "class_type": "LoraLoaderModelOnly",
+        "inputs": {"model": ["18:24", 0],
+                   "lora_name": "moss_image_sft_4step_v2.0.safetensors",
+                   "strength_model": 1.0}
+    }
+    api["ff_moss_fast_sampler"] = {
+        "class_type": "KSampler",
+        "inputs": {"model": ["ff_moss_fast_lora", 0],
+                   "positive": ["18:4", 0], "negative": ["18:5", 0],
+                   "latent_image": ["18:6", 0], "seed": 0,
+                   "steps": 4, "cfg": 1.0,
+                   "sampler_name": "euler", "scheduler": "simple", "denoise": 1},
+        "_meta": {"title": "KSampler"}
+    }
+    api["ff_moss_fast_switch"] = {
+        "class_type": "ComfySwitchNode",
+        "inputs": {"on_false": ["18:7", 0], "on_true": ["ff_moss_fast_sampler", 0],
+                   "switch": False}
+    }
+    api["18:8"]["inputs"]["samples"] = ["ff_moss_fast_switch", 0]
+
+
 def krea_reference_low_memory(api: Api) -> None:
     """Offer the native VAE reference-latent path without making it run on small shared GPUs.
 
@@ -740,6 +774,7 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     drop(ms, "19")
     put(ms, "18:6", "width", 1024)
     put(ms, "18:6", "height", 1024)
+    moss_fast_modes(ms)
     out["moss-image"] = ms
 
     e = tpl("image_flux3_klein_distilled_image_edit.json")
@@ -927,8 +962,11 @@ def recipes(templates: Path, ltx: Path, info: dict, reshoot: Path | None = None)
     drop(rc, "213:184", "213:183")
     out["recast"] = rc
     out["relight"] = tpl("image_qwen_image_edit_2509_relight.json")
-    # Keep both 2509 LoRAs and the template's controls; use the official native INT8 weight and per-model attention.
-    put(out["relight"], "10:37", "unet_name", "qwen_image_edit_2509_int8_convrot.safetensors")
+    # Cloud9 benchmark proved 2511 INT8 + 2511 Lightning is 24% faster on Relight.
+    # Preserve the 2509 Relight specialty LoRA, trigger, all user fields and per-model attention.
+    # What's Next still needs 2509; never delete that shared checkpoint on this basis alone.
+    put(out["relight"], "10:37", "unet_name", "qwen_image_edit_2511_int8_convrot.safetensors")
+    put(out["relight"], "10:89", "lora_name", "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors")
     out["relight"]["10:119"] = {"class_type": "ModelAttentionBackend",
                                "inputs": {"model": ["10:118", 0], "attention": "sub-quadratic attention"}}
     put(out["relight"], "10:66", "model", ["10:119", 0])

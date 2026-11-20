@@ -5,14 +5,17 @@ import { loadRegistry } from "../server/registry.ts";
 const { apps, problems } = loadRegistry();
 const edit = apps.find((app) => app.id === "qwen21-edit");
 const older2511 = apps.find((app) => app.id === "angles");
-const older2509 = apps.find((app) => app.id === "relight");
+const older2509 = apps.find((app) => app.id === "whats-next");
+const optimizedRelight = apps.find((app) => app.id === "relight");
 
-test("Qwen Image 2.1: generic edit is an independent native app, original specialist apps unchanged", () => {
+test("Qwen Image 2.1: general editor is independent of 2511 Relight and remaining 2509 Whats Next", () => {
   assert.ok(edit?.graph);
   assert.equal(edit.status, "ready");
   assert.equal(edit.pack, "image-qwen21");
   assert.equal(problems.some((p) => p.app === "qwen21-edit" && p.severity === "error"), false);
   assert.equal(older2511?.graph?.["10:37"].inputs.unet_name, "qwen_image_edit_2511_int8_convrot.safetensors");
+  assert.equal(optimizedRelight?.graph?.["10:37"].inputs.unet_name, "qwen_image_edit_2511_int8_convrot.safetensors");
+  assert.equal(optimizedRelight?.graph?.["10:89"].inputs.lora_name, "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors");
   assert.equal(older2509?.graph?.["10:37"].inputs.unet_name, "qwen_image_edit_2509_int8_convrot.safetensors");
   assert.equal(edit.graph["1"].class_type, "UNETLoader");
   assert.equal(edit.graph["1"].inputs.unet_name, "qwen_image_2.1_turbo_int8_convrot.safetensors");

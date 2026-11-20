@@ -20,7 +20,6 @@
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
-        "relight",
         "whats-next"
       ]
     },
@@ -34,6 +33,7 @@
       "license": "Apache-2.0",
       "used_by": [
         "angles",
+        "relight",
         "shots",
         "zooms"
       ]
@@ -47,7 +47,6 @@
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
-        "relight",
         "whats-next"
       ]
     },
@@ -73,6 +72,7 @@
       "license": "Apache-2.0",
       "used_by": [
         "angles",
+        "relight",
         "shots",
         "zooms"
       ]
