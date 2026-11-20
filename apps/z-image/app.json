@@ -87,6 +87,19 @@
       ]
     },
     {
+      "id": "freer_encoder",
+      "type": "toggle",
+      "label": "Experimental abliterated encoder",
+      "default": false,
+      "help": "Opt-in less restrictive Qwen3-4B Q6_K (author claim, refusal reduction not independently verified). Cloud9 same-seed 1024px quality similar but 246s vs 195s with default FP8. Default preserves fast FP8.",
+      "bind": [
+        {
+          "node": "ff_z_ablit_enabled",
+          "field": "value"
+        }
+      ]
+    },
+    {
       "id": "steps",
       "type": "slider",
       "label": "Steps",
@@ -146,10 +159,20 @@
       "gb": 0.34,
       "phase": "decode",
       "license": "Apache-2.0"
+    },
+    {
+      "repo": "BennyDaBall/Qwen3-4b-Z-Image-Turbo-AbliteratedV1",
+      "file": "Z-Image-AbliteratedV1.Q6_K.gguf",
+      "dir": "text_encoders",
+      "gb": 3.31,
+      "phase": "encode",
+      "license": "Apache-2.0",
+      "optional": true
     }
   ],
   "credits": [
-    "Z-Image Turbo by Tongyi-MAI (Apache-2.0)"
+    "Z-Image Turbo by Tongyi-MAI (Apache-2.0)",
+    "Experimental abliterated Qwen3-4B TE GGUF by BennyDaBall (Apache-2.0); independently tested only on a neutral 1024px Cloud9 prompt."
   ],
   "test": {
     "prompt": "a red bicycle against a white wall"

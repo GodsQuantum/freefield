@@ -1708,7 +1708,7 @@
       },
       "largest_phase": "denoise",
       "largest_phase_gb": 6.2,
-      "optional_gb": 0,
+      "optional_gb": 3.31,
       "biggest_file": {
         "name": "z_image_turbo_int8_convrot.safetensors",
         "gb": 6.2
@@ -1916,7 +1916,7 @@
       },
       "largest_phase": "denoise",
       "largest_phase_gb": 13.96,
-      "optional_gb": 3.76,
+      "optional_gb": 4.2,
       "biggest_file": {
         "name": "krea2_turbo_int8_convrot.safetensors",
         "gb": 13.49

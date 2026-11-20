@@ -86,7 +86,7 @@
     "class_type": "CLIPTextEncode",
     "inputs": {
       "clip": [
-        "57:30",
+        "ff_z_clip_router",
         0
       ],
       "text": "Dramatic black and white high fashion studio portrait, close-up bust shot, pale platinum blonde woman with sleek low ponytail, head tilted upward, eyes softly closed, wearing a fitted black turtleneck top. A large translucent pale white butterfly hovers gently right at her lips, delicate detailed wing veins visible. Hard rim light creates glowing bright white halo around her hair and face, deep inky pure black minimalist background, stark high contrast chiaroscuro lighting, film grain texture, moody ethereal atmosphere, monochrome, editorial fashion photography, shot on 35mm film, soft subtle skin texture, sharp focus on butterfly and facial profile, vertical composition, minimalist dark aesthetic, artistic surreal fashion"
@@ -135,6 +135,45 @@
     },
     "_meta": {
       "title": "Conditioning Zero Out"
+    }
+  },
+  "ff_z_ablit_enabled": {
+    "class_type": "PrimitiveBoolean",
+    "inputs": {
+      "value": false
+    },
+    "_meta": {
+      "title": "Use experimental abliterated text encoder"
+    }
+  },
+  "ff_z_ablit_clip": {
+    "class_type": "CLIPLoaderGGUF",
+    "inputs": {
+      "clip_name": "Z-Image-AbliteratedV1.Q6_K.gguf",
+      "type": "lumina2"
+    },
+    "_meta": {
+      "title": "Abliterated Qwen3 4B Q6_K text encoder"
+    }
+  },
+  "ff_z_clip_router": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "switch": [
+        "ff_z_ablit_enabled",
+        0
+      ],
+      "on_false": [
+        "57:30",
+        0
+      ],
+      "on_true": [
+        "ff_z_ablit_clip",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Default fast FP8 / experimental Q6 encoder"
     }
   }
 }

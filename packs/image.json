@@ -3,7 +3,7 @@
   "apps": [
     "z-image"
   ],
-  "download_gb": 12.17,
+  "download_gb": 15.48,
   "needs_hf_token": false,
   "custom_nodes": [],
   "models": [
@@ -13,6 +13,18 @@
       "dir": "diffusion_models",
       "gb": 6.2,
       "name": "z_image_turbo_int8_convrot.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "z-image"
+      ]
+    },
+    {
+      "repo": "BennyDaBall/Qwen3-4b-Z-Image-Turbo-AbliteratedV1",
+      "file": "Z-Image-AbliteratedV1.Q6_K.gguf",
+      "dir": "text_encoders",
+      "gb": 3.31,
+      "name": "Z-Image-AbliteratedV1.Q6_K.gguf",
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
