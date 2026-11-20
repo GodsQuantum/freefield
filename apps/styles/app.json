@@ -11,7 +11,7 @@
   "source": {
     "template": "image_krea2_turbo_t2i_int8.json",
     "comfyui": "0.42.0",
-    "notes": "The template's LoRA switch is turned on; each style option writes its trigger phrase and swaps the LoRA file. The optional 3-step path uses native ComfyUI lazy model/step switches and preserves the original 8-step path as default. An additional lazy native 2-step ultra-fast branch uses the already shared base weights; if both opt-ins are true, ultra-fast takes precedence, preserving Fast and quality paths."
+    "notes": "The template's LoRA switch is turned on; each style option writes its trigger phrase and swaps the LoRA file. The optional 3-step path uses native ComfyUI lazy model/step switches and preserves the original 8-step path as default. An additional lazy native 2-step ultra-fast branch uses the already shared base weights; if both opt-ins are true, ultra-fast takes precedence, preserving Fast and quality paths. Ultra uses the original text prompt via a native lazy boolean switch, bypassing expensive optional Qwen3-VL rewriting; Quality and 3-step Fast preserve their previous Enhance setting."
   },
   "inputs": [
     {
@@ -173,7 +173,7 @@
       "type": "toggle",
       "label": "Ultra-fast preview (2 steps)",
       "default": false,
-      "help": "Optional Krea Turbo 2-step distillation. Cloud9 native 1024x1024 rendered in 212 s; 3-step Freefield baseline was 293 s. Single-scene fidelity comparable, but detail may vary; ultra-fast takes priority when Fast is also on. Quality 8-step remains default.",
+      "help": "Optional Krea Turbo 2-step distillation with native 1024x1024 212 s benchmark. Ultra takes priority over Fast and automatically uses the prompt exactly as written (skips Enhance prompt to save time and shared GPU memory). Quality 8-step and Fast 3-step still honor Enhance as before; all old defaults remain unchanged.",
       "bind": [
         {
           "node": "ff_krea_ultra_enabled",
@@ -186,7 +186,7 @@
       "type": "toggle",
       "label": "Enhance prompt",
       "default": true,
-      "help": "Rewrites your prompt with the Qwen3-VL text encoder first",
+      "help": "Rewrites your prompt with the Qwen3-VL text encoder first in Quality/Fast. Ultra-fast preview deliberately skips this rewrite to reduce load.",
       "bind": [
         {
           "node": "30:24",

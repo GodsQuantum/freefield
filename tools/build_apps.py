@@ -106,6 +106,8 @@ def krea_styles_fast_modes(api: Api) -> None:
     Both LoRAs share the existing Krea2 INT8/CLIP/VAE model.  Ultra takes
     precedence if Fast and Ultra are both enabled; the default is unchanged
     from the official 8-step quality workflow.  ComfySwitchNode is lazy.
+    For Ultra, skip the optional expensive Qwen3-VL prompt rewrite even when
+    Enhance is enabled in the form; preserve Enhance exactly in old modes.
     """
     if api["30:10"]["class_type"] != "UNETLoader" or api["30:15"]["class_type"] != "LoraLoaderModelOnly":
         raise LookupError("Krea style workflow changed native UNET/LoRA node layout")
@@ -113,6 +115,8 @@ def krea_styles_fast_modes(api: Api) -> None:
         raise LookupError("Krea style LoRA no longer receives unmodified base model")
     if api["30:3"]["class_type"] != "KSampler" or api["30:3"]["inputs"]["steps"] != 8:
         raise LookupError("Krea official eight-step quality path changed")
+    if api["30:21"]["class_type"] != "ComfySwitchNode" or api["30:21"]["inputs"]["switch"] != ["30:24",0]:
+        raise LookupError("Krea official prompt enhancement switch changed")
     new = {
         "ff_krea_fast_enabled": {"class_type":"PrimitiveBoolean","inputs":{"value":False},
                                  "_meta":{"title":"Fast mode (quality 8-step default)"}},
@@ -139,12 +143,18 @@ def krea_styles_fast_modes(api: Api) -> None:
         "ff_krea_steps_ultra_selected": {"class_type":"ComfySwitchNode",
                                          "inputs":{"on_false":["ff_krea_steps_selected",0],"on_true":["ff_krea_steps_ultra",0],"switch":["ff_krea_ultra_enabled",0]},
                                          "_meta":{"title":"Match 8/3/2 steps to selected LoRA"}},
+        "ff_krea_ultra_no_enhance": {"class_type":"PrimitiveBoolean","inputs":{"value":False},
+                                    "_meta":{"title":"Ultra fast uses original prompt without rewrite"}},
+        "ff_krea_effective_enhance": {"class_type":"ComfySwitchNode",
+                                      "inputs":{"on_false":["30:24",0],"on_true":["ff_krea_ultra_no_enhance",0],"switch":["ff_krea_ultra_enabled",0]},
+                                      "_meta":{"title":"Enhance prompt for quality and fast; skip in ultra"}},
     }
     if any(k in api for k in new):
         raise ValueError("Krea style native fast option already present or collided")
     api.update(new)
     put(api, "30:15", "model", ["ff_krea_ultra_model",0])
     put(api, "30:3", "steps", ["ff_krea_steps_ultra_selected",0])
+    put(api, "30:21", "switch", ["ff_krea_effective_enhance",0])
 
 
 def krea_reference_low_memory(api: Api) -> None:

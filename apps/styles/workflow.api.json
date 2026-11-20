@@ -236,7 +236,7 @@
         0
       ],
       "switch": [
-        "30:24",
+        "ff_krea_effective_enhance",
         0
       ]
     },
@@ -482,6 +482,35 @@
     },
     "_meta": {
       "title": "Match 8/3/2 steps to selected LoRA"
+    }
+  },
+  "ff_krea_ultra_no_enhance": {
+    "class_type": "PrimitiveBoolean",
+    "inputs": {
+      "value": false
+    },
+    "_meta": {
+      "title": "Ultra fast uses original prompt without rewrite"
+    }
+  },
+  "ff_krea_effective_enhance": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "on_false": [
+        "30:24",
+        0
+      ],
+      "on_true": [
+        "ff_krea_ultra_no_enhance",
+        0
+      ],
+      "switch": [
+        "ff_krea_ultra_enabled",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Enhance prompt for quality and fast; skip in ultra"
     }
   }
 }

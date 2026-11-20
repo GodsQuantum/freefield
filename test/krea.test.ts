@@ -9,7 +9,7 @@ const { apps, problems } = loadRegistry();
 const specs = [
   { id: "styles", consumers: ["30:16", "30:6"],
     graphBefore: "69de6ecef0cd28cebf48f6316f9105d53a9bce8c97a82bd9e3361abad7581731",
-    manifest: "9c3a11977fb27245aa26383128ee6be6da0b5878430dac054334cb5ae3a27ef5" },
+    manifest: "d658bb42e17d824fe292560c5f1ebc40be9cb0cb12a625cbe0baf086188aeb66" },
 
 ];
 const sha = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
@@ -45,9 +45,11 @@ for (const spec of specs) {
         "ff_krea_steps_quality", "ff_krea_steps_fast", "ff_krea_steps_selected",
         "ff_krea_ultra_enabled", "ff_krea_ultra_lora", "ff_krea_ultra_model",
         "ff_krea_steps_ultra", "ff_krea_steps_ultra_selected",
+        "ff_krea_ultra_no_enhance", "ff_krea_effective_enhance",
       ]) delete restored[extra];
       restored["30:15"].inputs.model = ["30:10", 0];
       restored["30:3"].inputs.steps = 8;
+      restored["30:21"].inputs.switch = ["30:24", 0];
     }
     // Pin the complete pre-adoption graph at d9f87, not only a few sampler fields.
     assert.equal(sha(JSON.stringify(restored)), spec.graphBefore);
@@ -162,6 +164,14 @@ test("styles: native 2-step Ultra preview remains optional, lazily overrides 3-s
     on_true: ["ff_krea_steps_ultra", 0],
     switch: ["ff_krea_ultra_enabled", 0],
   });
+  assert.deepEqual(g["ff_krea_effective_enhance"].inputs, {
+    on_false: ["30:24", 0],
+    on_true: ["ff_krea_ultra_no_enhance", 0],
+    switch: ["ff_krea_ultra_enabled", 0],
+  });
+  assert.deepEqual(g["ff_krea_ultra_no_enhance"].inputs, { value: false });
+  assert.deepEqual(g["30:21"].inputs.switch, ["ff_krea_effective_enhance", 0]);
+  assert.match(String(ultra.help), /skips Enhance prompt/);
   assert.deepEqual(g["30:15"].inputs.model, ["ff_krea_ultra_model", 0]);
   assert.deepEqual(g["30:3"].inputs.steps, ["ff_krea_steps_ultra_selected", 0]);
   assert.equal(app.models.filter(m => m.file.endsWith("2step_rank_64_lora_comfyui.safetensors")).length, 1);
@@ -182,6 +192,8 @@ test("styles: native 2-step Ultra preview remains optional, lazily overrides 3-s
       fast_mode ? g["ff_krea_steps_fast"].inputs.value : g["ff_krea_steps_quality"].inputs.value);
     assert.deepEqual(graph["30:15"].inputs.model, ["ff_krea_ultra_model", 0]);
     assert.deepEqual(graph["30:3"].inputs.steps, ["ff_krea_steps_ultra_selected", 0]);
+    assert.deepEqual(graph["30:21"].inputs.switch, ["ff_krea_effective_enhance", 0]);
+    assert.equal(graph["ff_krea_ultra_no_enhance"].inputs.value, false);
     assert.equal(graph["30:3"].inputs.seed, 202611201600);
   }
 });
