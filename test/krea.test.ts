@@ -9,7 +9,7 @@ const { apps, problems } = loadRegistry();
 const specs = [
   { id: "styles", consumers: ["30:16", "30:6"],
     graphBefore: "69de6ecef0cd28cebf48f6316f9105d53a9bce8c97a82bd9e3361abad7581731",
-    manifest: "22a783e9826973c74c4903961d06abb44d264411636e407e0e5fef56acbe9a83" },
+    manifest: "7de214f0b746fa43e791b8530944de1cac7bbd5fd1b6451c382cd167df7e4a30" },
 
 ];
 const sha = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
@@ -38,6 +38,15 @@ for (const spec of specs) {
     const restored = structuredClone(app.graph);
     delete restored[selector];
     for (const id of spec.consumers) restored[id].inputs.clip = ["30:11", 0];
+    // Restore only the opt-in Krea fast-path edits before comparing the old frozen baseline.
+    if (spec.id === "styles") {
+      for (const extra of [
+        "ff_krea_fast_enabled", "ff_krea_fast_lora", "ff_krea_fast_model",
+        "ff_krea_steps_quality", "ff_krea_steps_fast", "ff_krea_steps_selected",
+      ]) delete restored[extra];
+      restored["30:15"].inputs.model = ["30:10", 0];
+      restored["30:3"].inputs.steps = 8;
+    }
     // Pin the complete pre-adoption graph at d9f87, not only a few sampler fields.
     assert.equal(sha(JSON.stringify(restored)), spec.graphBefore);
     assert.equal(sha(readFileSync(new URL(`../apps/${spec.id}/app.json`, import.meta.url))), spec.manifest);
@@ -70,6 +79,59 @@ test("styles: all nine looks retain their triggers, LoRAs and user settings thro
     assert.deepEqual(graph["30:16"].inputs.clip, [selector, 0]);
     assert.deepEqual(graph["30:6"].inputs.clip, [selector, 0]);
     assert.deepEqual(graph["30:20"], app.graph["30:20"]); // live text-conversion branch
+  }
+});
+
+
+
+test("styles: optional three-step LoRA is lazy, model/steps stay synchronized, defaults remain quality", () => {
+  const app = apps.find((a) => a.id === "styles")!;
+  assert.ok(app.graph);
+  const graph = app.graph;
+  const expectedLoRA = "krea2_turbo_3step_rank_64_lora_comfyui.safetensors";
+  assert.equal(app.inputs.find((field) => field.id === "fast_mode")?.type, "toggle");
+  assert.equal(app.inputs.find((field) => field.id === "fast_mode")?.default, false);
+  assert.deepEqual(app.inputs.find((field) => field.id === "fast_mode")?.bind, [
+    { node: "ff_krea_fast_enabled", field: "value" },
+  ]);
+  assert.deepEqual(app.inputs.map((field) => field.id).filter((id) => id !== "fast_mode"), [
+    "prompt", "style", "strength", "enhance", "aspect", "megapixels", "seed",
+  ]);
+  assert.deepEqual(graph["ff_krea_fast_lora"].inputs, {
+    model: ["30:10", 0], lora_name: expectedLoRA, strength_model: 1,
+  });
+  assert.deepEqual(graph["ff_krea_fast_model"].inputs, {
+    on_false: ["30:10", 0], on_true: ["ff_krea_fast_lora", 0],
+    switch: ["ff_krea_fast_enabled", 0],
+  });
+  assert.deepEqual(graph["30:15"].inputs.model, ["ff_krea_fast_model", 0]);
+  assert.deepEqual(graph["ff_krea_steps_quality"].inputs, { value: 8 });
+  assert.deepEqual(graph["ff_krea_steps_fast"].inputs, { value: 3 });
+  assert.deepEqual(graph["ff_krea_steps_selected"].inputs, {
+    on_false: ["ff_krea_steps_quality", 0],
+    on_true: ["ff_krea_steps_fast", 0],
+    switch: ["ff_krea_fast_enabled", 0],
+  });
+  assert.deepEqual(graph["30:3"].inputs.steps, ["ff_krea_steps_selected", 0]);
+  assert.equal(graph["30:3"].inputs.cfg, 1);
+  assert.equal(graph["30:3"].inputs.scheduler, "simple");
+  assert.equal(graph["30:3"].inputs.sampler_name, "euler");
+  const metadata = app.models.find((m) => m.file.endsWith(expectedLoRA));
+  assert.equal(metadata?.optional, true, "quality path must not require extra experimental weights");
+
+  for (const fast_mode of [false, true]) {
+    const copy: ApiWorkflow = structuredClone(graph);
+    const values = resolveValues(app, {
+      prompt: "A piano beside a window.", style: "Art Deco watercolor style",
+      enhance: false, fast_mode, seed: 20261120,
+    });
+    applyInputs(app, values, {
+      setInput: (node, field, value) => { copy[node].inputs[field] = value; },
+    }, () => { throw new Error("unexpected image upload"); });
+    assert.equal(copy["ff_krea_fast_enabled"].inputs.value, fast_mode);
+    assert.deepEqual(copy["ff_krea_fast_model"].inputs.switch, ["ff_krea_fast_enabled", 0]);
+    assert.deepEqual(copy["ff_krea_steps_selected"].inputs.switch, ["ff_krea_fast_enabled", 0]);
+    assert.equal(copy["30:3"].inputs.seed, 20261120);
   }
 });
 

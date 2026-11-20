@@ -11,7 +11,7 @@
   "source": {
     "template": "image_krea2_turbo_t2i_int8.json",
     "comfyui": "0.42.0",
-    "notes": "The template's LoRA switch is turned on; each style option writes its trigger phrase and swaps the LoRA file."
+    "notes": "The template's LoRA switch is turned on; each style option writes its trigger phrase and swaps the LoRA file. The optional 3-step path uses native ComfyUI lazy model/step switches and preserves the original 8-step path as default."
   },
   "inputs": [
     {
@@ -152,6 +152,19 @@
         {
           "node": "30:15",
           "field": "strength_model"
+        }
+      ]
+    },
+    {
+      "id": "fast_mode",
+      "type": "toggle",
+      "label": "Fast render (3 steps)",
+      "default": false,
+      "help": "Optional Krea Turbo 3-step distillation. Cloud9 measured 329 s vs 593 s at 1024x1024; original 8-step quality remains default. Experimental detail/coherence differences may occur.",
+      "bind": [
+        {
+          "node": "ff_krea_fast_enabled",
+          "field": "value"
         }
       ]
     },
@@ -354,11 +367,21 @@
       "phase": "denoise",
       "license": "Krea 2 Community License",
       "optional": true
+    },
+    {
+      "repo": "lvladikov/Krea2-Turbo-Distill-3step-LoRA",
+      "file": "loras/krea2_turbo_3step_rank_64_lora_comfyui.safetensors",
+      "dir": "loras",
+      "gb": 0.44,
+      "phase": "denoise",
+      "license": "Krea 2 Community License",
+      "optional": true
     }
   ],
   "credits": [
     "Krea 2 Turbo and the style LoRAs by Krea (Krea 2 Community License)",
-    "Workflow: ComfyUI official template"
+    "Workflow: ComfyUI official template",
+    "Optional 3-step Krea Turbo distillation by lvladikov (Krea 2 Community License)."
   ],
   "test": {
     "style": "vintage tarot style"

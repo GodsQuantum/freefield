@@ -4,7 +4,7 @@
     "style-reference",
     "styles"
   ],
-  "download_gb": 23.29,
+  "download_gb": 23.73,
   "needs_hf_token": false,
   "custom_nodes": [],
   "models": [
@@ -123,6 +123,18 @@
       "dir": "loras",
       "gb": 0.47,
       "name": "krea2_sunsetblur.safetensors",
+      "gated": false,
+      "license": "Krea 2 Community License",
+      "used_by": [
+        "styles"
+      ]
+    },
+    {
+      "repo": "lvladikov/Krea2-Turbo-Distill-3step-LoRA",
+      "file": "loras/krea2_turbo_3step_rank_64_lora_comfyui.safetensors",
+      "dir": "loras",
+      "gb": 0.44,
+      "name": "krea2_turbo_3step_rank_64_lora_comfyui.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
       "used_by": [

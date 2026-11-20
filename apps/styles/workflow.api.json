@@ -32,7 +32,10 @@
         0
       ],
       "seed": 45862206397178,
-      "steps": 8,
+      "steps": [
+        "ff_krea_steps_selected",
+        0
+      ],
       "cfg": 1,
       "sampler_name": "euler",
       "scheduler": "simple",
@@ -137,7 +140,7 @@
     "class_type": "LoraLoaderModelOnly",
     "inputs": {
       "model": [
-        "30:10",
+        "ff_krea_fast_model",
         0
       ],
       "lora_name": "krea2_softwatercolor.safetensors",
@@ -335,6 +338,81 @@
     },
     "_meta": {
       "title": "Qwen3-VL on GPU"
+    }
+  },
+  "ff_krea_fast_enabled": {
+    "class_type": "PrimitiveBoolean",
+    "inputs": {
+      "value": false
+    },
+    "_meta": {
+      "title": "Fast mode (quality 8-step default)"
+    }
+  },
+  "ff_krea_fast_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "30:10",
+        0
+      ],
+      "lora_name": "krea2_turbo_3step_rank_64_lora_comfyui.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "Krea2 Turbo 3-step distillation - opt in"
+    }
+  },
+  "ff_krea_fast_model": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "on_false": [
+        "30:10",
+        0
+      ],
+      "on_true": [
+        "ff_krea_fast_lora",
+        0
+      ],
+      "switch": [
+        "ff_krea_fast_enabled",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Krea base / 3-step LoRA"
+    }
+  },
+  "ff_krea_steps_quality": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": 8
+    }
+  },
+  "ff_krea_steps_fast": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": 3
+    }
+  },
+  "ff_krea_steps_selected": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "on_false": [
+        "ff_krea_steps_quality",
+        0
+      ],
+      "on_true": [
+        "ff_krea_steps_fast",
+        0
+      ],
+      "switch": [
+        "ff_krea_fast_enabled",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Match 8/3 steps to LoRA"
     }
   }
 }
