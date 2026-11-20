@@ -11,7 +11,7 @@
   "source": {
     "template": "image_moss_image_t2i.json",
     "comfyui": "0.42.0",
-    "notes": "MOSS-Image SFT, int8. Its Qwen3.5-9B text encoder also rewrites a short prompt into a caption. A layout prompt is the JSON MOSSImageLayoutPrompt writes: {\"summary\": {\"caption\": ...}, \"items\": [{\"label\": \"text\"|\"object\"|\"character\", \"caption\": ..., \"text\": ..., \"bbox\": [y0, x0, y1, x1]}], \"bbox_coord_space\": \"abs_centralized\", \"bbox_format\": \"yxyx\"} (pixels, origin at the centre); turn the rewrite off for it. Cloud9 validation: native INT8 diffusion and W4A8 Qwen3.5-9B, direct prompt, 1024x1024, 25 er_sde steps; complete Freefield CLI render in 1112.4 seconds without a memory-guard trip. Optional prompt rewriting and larger sizes were not qualified by that test."
+    "notes": "MOSS-Image SFT, int8. Its Qwen3.5-9B text encoder also rewrites a short prompt into a caption. A layout prompt is the JSON MOSSImageLayoutPrompt writes: {\"summary\": {\"caption\": ...}, \"items\": [{\"label\": \"text\"|\"object\"|\"character\", \"caption\": ..., \"text\": ..., \"bbox\": [y0, x0, y1, x1]}], \"bbox_coord_space\": \"abs_centralized\", \"bbox_format\": \"yxyx\"} (pixels, origin at the centre); turn the rewrite off for it. Cloud9 validation: native INT8 diffusion and W4A8 Qwen3.5-9B, direct prompt, 1024x1024, 25 er_sde steps; complete Freefield CLI render in 1112.4 seconds without a memory-guard trip. Optional prompt rewriting and larger sizes were not qualified by that test. Native ComfyUI Fast Preview verified on Cloud9 gfx1103 2026-11-20: 4 steps Euler CFG1 + akhaliq v2 LoRA strength 1.0, same 1024px bicycle prompt/seed: 291.30 s, max GTT 4.486 GiB, min RAM avail 16.989 GiB, PSI max 2.66%. Quality 25step/er_sde remains default, no second MOSS DiT or encoder; LoRA xfs symlink. Receipt validation/moss-sft-euler-4step-int8-1024-20261120.json. Fast preview visual tradeoff: smoother surfaces and minor mechanical bicycle detail differences."
   },
   "inputs": [
     {
@@ -36,6 +36,19 @@
       "bind": [
         {
           "node": "18:16",
+          "field": "switch"
+        }
+      ]
+    },
+    {
+      "id": "fast_mode",
+      "type": "toggle",
+      "label": "Fast preview (4 steps)",
+      "default": false,
+      "help": "Optional MOSS Euler-native 4-step LoRA. 291.3 s for 1024px on Cloud9 vs 1118.2 s quality reference; visual result smoother. When on, fixed 4-step Euler CFG1 overrides quality Steps slider. Quality 25 steps remains unchanged by default.",
+      "bind": [
+        {
+          "node": "ff_moss_fast_switch",
           "field": "switch"
         }
       ]
@@ -113,7 +126,8 @@
           "node": "18:7",
           "field": "steps"
         }
-      ]
+      ],
+      "help": "Quality mode only (20–60 steps). Fast preview always uses 4 steps Euler CFG1."
     },
     {
       "id": "seed",
@@ -124,6 +138,10 @@
       "bind": [
         {
           "node": "18:7",
+          "field": "seed"
+        },
+        {
+          "node": "ff_moss_fast_sampler",
           "field": "seed"
         }
       ]
@@ -160,10 +178,19 @@
       "gb": 0.25,
       "phase": "decode",
       "license": "Apache-2.0"
+    },
+    {
+      "repo": "akhaliq/MOSS-Image-SFT-4-steps",
+      "file": "loras/moss_image_sft_4step_v2.0.safetensors",
+      "dir": "loras",
+      "gb": 1.19,
+      "phase": "denoise",
+      "license": "Apache-2.0"
     }
   ],
   "credits": [
-    "MOSS-Image by OpenMOSS (Apache-2.0)"
+    "MOSS-Image by OpenMOSS (Apache-2.0)",
+    "akhaliq MOSS-Image-SFT Euler-native 4-step DMD LoRA, v2.0, Oct 2026"
   ],
   "test": {
     "prompt": "A documentary photograph of a red bicycle leaning against a clean white stucco wall, soft daylight, side view, natural shadows, fine details of spokes and paint.",
@@ -171,6 +198,7 @@
     "seed": 202611191454,
     "width": 1024,
     "height": 1024,
-    "steps": 25
+    "steps": 25,
+    "fast_mode": false
   }
 }

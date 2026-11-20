@@ -116,7 +116,7 @@
     "class_type": "VAEDecode",
     "inputs": {
       "samples": [
-        "18:7",
+        "ff_moss_fast_switch",
         0
       ],
       "vae": [
@@ -238,6 +238,61 @@
     },
     "_meta": {
       "title": "If/Else Switch"
+    }
+  },
+  "ff_moss_fast_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "18:24",
+        0
+      ],
+      "lora_name": "moss_image_sft_4step_v2.0.safetensors",
+      "strength_model": 1.0
+    }
+  },
+  "ff_moss_fast_sampler": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "ff_moss_fast_lora",
+        0
+      ],
+      "positive": [
+        "18:4",
+        0
+      ],
+      "negative": [
+        "18:5",
+        0
+      ],
+      "latent_image": [
+        "18:6",
+        0
+      ],
+      "seed": 0,
+      "steps": 4,
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1
+    },
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "ff_moss_fast_switch": {
+    "class_type": "ComfySwitchNode",
+    "inputs": {
+      "on_false": [
+        "18:7",
+        0
+      ],
+      "on_true": [
+        "ff_moss_fast_sampler",
+        0
+      ],
+      "switch": false
     }
   }
 }
