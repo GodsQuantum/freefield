@@ -423,6 +423,20 @@ the values, the seed that was used, and timings), so they survive a closed tab, 
 restart; runs still going when the server stops are picked up again. *Recreate* puts any result's inputs and settings
 back in the form.
 
+For an external local validation (not a web run), `tools/import_qualified_media_into_history.py` can place an
+**already generated and visually approved** result into that same history. It never starts an inference or copies
+large media files. The receipt must record a successful run, an explicit positive visual review and sufficient
+source inputs to replay the result; workflows with temporary test overrides and failed-quality receipts are rejected.
+Run it first without `--apply` for a dry run, then with `--apply` after inspection:
+
+```sh
+python tools/import_qualified_media_into_history.py --history-dir /path/to/out/history --validation-out /path/to/out/validation receipt.json
+python tools/import_qualified_media_into_history.py --history-dir /path/to/out/history --validation-out /path/to/out/validation --apply receipt.json
+```
+
+An existing imported receipt is recognized by its stable id and SHA-256 and will not create duplicate gallery entries.
+Original validation media are hard-linked on the same filesystem, leaving them available as source evidence.
+
 ### A private link to the studio
 
 To let someone else use your Freefield (a reviewer, a friend) without installing anything, the same web app runs on
