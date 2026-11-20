@@ -1,0 +1,126 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "nitrofusion2",
+  "name": "NitroFusion2 Fast",
+  "section": "image",
+  "pack": "image-nitro",
+  "status": "ready",
+  "higgsfield_feature": "Create Image",
+  "summary": "One-step photorealistic text-to-image with NitroFusion2 W6A8 GPTQ and the shared Qwen3-4B FP8 encoder.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "ChenDY/NitroFusion2 workflows/nitrofusion2_1step.json",
+    "comfyui": "0.42.0",
+    "notes": "Tested Cloud9 gfx1103 native ROCm, 1024x1024 portrait in 105.28s. PedroMarinhoDev W6A8 GPTQ quantized denoiser + existing Z-Image Qwen3-4B FP8 text encoder and ae VAE. Original BF16 encoder exceeded host memory guard; FP8 substitution is necessary. Quality baseline Z-Image 8 steps remains available."
+  },
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Prompt",
+      "required": true,
+      "default": "A photorealistic still life of a small red espresso cup on a white stone countertop beside a warm croissant, morning window light, realistic porcelain and flaky texture, editorial food photography.",
+      "bind": [
+        {
+          "node": "4",
+          "field": "text"
+        }
+      ]
+    },
+    {
+      "id": "width",
+      "type": "select",
+      "label": "Width",
+      "default": 1024,
+      "options": [
+        {
+          "value": 768,
+          "label": "768"
+        },
+        {
+          "value": 1024,
+          "label": "1024"
+        }
+      ],
+      "bind": [
+        {
+          "node": "7",
+          "field": "width"
+        }
+      ]
+    },
+    {
+      "id": "height",
+      "type": "select",
+      "label": "Height",
+      "default": 1024,
+      "options": [
+        {
+          "value": 768,
+          "label": "768"
+        },
+        {
+          "value": 1024,
+          "label": "1024"
+        }
+      ],
+      "bind": [
+        {
+          "node": "7",
+          "field": "height"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": -1,
+      "help": "-1 chooses a new random seed",
+      "bind": [
+        {
+          "node": "8",
+          "field": "seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "10",
+      "type": "image",
+      "label": "Image"
+    }
+  ],
+  "models": [
+    {
+      "repo": "PedroMarinhoDev/NitroFusion2-ComfyUI",
+      "file": "diffusion_models/nitrofusion2_w6a8_gptq.safetensors",
+      "dir": "diffusion_models",
+      "gb": 5.024,
+      "phase": "denoise"
+    },
+    {
+      "repo": "Comfy-Org/z_image_turbo",
+      "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
+      "dir": "text_encoders",
+      "gb": 5.63,
+      "phase": "encode"
+    },
+    {
+      "repo": "Comfy-Org/z_image_turbo",
+      "file": "split_files/vae/ae.safetensors",
+      "dir": "vae",
+      "gb": 0.34,
+      "phase": "decode"
+    }
+  ],
+  "credits": [
+    "NitroFusion2 1-step distilled model by ChenDY",
+    "W6A8 GPTQ compressed weights by PedroMarinhoDev, same ComfyUI native architecture",
+    "FP8 Z-Image text encoder/VAE reused; avoids model weight duplication and memory overflow on Cloud9."
+  ],
+  "test": {
+    "prompt": "A photorealistic still life of a small red espresso cup on a white stone countertop beside a warm croissant, morning window light, realistic porcelain and flaky texture, editorial food photography."
+  }
+}
