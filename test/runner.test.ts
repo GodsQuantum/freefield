@@ -225,3 +225,23 @@ test("drafts run only when allowed", async () => {
   await assert.rejects(open.submit(draft, values), (e: unknown) => !(e instanceof InputError));
   assert.ok(seen[0]?.endsWith("/freefield/prepare"), "got past the draft gate and asked the gateway");
 });
+
+test("prepare sends the effective checkpoint-specific model key to the gateway", async () => {
+  const posts: Array<{ app: string; models: string }> = [];
+  const capture = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+    posts.push(JSON.parse(String(init?.body)));
+    return new Response(JSON.stringify({ freed: true }), { status: 200 });
+  }) as typeof fetch;
+  const runner = new Runner({ baseUrl: "http://gateway.test", token: "t", fetch: capture });
+  const app = byId("sfx");
+  const original = resolveValues(app, { renderer: "medium", category: "Music", seconds: 180, seed: 42 });
+  const small = resolveValues(app, { renderer: "small_sfx", category: "SFX", seconds: 3, seed: 42 });
+  await runner.prepare(app, original);
+  await runner.prepare(app, small);
+  await runner.prepare(app, original);
+  assert.equal(posts.length, 3);
+  assert.equal(posts[0].app, "sfx");
+  assert.equal(posts[0].models, posts[2].models, "returning to Medium restores the original key");
+  assert.notEqual(posts[0].models, posts[1].models, "switch to Small forces the gateway's unload");
+  assert.match(posts[1].models, /active:52:25\.ckpt_name=stable_audio_3_small_sfx\.safetensors/);
+});

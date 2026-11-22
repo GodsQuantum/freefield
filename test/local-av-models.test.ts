@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { loadRegistry, type ApiWorkflow } from "../server/registry.ts";
+import { loadRegistry, modelKey, type ApiWorkflow } from "../server/registry.ts";
 import { applyInputs, resolveValues } from "../server/runner.ts";
 
 const { apps, problems } = loadRegistry();
@@ -229,4 +229,35 @@ test("both native Qwen 2509 and 2511 VRAM maps leave unmeasured peaks unknown", 
     assert.equal(row.measured_peak_gb, null);
     assert.equal(row.measured_on, null);
   }
+});
+
+test("SFX small checkpoint is opt-in, bounded to short effects, and unloads on model change", () => {
+  const app = apps.find((a) => a.id === "sfx");
+  assert.ok(app?.graph);
+  assert.equal(app.graph["52:25"].inputs.ckpt_name, "stable_audio_3_medium.safetensors",
+    "never change the original quality/music default");
+  const renderer = app.inputs.find((i) => i.id === "renderer");
+  assert.equal(renderer?.default, "medium");
+  assert.equal(renderer?.options?.length, 2);
+  assert.ok(app.models.some((m) => m.optional && m.file.endsWith("stable_audio_3_small_sfx.safetensors")));
+  const medium = resolveValues(app, { category: "Music", seconds: 180, renderer: "medium", seed: 42 });
+  const small = resolveValues(app, { category: "SFX", seconds: 3, renderer: "small_sfx", seed: 42 });
+  assert.equal(modelKey(app, medium), modelKey(app),
+    "existing model key should not change for original Medium default");
+  assert.notEqual(modelKey(app, small), modelKey(app, medium),
+    "gateway must unload Medium when the opt-in Small base model is selected");
+  assert.match(modelKey(app, small), /active:52:25\.ckpt_name=stable_audio_3_small_sfx/);
+  const graph: ApiWorkflow = structuredClone(app.graph);
+  applyInputs(app, small, { setInput(node, field, value) { graph[node].inputs[field] = value; } }, () => null);
+  assert.equal(graph["52:25"].inputs.ckpt_name, "stable_audio_3_small_sfx.safetensors");
+  assert.deepEqual(graph["52:3"].inputs.model, ["52:25", 0]);
+  assert.equal(resolveValues(app, { category: "One-shot", seconds: 120, renderer: "small_sfx", seed: 42 }).renderer, "small_sfx");
+  assert.throws(() => resolveValues(app, { category: "Music", seconds: 30, renderer: "small_sfx", seed: 42 }), /renderer: category must be one of SFX, One-shot/);
+  assert.throws(() => resolveValues(app, { category: "Instrument", seconds: 30, renderer: "small_sfx", seed: 42 }), /renderer: category must be one of/);
+  assert.throws(() => resolveValues(app, { category: "SFX", seconds: 121, renderer: "small_sfx", seed: 42 }), /renderer: seconds must be <= 120/);
+  assert.equal(problems.some((p) => p.app === app.id && p.severity === "error"), false);
+  const pack = JSON.parse(readFileSync(new URL("../packs/audio.json", import.meta.url), "utf8"));
+  assert.ok(pack.models.some((m: { name: string; optional?: boolean }) =>
+    m.name === "stable_audio_3_small_sfx.safetensors" && m.optional));
+  assert.equal(pack.models.find((m: { name: string }) => m.name === "stable_audio_3_medium.safetensors").optional, undefined);
 });

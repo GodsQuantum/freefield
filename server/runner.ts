@@ -100,6 +100,25 @@ export function resolveValues(app: App, values: Values): Values {
       out[input.id] = coerce(input, v);
     }
   }
+  // Validate option-specific cross-input constraints before preparing/unloading
+  // any GPU model; e.g. the optional Small SFX checkpoint cannot serve music
+  // or long clips. Defaults and numeric coercion have already been resolved.
+  for (const input of app.inputs) {
+    if (input.type !== "select") continue;
+    const selected = input.options?.find((option) => option.value === out[input.id]);
+    for (const rule of selected?.requires ?? []) {
+      const actual = out[rule.input];
+      if (rule.one_of && !rule.one_of.includes(actual)) {
+        throw new InputError(`${input.id}: ${rule.input} must be one of ${rule.one_of.map(String).join(", ")} for this option`);
+      }
+      if (rule.min !== undefined && (typeof actual !== "number" || actual < rule.min)) {
+        throw new InputError(`${input.id}: ${rule.input} must be >= ${rule.min} for this option`);
+      }
+      if (rule.max !== undefined && (typeof actual !== "number" || actual > rule.max)) {
+        throw new InputError(`${input.id}: ${rule.input} must be <= ${rule.max} for this option`);
+      }
+    }
+  }
   return out;
 }
 
@@ -219,14 +238,14 @@ export class Runner {
    * Freefield gateway (a bare comfy-api-proxy, a hosted Comfy API) answers 404 and manages
    * its own memory, so that is not an error.
    */
-  async prepare(app: App): Promise<{ freed: boolean; skipped?: boolean }> {
+  async prepare(app: App, values?: Values): Promise<{ freed: boolean; skipped?: boolean }> {
     const res = await this.doFetch(`${this.baseUrl}/freefield/prepare`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
         ...(this.token ? { authorization: `Bearer ${this.token}` } : {}),
       },
-      body: JSON.stringify({ app: app.id, models: modelKey(app) }),
+      body: JSON.stringify({ app: app.id, models: modelKey(app, values) }),
     });
     if (res.status === 404 || res.status === 405) return { freed: false, skipped: true };
     if (!res.ok) throw new Error(`gateway /freefield/prepare answered ${res.status}`);
@@ -239,7 +258,7 @@ export class Runner {
       throw new InputError(`${app.id} is a draft; set FREEFIELD_DRAFTS=1 (or pass --draft) to run it anyway`);
     }
     const values = resolveValues(app, rawValues);
-    await this.prepare(app);
+    await this.prepare(app, values);
     const wf = await this.comfy.workflows.fromFile(app.workflowPath);
     applyInputs(
       app,

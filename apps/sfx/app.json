@@ -6,7 +6,7 @@
   "pack": "audio",
   "status": "ready",
   "higgsfield_feature": "Audio",
-  "summary": "Music beds, instruments, ambiences and one-shots with Stable Audio 3.",
+  "summary": "Music beds, instruments, ambiences and one-shots with Stable Audio 3 Medium; optional lightweight Fast Small engine for SFX and one-shots.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "audio_stable_audio_3_medium.json",
@@ -72,6 +72,50 @@
       ]
     },
     {
+      "id": "renderer",
+      "type": "select",
+      "label": "Render engine",
+      "default": "medium",
+      "help": "Medium (default) preserves music, instruments and long effects. Fast SFX 433M is for effects and one-shots up to 120 seconds only; first cold load from HDD can be slower.",
+      "options": [
+        {
+          "value": "medium",
+          "label": "Medium — quality and music (default)",
+          "sets": [
+            {
+              "node": "52:25",
+              "field": "ckpt_name",
+              "value": "stable_audio_3_medium.safetensors"
+            }
+          ]
+        },
+        {
+          "value": "small_sfx",
+          "label": "Fast Small — SFX / One-shot (up to 120s)",
+          "sets": [
+            {
+              "node": "52:25",
+              "field": "ckpt_name",
+              "value": "stable_audio_3_small_sfx.safetensors"
+            }
+          ],
+          "requires": [
+            {
+              "input": "category",
+              "one_of": [
+                "SFX",
+                "One-shot"
+              ]
+            },
+            {
+              "input": "seconds",
+              "max": 120
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "reprompt",
       "type": "select",
       "label": "Expand description",
@@ -81,12 +125,30 @@
         {
           "value": false,
           "label": "Direct (fast, no extra model)",
-          "sets": [{ "node": "52:34", "field": "on_true", "value": ["52:31", 0] }]
+          "sets": [
+            {
+              "node": "52:34",
+              "field": "on_true",
+              "value": [
+                "52:31",
+                0
+              ]
+            }
+          ]
         },
         {
           "value": true,
           "label": "Expand with Qwen (optional model)",
-          "sets": [{ "node": "52:34", "field": "on_true", "value": ["52:28", 0] }]
+          "sets": [
+            {
+              "node": "52:34",
+              "field": "on_true",
+              "value": [
+                "52:28",
+                0
+              ]
+            }
+          ]
         }
       ],
       "bind": [
@@ -141,6 +203,15 @@
       "gb": 4.55,
       "phase": "encode",
       "license": "Apache-2.0",
+      "optional": true
+    },
+    {
+      "repo": "Comfy-Org/stable-audio-3",
+      "file": "checkpoints/stable_audio_3_small_sfx.safetensors",
+      "dir": "checkpoints",
+      "gb": 2.27,
+      "phase": "all",
+      "license": "Stable Audio Community License",
       "optional": true
     }
   ],

@@ -97,6 +97,22 @@
           "type": "array",
           "items": { "$ref": "#/$defs/set" },
           "description": "Extra node fields written when this option is chosen, e.g. the LoRA file that goes with a style, or the prompt that goes with an effect LoRA."
+        },
+        "requires": {
+          "type": "array",
+          "description": "Optional input constraints checked after resolving all defaults, before GPU preparation.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["input"],
+            "properties": {
+              "input": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+              "one_of": { "type": "array", "minItems": 1 },
+              "min": { "type": "number" },
+              "max": { "type": "number" }
+            },
+            "anyOf": [{ "required": ["one_of"] }, { "required": ["min"] }, { "required": ["max"] }]
+          }
         }
       }
     },

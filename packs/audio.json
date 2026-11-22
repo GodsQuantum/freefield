@@ -4,7 +4,7 @@
     "music",
     "sfx"
   ],
-  "download_gb": 29.29,
+  "download_gb": 31.56,
   "needs_hf_token": false,
   "custom_nodes": [],
   "models": [
@@ -79,6 +79,19 @@
       "used_by": [
         "music"
       ]
+    },
+    {
+      "repo": "Comfy-Org/stable-audio-3",
+      "file": "checkpoints/stable_audio_3_small_sfx.safetensors",
+      "dir": "checkpoints",
+      "gb": 2.27,
+      "name": "stable_audio_3_small_sfx.safetensors",
+      "gated": false,
+      "license": "Stable Audio Community License",
+      "used_by": [
+        "sfx"
+      ],
+      "optional": true
     }
   ]
 }

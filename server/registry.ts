@@ -7,7 +7,8 @@ import { Ajv2020 } from "ajv/dist/2020.js";
 
 export type Bind = { node: string; field: string; template?: string };
 export type SetField = { node: string; field: string; value: unknown };
-export type Option = { value: unknown; label: string; sets?: SetField[] };
+export type OptionRequirement = { input: string; one_of?: unknown[]; min?: number; max?: number };
+export type Option = { value: unknown; label: string; sets?: SetField[]; requires?: OptionRequirement[] };
 export type Input = {
   id: string;
   type: "text" | "textarea" | "number" | "slider" | "select" | "toggle" | "seed" | "image" | "video" | "audio";
@@ -87,12 +88,24 @@ export function templateVars(template: string): string[] {
  * everything when this changes. LoRAs are left out: ComfyUI re-patches them without
  * reloading the base model, so switching LoRAs is no reason to empty the GPU.
  */
-export function modelKey(app: AppManifest): string {
-  return app.models
+export function modelKey(app: AppManifest, values?: Readonly<Record<string, unknown>>): string {
+  const files = app.models
     .filter((m) => !m.optional && m.dir !== "loras")
-    .map((m) => `${m.dir}/${basename(m.file)}`)
-    .sort()
-    .join("|");
+    .map((m) => `${m.dir}/${basename(m.file)}`);
+  // Gateway compares this opaque key to unload prior base models. A selected
+  // checkpoint override must change the key, even when the opt-in model is
+  // absent from the required pack list (and LoRA-only choices need no unload).
+  for (const input of app.inputs) {
+    if (!values || input.type !== "select" || values[input.id] === input.default) continue;
+    const selected = input.options?.find((o) => o.value === values[input.id]);
+    for (const change of selected?.sets ?? []) {
+      if (["ckpt_name", "unet_name", "clip_name", "vae_name", "model_name"].includes(change.field)
+          && typeof change.value === "string") {
+        files.push(`active:${change.node}.${change.field}=${change.value}`);
+      }
+    }
+  }
+  return files.sort().join("|");
 }
 
 function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]): void {
@@ -114,6 +127,12 @@ function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]
     }
   };
   for (const input of app.inputs) {
+    for (const opt of input.options ?? []) for (const requirement of opt.requires ?? []) {
+      if (!ids.has(requirement.input)) say(`input "${input.id}" option "${opt.label}": unknown required input "${requirement.input}"`);
+      if (!(requirement.one_of?.length || requirement.min !== undefined || requirement.max !== undefined)) {
+        say(`input "${input.id}" option "${opt.label}": empty requirement`);
+      }
+    }
     for (const b of input.bind ?? []) {
       has(b.node, b.field, `input "${input.id}"`);
       if (b.template) checkTemplate(b.template, `input "${input.id}"`);
