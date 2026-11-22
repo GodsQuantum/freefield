@@ -2,11 +2,11 @@
 //   npm run validate                          check every app.json and its bindings
 //   npm run apps                              list apps with status and pack
 //   npm run app -- <id> [--set k=v] [--file k=path] [--preset id] [--out dir] [--draft] [--no-history]
-import { copyFileSync, linkSync, mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { loadRegistry } from "./registry.ts";
 import { explainSubmitError, resolveValues, Runner, type Values } from "./runner.ts";
-import { History } from "./history.ts";
+import { exportHistoryOutput, History } from "./history.ts";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const { apps, problems } = loadRegistry();
@@ -109,15 +109,9 @@ if (cmd === "validate") {
     // when both destinations are on the same filesystem.
     for (const output of entry.outputs) {
       const source = join(history.dir, entry.id, output.file);
-      const destination = join(out, `${app.id}-${basename(output.name)}`);
-      try {
-        linkSync(source, destination);
-      } catch (error) {
-        // A separate filesystem cannot hard-link; an existing destination was
-        // already created by a previous CLI call. Both can use the saved file.
-        if (!["EXDEV", "EEXIST"].includes((error as NodeJS.ErrnoException).code ?? "")) throw error;
-        copyFileSync(source, destination);
-      }
+      const destination = exportHistoryOutput(
+        source, join(out, app.id + "-" + basename(output.name)), entry.id,
+      );
       console.log(`saved ${destination}`);
     }
     console.log(`library /api/history/${entry.id}`);

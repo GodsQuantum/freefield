@@ -7,7 +7,7 @@
 // the UI shows it as "starting" right away instead of a spinner on a button.
 // On a hosted demo each run belongs to the visitor who started it (`owner`, from guard.ts): every read, file,
 // cancel and delete takes that visitor and sees only their runs. Locally there is no owner and nothing is filtered.
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { constants, copyFileSync, existsSync, linkSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { extname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 import type { ComfyEvent } from "@comfyorg/sdk";
@@ -121,6 +121,39 @@ export class Meter {
 }
 
 const ID = /^\d{8}-\d{9}-[0-9a-f]{4}$/;
+
+/** Materialize a CLI result without overwriting an earlier archived hardlink.
+ * Use a deterministic alternate name on collision, and copy only for EXDEV.
+ */
+export function exportHistoryOutput(source: string, destination: string, historyId: string): string {
+  if (!ID.test(historyId)) throw new Error("Invalid history entry id");
+  const original = statSync(source);
+  const writeIfAvailable = (path: string): boolean => {
+    try {
+      linkSync(source, path);
+      return true;
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code === "EEXIST") {
+        const other = statSync(path);
+        return other.dev === original.dev && other.ino === original.ino;
+      }
+      if (code !== "EXDEV") throw error;
+      try {
+        copyFileSync(source, path, constants.COPYFILE_EXCL);
+        return true;
+      } catch (copyError) {
+        if ((copyError as NodeJS.ErrnoException).code === "EEXIST") return false;
+        throw copyError;
+      }
+    }
+  };
+  if (writeIfAvailable(destination)) return destination;
+  const ext = extname(destination);
+  const alternate = destination.slice(0, destination.length - ext.length) + "-" + historyId + ext;
+  if (writeIfAvailable(alternate)) return alternate;
+  throw new Error("Both CLI output names already contain different media; history remains safe");
+}
 const EXT: Record<string, string> = {
   "image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif",
   "video/mp4": ".mp4", "video/webm": ".webm", "video/quicktime": ".mov",

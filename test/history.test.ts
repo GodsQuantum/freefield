@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { ComfyEvent } from "@comfyorg/sdk";
 import { loadRegistry } from "../server/registry.ts";
 import { resolveValues } from "../server/runner.ts";
-import { History, Meter, pickOutputs, replayValues, type JobLike } from "../server/history.ts";
+import { exportHistoryOutput, History, Meter, pickOutputs, replayValues, type JobLike } from "../server/history.ts";
 import { parseSse, type Frame } from "../server/runner.ts";
 
 const { apps } = loadRegistry();
@@ -113,6 +113,31 @@ test("CLI H3 outputs share the durable Library history without copying media", a
     assert.equal(shown.outputs[0].url, "/api/history/" + complete.id + "/files/out-01.mp4");
     assert.equal(restarted.list("h3-video-int4")[0].id, complete.id);
   } finally { done(); }
+});
+
+test("CLI output filename collisions never mutate prior Library media", () => {
+  const dir = mkdtempSync(join(tmpdir(), "ff-cli-output-"));
+  try {
+    const first = join(dir, "history-one.mp4");
+    const second = join(dir, "history-two.mp4");
+    const destination = join(dir, "h3-video-int4-render.mp4");
+    const firstId = "20261122-130457577-a74e";
+    const secondId = "20261122-141000000-baaa";
+    writeFileSync(first, "video-one-verified");
+    writeFileSync(second, "video-two-verified");
+    const firstOut = exportHistoryOutput(first, destination, firstId);
+    assert.equal(firstOut, destination);
+    assert.equal(statSync(first).ino, statSync(firstOut).ino);
+    const nextOut = exportHistoryOutput(second, destination, secondId);
+    assert.notEqual(nextOut, firstOut);
+    assert.ok(nextOut.endsWith("-" + secondId + ".mp4"));
+    assert.equal(statSync(second).ino, statSync(nextOut).ino);
+    assert.equal(readFileSync(first, "utf8"), "video-one-verified", "old archived media is intact");
+    assert.equal(readFileSync(destination, "utf8"), "video-one-verified", "old CLI output is intact");
+    assert.equal(readFileSync(nextOut, "utf8"), "video-two-verified", "new CLI output is accessible");
+    assert.equal(exportHistoryOutput(second, destination, secondId), nextOut, "retry reuses the same inode");
+    assert.throws(() => exportHistoryOutput(second, destination, "../danger"), /Invalid history entry/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 test("the app's declared output nodes come first; the backend also lists what LoadVideo was given", () => {
