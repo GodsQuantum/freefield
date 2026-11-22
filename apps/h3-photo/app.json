@@ -136,5 +136,10 @@
     "image": "test/portrait.png",
     "prompt": "she smiles",
     "duration": 2
-  }
+  },
+  "modes": [
+    "h3-photo",
+    "h3-photo-int4"
+  ],
+  "mode_label": "H3 photo precision"
 }

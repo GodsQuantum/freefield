@@ -338,3 +338,49 @@ test("H3 INT4 compact: verified native model pair, safe default, old INT8 unchan
   }
   assert.equal(problems.some((p) => p.app === compact.id && p.severity === "error"), false);
 });
+
+
+test("H3 Photo INT4: preserve first-frame + synchronized audio, native models, safe preview", () => {
+  const old = apps.find((x) => x.id === "h3-photo");
+  const app = apps.find((x) => x.id === "h3-photo-int4");
+  assert.ok(old?.graph && app?.graph);
+  assert.deepEqual(old.modes, ["h3-photo", "h3-photo-int4"]);
+  assert.deepEqual(app.modes, old.modes);
+  assert.equal(app.status, "ready");
+  assert.equal(app.graph["105:6"].inputs.unet_name, "minimax_h3_fl2va_pruned_int4_convrot.safetensors");
+  assert.equal(app.graph["105:13"].inputs.clip_name, "qwen3vl_32b_minimax_h3_int4_convrot.safetensors");
+  assert.equal(old.graph["105:6"].inputs.unet_name, "minimax_h3_fl2va_pruned_int8_convrot.safetensors");
+  assert.equal(old.graph["105:13"].inputs.clip_name, "qwen3vl_32b_minimax_h3_int8_convrot.safetensors");
+  assert.equal(modelKey(app) !== modelKey(old), true);
+  assert.equal(Object.keys(app.graph).length, 20);
+  assert.equal(app.graph["114"].class_type, "LoadImage");
+  assert.deepEqual(app.graph["105:104"].inputs.first_frame, ["119", 0]);
+  assert.deepEqual(app.graph["119"].inputs.image, ["114", 0]);
+  assert.deepEqual(app.graph["120"].inputs.image, ["119", 0]);
+  assert.equal(app.graph["119"].inputs.megapixels, 0.1);
+  assert.equal(app.graph["105:111"].inputs.value, 1);
+  assert.equal(app.graph["105:124"].inputs.value, 8);
+  assert.deepEqual(app.graph["105:10"].inputs.samples, ["105:14", 0]);
+  assert.deepEqual(app.graph["105:23"].inputs.samples, ["105:14", 0]);
+  assert.deepEqual(app.graph["105:91"].inputs.audio, ["105:23", 0]);
+  assert.equal(app.graph["92"].class_type, "SaveVideo");
+  assert.deepEqual(app.inputs.find((x) => x.id === "image")?.bind, [{ node: "114", field: "image" }]);
+  assert.equal(app.test?.image, "web/examples/idol/input-image.jpg");
+  const mockImage = { name: "robot.png", bytes: new Uint8Array([137,80,78,71]), type: "image/png" };
+  const values = resolveValues(app, { image: mockImage, prompt: "robot waves", duration: 1, steps: 8, seed: 202611201401 });
+  const graph = structuredClone(app.graph);
+  applyInputs(app, values, { setInput(node, field, value) { graph[node].inputs[field] = value; } }, () => "mock-asset-id");
+  assert.equal(graph["114"].inputs.image, "mock-asset-id");
+  assert.equal(graph["105:104"].inputs.prompt, "robot waves");
+  assert.equal(graph["105:111"].inputs.value, 1);
+  assert.equal(graph["105:124"].inputs.value, 8);
+  assert.equal(graph["105:15"].inputs.noise_seed, 202611201401);
+  assert.throws(() => resolveValues(app, { prompt: "robot", duration: 1, steps: 8, seed: 2 }), /image: required/);
+  assert.throws(() => resolveValues(app, { image: mockImage, prompt: "robot", duration: 3, steps: 8, seed: 2 }), /duration/);
+  const pack = JSON.parse(readFileSync(new URL("../packs/video-h3.json", import.meta.url), "utf8"));
+  for (const name of ["minimax_h3_fl2va_pruned_int4_convrot.safetensors", "qwen3vl_32b_minimax_h3_int4_convrot.safetensors"]) {
+    const weight = pack.models.find((m: { name: string }) => m.name === name);
+    assert.ok(weight?.optional && weight.used_by.includes("h3-video-int4") && weight.used_by.includes(app.id));
+  }
+  assert.equal(problems.some((p) => p.app === app.id && p.severity === "error"), false);
+});

@@ -1,0 +1,148 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "h3-photo-int4",
+  "name": "H3 Photo INT4 compact",
+  "section": "video",
+  "summary": "Optional H3 photo-to-video with synchronized audio using Merserk INT4, 0.1MP, 8 steps. Original H3 Photo INT8 stays available.",
+  "higgsfield_feature": "Animate Photo (low-memory INT4 preview)",
+  "pack": "video-h3",
+  "status": "ready",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "video_minimax_h3_i2v.json",
+    "comfyui": "0.42.0",
+    "notes": "Merserk MiniMax H3 INT4 precision variant, lower resolution 0.1MP 8 steps 1s; release only after real 2026-11-22 image-to-video + audio E2E MP4 and memory qualification; original H3 Photo INT8 preserved. Studio preview, long-duration and higher resolutions not yet validated."
+  },
+  "inputs": [
+    {
+      "id": "image",
+      "type": "image",
+      "label": "Photo",
+      "required": true,
+      "limits": {
+        "max_mb": 20
+      },
+      "bind": [
+        {
+          "node": "114",
+          "field": "image"
+        }
+      ]
+    },
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "What happens",
+      "required": true,
+      "default": "The person smiles, waves at the camera and says: \"Hey, good to see you.\"",
+      "help": "Put spoken words in quotes; describe sounds and music too.",
+      "bind": [
+        {
+          "node": "105:104",
+          "field": "prompt"
+        }
+      ]
+    },
+    {
+      "id": "duration",
+      "type": "slider",
+      "label": "Duration (s)",
+      "min": 1,
+      "max": 2,
+      "step": 1,
+      "default": 1,
+      "bind": [
+        {
+          "node": "105:111",
+          "field": "value"
+        }
+      ],
+      "help": "1 second compact H3 preview. Longer durations are not yet validated on this APU."
+    },
+    {
+      "id": "steps",
+      "type": "slider",
+      "label": "Steps",
+      "min": 8,
+      "max": 8,
+      "step": 1,
+      "default": 8,
+      "help": "Fixed 8 steps; do not use the Lightx2v 4-step experimental LoRA (no qualified benefit).",
+      "bind": [
+        {
+          "node": "105:124",
+          "field": "value"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": -1,
+      "help": "-1 picks a random seed",
+      "bind": [
+        {
+          "node": "105:15",
+          "field": "noise_seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "92",
+      "type": "video",
+      "label": "Video"
+    }
+  ],
+  "models": [
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "diffusion_models/minimax_h3_fl2va_pruned_int4_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 11.34,
+      "phase": "denoise",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "dir": "text_encoders",
+      "gb": 14.95,
+      "phase": "encode",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "Comfy-Org/MiniMax-H3",
+      "file": "vae/minimax_h3_video_vae_int8_convrot.safetensors",
+      "dir": "vae",
+      "gb": 2.81,
+      "phase": "decode",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "Comfy-Org/MiniMax-H3",
+      "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
+      "dir": "vae",
+      "gb": 0.61,
+      "phase": "decode",
+      "license": "MiniMax H3 Community License"
+    }
+  ],
+  "credits": [
+    "MiniMax H3 (MiniMax H3 Community License)",
+    "Merserk MiniMax H3 INT4 ConvRot"
+  ],
+  "test": {
+    "image": "web/examples/idol/input-image.jpg",
+    "prompt": "The person raises a hand, waves gently and smiles, quiet indoor ambience, steady framing",
+    "duration": 1,
+    "steps": 8
+  },
+  "modes": [
+    "h3-photo",
+    "h3-photo-int4"
+  ],
+  "mode_label": "H3 photo precision"
+}

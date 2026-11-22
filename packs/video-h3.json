@@ -5,7 +5,8 @@
     "h3-photo",
     "h3-video",
     "reshoot",
-    "h3-video-int4"
+    "h3-video-int4",
+    "h3-photo-int4"
   ],
   "download_gb": 75.72,
   "needs_hf_token": false,
@@ -133,7 +134,8 @@
       "optional": true,
       "license": "MiniMax H3 Community License",
       "used_by": [
-        "h3-video-int4"
+        "h3-video-int4",
+        "h3-photo-int4"
       ]
     },
     {
@@ -146,7 +148,8 @@
       "optional": true,
       "license": "MiniMax H3 Community License",
       "used_by": [
-        "h3-video-int4"
+        "h3-video-int4",
+        "h3-photo-int4"
       ]
     }
   ]
