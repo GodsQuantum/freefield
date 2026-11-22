@@ -384,3 +384,30 @@ test("H3 Photo INT4: preserve first-frame + synchronized audio, native models, s
   }
   assert.equal(problems.some((p) => p.app === app.id && p.severity === "error"), false);
 });
+
+
+test("H3 Extend Video INT4 opt-in preserves original clip and sound without replacing INT8", () => {
+  const classic = apps.find((a) => a.id === "extend-video");
+  const compact = apps.find((a) => a.id === "extend-video-int4");
+  assert.ok(classic && compact);
+  assert.deepEqual(classic.modes, compact.modes);
+  assert.equal(classic.graph?.["105:6"]?.inputs?.unet_name, "minimax_h3_fl2va_pruned_int8_convrot.safetensors");
+  assert.equal(classic.graph?.["105:13"]?.inputs?.clip_name, "qwen3vl_32b_minimax_h3_int8_convrot.safetensors");
+  assert.equal(compact.graph?.["105:6"]?.inputs?.unet_name, "minimax_h3_fl2va_pruned_int4_convrot.safetensors");
+  assert.equal(compact.graph?.["105:13"]?.inputs?.clip_name, "qwen3vl_32b_minimax_h3_int4_convrot.safetensors");
+  assert.equal(compact.graph?.["119"]?.inputs?.megapixels, 0.1);
+  assert.equal(compact.graph?.["105:111"]?.inputs?.value, 1);
+  assert.equal(compact.graph?.["105:124"]?.inputs?.value, 8);
+  assert.deepEqual(compact.graph?.["ff_frames"]?.inputs?.image1, ["ff_parts", 0]);
+  assert.deepEqual(compact.graph?.["ff_frames"]?.inputs?.image2, ["105:10", 0]);
+  assert.deepEqual(compact.graph?.["ff_sound"]?.inputs?.audio1, ["ff_parts", 1]);
+  assert.deepEqual(compact.graph?.["ff_sound"]?.inputs?.audio2, ["105:23", 0]);
+  assert.deepEqual(compact.graph?.["105:91"]?.inputs?.fps, ["ff_parts", 2]);
+  assert.equal(compact.inputs.find((i) => i.id === "clip")?.type, "video");
+  assert.equal(compact.inputs.find((i) => i.id === "duration")?.max, 1);
+  assert.equal(compact.inputs.find((i) => i.id === "steps")?.max, 8);
+  assert.ok(compact.models.some((m) => m.file.includes("minimax_h3_fl2va_pruned_int4")));
+  assert.ok(compact.models.some((m) => m.file.includes("qwen3vl_32b_minimax_h3_int4")));
+  assert.ok(compact.models.some((m) => m.file.includes("minimax_h3_audio_vae_fp32")));
+  assert.equal(problems.some((p) => p.app === compact.id && p.severity === "error"), false);
+});

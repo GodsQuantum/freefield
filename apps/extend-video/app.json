@@ -135,5 +135,10 @@
   "test": {
     "clip": "test/clip.mp4",
     "duration": 2
-  }
+  },
+  "modes": [
+    "extend-video",
+    "extend-video-int4"
+  ],
+  "mode_label": "Extend video variant"
 }
