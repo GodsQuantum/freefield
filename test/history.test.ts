@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { ComfyEvent } from "@comfyorg/sdk";
@@ -75,6 +75,43 @@ test("following a job stores its media outputs and timings", async () => {
     assert.equal(done1.seconds, 2.5);
     assert.equal(history.get(entry.id)!.progress, null, "live progress is dropped once the run ends");
     assert.equal(JSON.parse(readFileSync(join(dir, entry.id, "meta.json"), "utf-8")).status, "succeeded");
+  } finally { done(); }
+});
+
+test("CLI H3 outputs share the durable Library history without copying media", async () => {
+  const { dir, history, done } = tempHistory();
+  try {
+    const app = byId("h3-video-int4");
+    const values = resolveValues(app, {
+      prompt: "a red robot waving", duration: 1, steps: 8, seed: 202611201401,
+    });
+    const entry = history.start(app, values);
+    const now = new Date();
+    const video: JobLike = {
+      id: "h3-cli-verified-job",
+      status: "succeeded",
+      outputs: [{
+        name: "h3-video-int4_00001_.mp4", type: "image", nodeId: "92",
+        contentType: "video/mp4", toBytes: async () => new Uint8Array([0, 0, 0, 0x18, 0x66, 0x74, 0x79, 0x70]),
+      }],
+      error: null, startedAt: now, completedAt: new Date(now.getTime() + 2000),
+      async *events() {}, async wait() {}, async cancel() {},
+    };
+    const complete = await history.follow(entry, video);
+    assert.equal(complete.status, "succeeded");
+    assert.equal(complete.job, "h3-cli-verified-job");
+    assert.equal(complete.values.seed, 202611201401);
+    assert.deepEqual(complete.outputs.map(({ file, type }) => [file, type]), [["out-01.mp4", "video"]]);
+    const archived = join(history.dir, complete.id, "out-01.mp4");
+    const validation = join(dir, "validation");
+    mkdirSync(validation);
+    const copied = join(validation, "h3-video-int4-h3-video-int4_00001_.mp4");
+    linkSync(archived, copied);
+    assert.equal(statSync(archived).ino, statSync(copied).ino, "CLI --out is a hardlink, not another copy");
+    const restarted = new History(dir);
+    const shown = restarted.get(complete.id)!;
+    assert.equal(shown.outputs[0].url, "/api/history/" + complete.id + "/files/out-01.mp4");
+    assert.equal(restarted.list("h3-video-int4")[0].id, complete.id);
   } finally { done(); }
 });
 

@@ -423,6 +423,16 @@ the values, the seed that was used, and timings), so they survive a closed tab, 
 restart; runs still going when the server stops are picked up again. *Recreate* puts any result's inputs and settings
 back in the form.
 
+**The Freefield CLI also archives to Library automatically.** `npm run app -- <id> ...`
+uses the same native `History` format as the web UI, including launches from agents
+and automation scripts. For the Cloud9 container, `FREEFIELD_OUT=/app/out` points to
+the persistent web history; `FREEFIELD_SHARED_HISTORY=1` exposes it behind the
+shared passcode. The CLI still supports `--out` and hard-links outputs when possible,
+avoiding duplicate media bytes. Submission failures are preserved as failed history
+entries. `--no-history` or `FREEFIELD_CLI_HISTORY=0` is an explicit opt-out.
+Direct ComfyUI API calls outside Freefield are not automatically tracked: the
+qualified-media importer below handles independently verified native outputs.
+
 For an external local validation (not a web run), `tools/import_qualified_media_into_history.py` can place an
 **already generated and visually approved** result into that same history. It never starts an inference or copies
 large media files. The receipt must record a successful run, an explicit positive visual review and sufficient
