@@ -4,7 +4,8 @@
     "extend-video",
     "h3-photo",
     "h3-video",
-    "reshoot"
+    "reshoot",
+    "h3-video-int4"
   ],
   "download_gb": 75.72,
   "needs_hf_token": false,
@@ -120,6 +121,32 @@
         "h3-photo",
         "h3-video",
         "reshoot"
+      ]
+    },
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "minimax_h3_fl2va_pruned_int4_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 11.34,
+      "name": "minimax_h3_fl2va_pruned_int4_convrot.safetensors",
+      "gated": false,
+      "optional": true,
+      "license": "MiniMax H3 Community License",
+      "used_by": [
+        "h3-video-int4"
+      ]
+    },
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "dir": "text_encoders",
+      "gb": 14.95,
+      "name": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "gated": false,
+      "optional": true,
+      "license": "MiniMax H3 Community License",
+      "used_by": [
+        "h3-video-int4"
       ]
     }
   ]

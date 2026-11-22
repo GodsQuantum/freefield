@@ -150,5 +150,10 @@
   "test": {
     "prompt": "a cat yawns on a sunny windowsill",
     "duration": 2
-  }
+  },
+  "modes": [
+    "h3-video",
+    "h3-video-int4"
+  ],
+  "mode_label": "H3 variant"
 }

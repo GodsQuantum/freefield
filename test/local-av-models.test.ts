@@ -302,3 +302,39 @@ test("What's Next: opt-in Qwen 2511 preserves original 2509 and the 2509 Next-Sc
   }
   assert.equal(problems.some((p) => p.app === app.id && p.severity === "error"), false);
 });
+
+
+test("H3 INT4 compact: verified native model pair, safe default, old INT8 unchanged", () => {
+  const baseline = apps.find((a) => a.id === "h3-video");
+  const compact = apps.find((a) => a.id === "h3-video-int4");
+  assert.ok(baseline?.graph && compact?.graph);
+  assert.deepEqual(baseline.modes, ["h3-video", "h3-video-int4"]);
+  assert.deepEqual(compact.modes, baseline.modes);
+  assert.equal(Object.keys(compact.graph).length, 18, "no experimental SaveLatent node");
+  assert.equal(compact.graph["140:127"].inputs.unet_name, "minimax_h3_fl2va_pruned_int4_convrot.safetensors");
+  assert.equal(compact.graph["140:128"].inputs.clip_name, "qwen3vl_32b_minimax_h3_int4_convrot.safetensors");
+  assert.equal(baseline.graph["140:127"].inputs.unet_name, "minimax_h3_fl2va_pruned_int8_convrot.safetensors");
+  assert.equal(baseline.graph["140:128"].inputs.clip_name, "qwen3vl_32b_minimax_h3_int8_convrot.safetensors");
+  assert.equal(compact.graph["115"].inputs.megapixels, 0.1);
+  assert.equal(compact.graph["140:133"].inputs.value, 1);
+  assert.equal(compact.graph["140:137"].inputs.value, 8);
+  assert.deepEqual(compact.graph["140:122"].inputs.samples, ["140:125", 0]);
+  assert.deepEqual(compact.graph["140:121"].inputs.samples, ["140:125", 0]);
+  assert.deepEqual(compact.graph["140:130"].inputs.audio, ["140:121", 0], "audio output preserved");
+  assert.equal(compact.graph["92"].class_type, "SaveVideo");
+  const v = resolveValues(compact, { prompt: "red robot", duration: 1, steps: 8, seed: 202611201401 });
+  const graph = structuredClone(compact.graph);
+  applyInputs(compact, v, { setInput(node, field, value) { graph[node].inputs[field] = value; } }, () => "");
+  assert.equal(graph["140:131"].inputs.prompt, "red robot");
+  assert.equal(graph["140:133"].inputs.value, 1);
+  assert.equal(graph["140:137"].inputs.value, 8);
+  assert.equal(graph["140:129"].inputs.noise_seed, 202611201401);
+  assert.notEqual(modelKey(compact), modelKey(baseline));
+  assert.throws(() => resolveValues(compact, { prompt: "hi", duration: 3, steps: 8, seed: 1 }), /duration/);
+  const pack = JSON.parse(readFileSync(new URL("../packs/video-h3.json", import.meta.url), "utf8"));
+  for (const name of ["minimax_h3_fl2va_pruned_int4_convrot.safetensors", "qwen3vl_32b_minimax_h3_int4_convrot.safetensors"]) {
+    const entry = pack.models.find((m: { name: string }) => m.name === name);
+    assert.ok(entry?.optional, "compact weights must not bulk-download with old H3 pack");
+  }
+  assert.equal(problems.some((p) => p.app === compact.id && p.severity === "error"), false);
+});
