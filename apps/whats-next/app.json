@@ -3,7 +3,7 @@
   "id": "whats-next",
   "name": "What's Next",
   "section": "image",
-  "summary": "The next shot of your scene: 8 cinematic continuations (next-scene LoRA on Qwen-Image-Edit).",
+  "summary": "The next shot of a scene: 8 cinematic continuations, Qwen Edit 2509 default; experimental Edit 2511 option.",
   "higgsfield_feature": "What's Next?",
   "pack": "image-qwen-edit",
   "status": "ready",
@@ -11,7 +11,7 @@
   "source": {
     "template": "image_qwen_image_edit_2509_relight.json",
     "comfyui": "0.42.0",
-    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with next-scene_lora-v2-3000.safetensors in place of the Relight LoRA and no Relight trigger; Comfy-Org Qwen Image Edit 2509 INT8 ConvRot via native UNETLoader and per-model sub-quadratic attention; the shared Relight model chain completed one Cloud9 1024-square run on 2026-11-19, but this Next Scene variant has not been rendered separately; historical examples do not measure this INT8 profile; the prompt below is fixed and \"Extra direction\" is appended to it."
+    "notes": "Template app written by tools/template_apps.py: the workflow is apps/relight's (built by tools/build_apps.py) with next-scene_lora-v2-3000.safetensors in place of the Relight LoRA and no Relight trigger; Comfy-Org Qwen Image Edit 2509 INT8 ConvRot via native UNETLoader and per-model sub-quadratic attention; the shared Relight model chain completed one Cloud9 1024-square run on 2026-11-19, but this Next Scene variant has not been rendered separately; historical examples do not measure this INT8 profile; the prompt below is fixed and \"Extra direction\" is appended to it. Experiment 2026-11-20: candidate 2511 DiT + 2511 Lightning + original Next Scene 2509 LoRA produced valid 1024px pullback in 598.16s, but extra people, changed clothing and inferred studio violated strict identity preservation. This is exposed only as an opt-in engine and original 2509 stays default. Receipt validation/qwen2511-whatsnext-nextscene2509lora-20261120.json."
   },
   "inputs": [
     {
@@ -66,6 +66,35 @@
         {
           "value": "the camera cuts to the reverse angle, looking back the other way",
           "label": "Reverse angle"
+        }
+      ]
+    },
+    {
+      "id": "engine",
+      "type": "select",
+      "label": "Edit model",
+      "default": "2509",
+      "help": "Edit 2509 is the original default. Experimental Edit 2511 is proven for one camera-pullback case only (598s); clothing/people/background may change. No controlled 2509 baseline for this app or universal fidelity proof.",
+      "options": [
+        {
+          "value": "2509",
+          "label": "Original 2509 (default)"
+        },
+        {
+          "value": "2511-preview",
+          "label": "Edit 2511 — experimental variant",
+          "sets": [
+            {
+              "node": "10:37",
+              "field": "unet_name",
+              "value": "qwen_image_edit_2511_int8_convrot.safetensors"
+            },
+            {
+              "node": "10:89",
+              "field": "lora_name",
+              "value": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors"
+            }
+          ]
         }
       ]
     },
@@ -144,6 +173,24 @@
       "gb": 0.3,
       "phase": "denoise",
       "license": "MIT"
+    },
+    {
+      "repo": "Comfy-Org/Qwen-Image-Edit",
+      "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 20.5,
+      "phase": "denoise",
+      "license": "Apache-2.0",
+      "optional": true
+    },
+    {
+      "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+      "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "dir": "loras",
+      "gb": 0.85,
+      "phase": "denoise",
+      "license": "Apache-2.0",
+      "optional": true
     }
   ],
   "vram": {

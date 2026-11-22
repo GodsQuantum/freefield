@@ -261,3 +261,44 @@ test("SFX small checkpoint is opt-in, bounded to short effects, and unloads on m
     m.name === "stable_audio_3_small_sfx.safetensors" && m.optional));
   assert.equal(pack.models.find((m: { name: string }) => m.name === "stable_audio_3_medium.safetensors").optional, undefined);
 });
+
+test("What's Next: opt-in Qwen 2511 preserves original 2509 and the 2509 Next-Scene LoRA", () => {
+  const app = apps.find((a) => a.id === "whats-next");
+  assert.ok(app?.graph);
+  const engine = app.inputs.find((i) => i.id === "engine");
+  assert.equal(engine?.default, "2509");
+  assert.deepEqual(engine?.options?.map((o) => o.value), ["2509", "2511-preview"]);
+  assert.equal(app.inputs.find((i) => i.id === "next")?.options?.length, 8, "preserve every camera continuation");
+  assert.ok(app.models.some((m) => m.optional && m.file.endsWith("qwen_image_edit_2511_int8_convrot.safetensors")));
+  assert.ok(app.models.some((m) => m.optional && m.file.endsWith("Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors")));
+  assert.equal(app.graph["10:37"].inputs.unet_name, "qwen_image_edit_2509_int8_convrot.safetensors");
+  assert.equal(app.graph["10:89"].inputs.lora_name, "Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors");
+  const vals = (choice: string) => resolveValues(app, {
+    image: { bytes: new Uint8Array([1, 2, 3]), name: "portrait.png" },
+    engine: choice, next: "the camera pulls back to reveal the wider surroundings",
+    details: "", seed: 202611191712,
+  });
+  const original = vals("2509");
+  const preview = vals("2511-preview");
+  assert.equal(modelKey(app, original), modelKey(app), "default key remains backward compatible");
+  assert.notEqual(modelKey(app, preview), modelKey(app, original), "gateway must unload the previous base DiT");
+  assert.match(modelKey(app, preview), /active:10:37\.unet_name=qwen_image_edit_2511_int8_convrot\.safetensors/);
+  const graphFor = (values: ReturnType<typeof resolveValues>) => {
+    const graph: ApiWorkflow = structuredClone(app.graph!);
+    applyInputs(app, values, { setInput(node, field, value) { graph[node].inputs[field] = value; } }, () => "portrait.png");
+    return graph;
+  };
+  const g0 = graphFor(original);
+  const g1 = graphFor(preview);
+  assert.equal(g0["10:37"].inputs.unet_name, "qwen_image_edit_2509_int8_convrot.safetensors");
+  assert.equal(g0["10:89"].inputs.lora_name, "Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors");
+  assert.equal(g1["10:37"].inputs.unet_name, "qwen_image_edit_2511_int8_convrot.safetensors");
+  assert.equal(g1["10:89"].inputs.lora_name, "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors");
+  for (const g of [g0, g1]) {
+    assert.equal(g["10:118"].inputs.lora_name, "next-scene_lora-v2-3000.safetensors");
+    assert.equal(g["10:3"].inputs.seed, 202611191712);
+    assert.equal(g["10:3"].inputs.steps, 4);
+    assert.equal(g["10:119"].inputs.attention, "sub-quadratic attention");
+  }
+  assert.equal(problems.some((p) => p.app === app.id && p.severity === "error"), false);
+});
