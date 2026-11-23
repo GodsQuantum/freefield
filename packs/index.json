@@ -173,6 +173,13 @@
     "download_gb": 14.87,
     "needs_hf_token": false
   },
+  "video-kandinsky6-lite-int8": {
+    "apps": [
+      "kandinsky6-lite-int8"
+    ],
+    "download_gb": 12.65,
+    "needs_hf_token": false
+  },
   "video-ltx25": {
     "apps": [
       "asmr-host",

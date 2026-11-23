@@ -1,0 +1,157 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "kandinsky6-lite-int8",
+  "name": "Kandinsky 6 Lite INT8",
+  "section": "video",
+  "pack": "video-kandinsky6-lite-int8",
+  "status": "ready",
+  "summary": "Aperçu 1,04 s de vidéo + son, 25 images 448×256, modèle INT8 ConvRot compact pour Cloud9. Génération à certifier avant exposition.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "Kandinsky 6 Lite-distill original 12-node PiFlow T2VA full video+audio native graph, only node1 checkpoint replaced by SHA-pinned native INT8 ConvRot",
+    "comfyui": "0.45.0",
+    "notes": "Model shadwosii/Kandinsky-6.0 pinned revision 68c1f666395f3d0bbb57cbe8093b6220ac0cb828, source LFS SHA256 523522487aeb9009a93e77f5d74bc1c817b1469aa6ce99b2b564c3da69c0f96e, 4166194712 bytes. Repackaged native Comfy int8 ConvRot quant. Official Kandinsky adapter on native CT410 already passed BF16 generation; quant needs real gfx1103 E2E. 25f 448x256 10steps, audio kept. No other source model replaced."
+  },
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Scène vidéo",
+      "required": true,
+      "default": "A natural cinematic shot of a clear mountain stream flowing over smooth rocks in daylight. Rippling water moves continuously; leaves and grasses gently sway in the breeze. A locked-off camera, realistic lighting, a single uncut shot.",
+      "bind": [
+        {
+          "node": "5",
+          "field": "video_caption"
+        }
+      ]
+    },
+    {
+      "id": "sound",
+      "type": "textarea",
+      "label": "Ambiance sonore",
+      "required": true,
+      "default": "Gentle flowing water and soft wind rustling through nearby leaves, subtle distant birds.",
+      "bind": [
+        {
+          "node": "5",
+          "field": "audio_caption"
+        }
+      ]
+    },
+    {
+      "id": "negative",
+      "type": "textarea",
+      "label": "Éléments à éviter",
+      "default": "Static, still frame, 2D cartoon, text, blur, unnatural motion, flicker, deformed objects, low quality.",
+      "bind": [
+        {
+          "node": "6",
+          "field": "video_caption"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Graine",
+      "default": -1,
+      "help": "-1 choisit une nouvelle graine",
+      "bind": [
+        {
+          "node": "8",
+          "field": "seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "12",
+      "type": "video",
+      "label": "Vidéo MP4 H264 + audio AAC"
+    }
+  ],
+  "models": [
+    {
+      "repo": "shadwosii/Kandinsky-6.0",
+      "file": "diffusion_models/Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 4.1662,
+      "phase": "denoise",
+      "license": "MIT (converted checkpoint repository); underlying Kandinsky original terms apply"
+    },
+    {
+      "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+      "file": "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+      "dir": "text_encoders",
+      "gb": 4.683,
+      "phase": "encode"
+    },
+    {
+      "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+      "file": "mmproj-BF16.gguf",
+      "dir": "text_encoders",
+      "gb": 1.354,
+      "phase": "encode",
+      "optional": true,
+      "install_name": "mmproj-Qwen2.5-VL-7B-Instruct-BF16.gguf"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "text_encoders/clip_l.safetensors",
+      "dir": "text_encoders",
+      "gb": 0.246,
+      "phase": "encode"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "vae/hunyuan_video_vae_bf16.safetensors",
+      "dir": "vae",
+      "gb": 0.493,
+      "phase": "decode"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "audio_vae/v1-44.pth",
+      "dir": "audio_vae",
+      "gb": 1.222,
+      "phase": "decode"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
+      "dir": "audio_vae",
+      "gb": 0.489,
+      "phase": "decode",
+      "install_name": "bigvgan_vocoder/bigvgan_generator.pt"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "audio_vae/bigvgan_vocoder/config.json",
+      "dir": "audio_vae",
+      "gb": 2e-06,
+      "phase": "decode",
+      "optional": true,
+      "install_name": "bigvgan_vocoder/config.json"
+    }
+  ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/kandinskylab/kandinsky-6",
+      "commit": "73b892b730885e02ab58fbf7fc5cb10b78e1e3da",
+      "install_subdirectory": "comfyui"
+    },
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "test": {
+    "prompt": "A tiny orange fox trotting across a sunlit meadow of tall grass, its tail swaying as it moves, soft wind and distant chirping birds, steady cinematic camera, continuous realistic motion.",
+    "sound": "Soft wind rustling tall grass, gentle fox paw steps and distant morning bird calls, no speech.",
+    "negative": "Static, still frame, 2D cartoon, text, blur, unnatural motion, flicker, deformed objects, low quality.",
+    "seed": 202611232325
+  },
+  "notes": "Preview 25 images/24fps, 448x256, audio and shared graph with native K6 BF16. INT8 ConvRot checkpoint is a distinct candidate, not auto-promoted; LFS SHA must pass and actual Freefield CLI output + ffprobe/visual/history required. Quality and freedom not yet qualified."
+}

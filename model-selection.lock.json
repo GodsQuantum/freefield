@@ -7448,6 +7448,117 @@
       "model_overrides": [],
       "limits": []
     },
+    "kandinsky6-lite-int8": {
+      "status": "ready",
+      "pack": "video-kandinsky6-lite-int8",
+      "models": [
+        {
+          "dir": "audio_vae",
+          "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": false,
+          "install_name": "bigvgan_vocoder/bigvgan_generator.pt"
+        },
+        {
+          "dir": "audio_vae",
+          "file": "audio_vae/bigvgan_vocoder/config.json",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": true,
+          "install_name": "bigvgan_vocoder/config.json"
+        },
+        {
+          "dir": "audio_vae",
+          "file": "audio_vae/v1-44.pth",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": false
+        },
+        {
+          "dir": "diffusion_models",
+          "file": "diffusion_models/Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
+          "repo": "shadwosii/Kandinsky-6.0",
+          "phase": "denoise",
+          "optional": false
+        },
+        {
+          "dir": "text_encoders",
+          "file": "mmproj-BF16.gguf",
+          "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+          "phase": "encode",
+          "optional": true,
+          "install_name": "mmproj-Qwen2.5-VL-7B-Instruct-BF16.gguf"
+        },
+        {
+          "dir": "text_encoders",
+          "file": "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+          "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "text_encoders",
+          "file": "text_encoders/clip_l.safetensors",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "vae",
+          "file": "vae/hunyuan_video_vae_bf16.safetensors",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": false
+        }
+      ],
+      "workflow": [
+        {
+          "id": "1",
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        {
+          "id": "2",
+          "class_type": "DualCLIPLoaderGGUF",
+          "inputs": {
+            "clip_name1": "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+            "clip_name2": "clip_l.safetensors"
+          }
+        },
+        {
+          "id": "3",
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "hunyuan_video_vae_bf16.safetensors"
+          }
+        },
+        {
+          "id": "7",
+          "class_type": "Kandinsky6EmptyLatent",
+          "inputs": {
+            "width": 448,
+            "height": 256
+          }
+        },
+        {
+          "id": "8",
+          "class_type": "Kandinsky6Sampler",
+          "inputs": {
+            "steps": 10,
+            "cfg": 1,
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "denoise": 1
+          }
+        }
+      ],
+      "model_overrides": [],
+      "limits": []
+    },
     "kick-ad": {
       "status": "ready",
       "pack": "video-ltx25",
