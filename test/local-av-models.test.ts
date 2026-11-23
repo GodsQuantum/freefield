@@ -411,3 +411,30 @@ test("H3 Extend Video INT4 opt-in preserves original clip and sound without repl
   assert.ok(compact.models.some((m) => m.file.includes("minimax_h3_audio_vae_fp32")));
   assert.equal(problems.some((p) => p.app === compact.id && p.severity === "error"), false);
 });
+
+
+test("Re-shoot INT4 retains original CrossView warp, Turbo8 LoRAs, camera controls and all audio outputs", () => {
+  const original = apps.find((a) => a.id === "reshoot");
+  const candidate = apps.find((a) => a.id === "reshoot-int4");
+  assert.ok(original?.graph && candidate?.graph);
+  assert.deepEqual(original.modes, candidate.modes);
+  assert.equal(original.graph["10"].inputs.unet_name, "minimax_h3_ref2va_pruned_int8_convrot.safetensors");
+  assert.equal(original.graph["15"].inputs.clip_name, "qwen3vl_32b_minimax_h3_int8_convrot.safetensors");
+  assert.equal(candidate.graph["10"].inputs.unet_name, "minimax_h3_ref2va_pruned_int4_convrot.safetensors");
+  assert.equal(candidate.graph["15"].inputs.clip_name, "qwen3vl_32b_minimax_h3_int4_convrot.safetensors");
+  assert.equal(candidate.graph["2"].inputs.megapixels, 0.1);
+  assert.equal(candidate.graph["2"].inputs.duration, 1);
+  assert.equal(candidate.graph["32"].inputs.steps, 8);
+  assert.equal(candidate.graph["11"].inputs.lora_name, original.graph["11"].inputs.lora_name);
+  assert.equal(candidate.graph["14"].inputs.lora_name, original.graph["14"].inputs.lora_name);
+  for (const node of ["3","4","5","12","13","20","21","30","31","32","33","34","35","36","37","40","42"]) {
+    assert.deepEqual(candidate.graph[node].inputs, original.graph[node].inputs, "must preserve "+node);
+  }
+  assert.deepEqual(candidate.outputs, original.outputs);
+  for (const field of ["clip","azimuth","elevation","distance","prompt","seed"]) {
+    assert.deepEqual(candidate.inputs.find((x) => x.id === field)?.bind, original.inputs.find((x) => x.id === field)?.bind);
+  }
+  assert.equal(candidate.inputs.find((x) => x.id === "duration")?.default, 1);
+  assert.equal(candidate.status,"draft","do not expose before actual GPU output");
+  assert.equal(problems.some((problem) => problem.app === candidate.id && problem.severity === "error"), false);
+});

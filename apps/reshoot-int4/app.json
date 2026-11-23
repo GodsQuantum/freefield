@@ -1,0 +1,215 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "reshoot-int4",
+  "name": "Re-shoot INT4 compact",
+  "section": "video",
+  "pack": "video-h3",
+  "status": "draft",
+  "higgsfield_feature": "Re-shoot (Merserk INT4 low-memory preview)",
+  "summary": "Experimental low-memory Re-shoot with Merserk Ref2VA INT4, CrossView, MoGe and Turbo8. Original INT8 remains the default.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "Comfy-Org/comfy-reshoot workflows/generate.api.json (dc53fc7)",
+    "comfyui": "0.42.0",
+    "notes": "Staged for native 00d E2E only; static preflight confirms CrossView LoRA target names 200/200 and Turbo8 208/208, but quantized patch runtime and visual results remain unverified. Never replace native INT8 until true video and audio pass."
+  },
+  "inputs": [
+    {
+      "id": "clip",
+      "type": "video",
+      "label": "Your clip",
+      "required": true,
+      "limits": {
+        "max_mb": 100,
+        "seconds": [
+          5,
+          15
+        ]
+      },
+      "bind": [
+        {
+          "node": "1",
+          "field": "file"
+        }
+      ]
+    },
+    {
+      "id": "azimuth",
+      "type": "slider",
+      "label": "Orbit (degrees)",
+      "min": -90,
+      "max": 90,
+      "step": 5,
+      "default": -30,
+      "bind": [
+        {
+          "node": "5",
+          "field": "azimuth"
+        }
+      ]
+    },
+    {
+      "id": "elevation",
+      "type": "slider",
+      "label": "Height (degrees)",
+      "min": -30,
+      "max": 60,
+      "step": 5,
+      "default": 20,
+      "bind": [
+        {
+          "node": "5",
+          "field": "elevation"
+        }
+      ]
+    },
+    {
+      "id": "distance",
+      "type": "slider",
+      "label": "Distance",
+      "min": 0.5,
+      "max": 2.0,
+      "step": 0.05,
+      "default": 1.0,
+      "bind": [
+        {
+          "node": "5",
+          "field": "distance"
+        }
+      ]
+    },
+    {
+      "id": "duration",
+      "type": "slider",
+      "label": "Seconds to keep",
+      "min": 1,
+      "max": 1,
+      "step": 1,
+      "default": 1,
+      "bind": [
+        {
+          "node": "2",
+          "field": "duration"
+        }
+      ],
+      "help": "Only a 1-second 0.1MP preview will be qualified; longer or higher-resolution generations are not tested."
+    },
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Extra description (optional)",
+      "default": "",
+      "bind": [
+        {
+          "node": "20",
+          "field": "prompt",
+          "template": "crossview. {prompt}"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": -1,
+      "help": "-1 picks a random seed",
+      "bind": [
+        {
+          "node": "30",
+          "field": "noise_seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "38",
+      "type": "video",
+      "label": "New angle"
+    },
+    {
+      "node": "41",
+      "type": "video",
+      "label": "Warp guide"
+    }
+  ],
+  "models": [
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "diffusion_models/minimax_h3_ref2va_pruned_int4_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 11.34,
+      "phase": "denoise",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "dir": "text_encoders",
+      "gb": 14.95,
+      "phase": "encode",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "Comfy-Org/MiniMax-H3",
+      "file": "vae/minimax_h3_video_vae_int8_convrot.safetensors",
+      "dir": "vae",
+      "gb": 2.81,
+      "phase": "decode",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "Comfy-Org/MiniMax-H3",
+      "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
+      "dir": "vae",
+      "gb": 0.61,
+      "phase": "decode",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "Comfy-Org/MoGe",
+      "file": "geometry_estimation/moge_2_vitl_normal_fp16.safetensors",
+      "dir": "geometry_estimation",
+      "gb": 0.66,
+      "phase": "aux",
+      "license": "MIT"
+    },
+    {
+      "repo": "Cseti/MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1",
+      "file": "MiniMax-H3_Ref2VA-LoRA-CrossView-Warp_v1_3500.safetensors",
+      "dir": "loras",
+      "gb": 0.6,
+      "phase": "denoise",
+      "license": "MiniMax H3 Community License"
+    },
+    {
+      "repo": "lightx2v/Minimax-h3-Turbo",
+      "file": "minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "dir": "loras",
+      "gb": 1.96,
+      "phase": "denoise",
+      "license": "Not stated on the model card (its code, ModelTC/Minimax-H3-Turbo, is Apache-2.0)"
+    }
+  ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/comfyrob/ComfyUI-CrossViewWarp",
+      "commit": "fbb1e93c7193329ff3ce7c17f95166b539687876"
+    }
+  ],
+  "credits": [
+    "Comfy-Org/comfy-reshoot (MIT)",
+    "CrossView-Warp node (Apache-2.0) and LoRA by Cseti",
+    "MiniMax H3 (MiniMax H3 Community License)",
+    "Merserk Ref2VA INT4 + Qwen3VL32B INT4; original CrossView & Turbo8 LoRAs"
+  ],
+  "test": {
+    "clip": "test/clip.mp4",
+    "duration": 5
+  },
+  "modes": [
+    "reshoot",
+    "reshoot-int4"
+  ],
+  "mode_label": "Re-shoot precision"
+}

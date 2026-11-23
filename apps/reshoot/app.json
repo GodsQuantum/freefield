@@ -204,5 +204,10 @@
   "test": {
     "clip": "test/clip.mp4",
     "duration": 5
-  }
+  },
+  "modes": [
+    "reshoot",
+    "reshoot-int4"
+  ],
+  "mode_label": "Re-shoot precision"
 }
