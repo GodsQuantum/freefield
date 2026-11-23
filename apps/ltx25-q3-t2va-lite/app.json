@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "ltx25-q3-t2va-lite",
+  "name": "LTX 2.5 Q3 AV compact",
+  "section": "video",
+  "pack": "video-ltx25-q3-compact",
+  "status": "ready",
+  "summary": "Vidéo + audio courte 1 s, 8 étapes, mono-étape sans upscale. Variante expérimentale très basse résolution ; la qualité doit être vérifiée.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "LTX-2.5 official T2VA template, single-stage only from SHA-verified native 43-node baseline; reused seed/condition path",
+    "comfyui": "0.45.0",
+    "notes": "Unsloth UD-Q3_K_XL 12.000GB 4349-tensor complete SHA, jameriles Gemma4 W4A8 10.604GB SHA; deliberately 8-step single-stage at original first-stage half-resolution, 24fps/25frames, spatial tiled256 temporal16/4; no upscale or prompt enhancer, no claims of full two-stage image quality."
+  },
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Scène et ambiance sonore",
+      "default": "A little robot slowly waves on a sunny wooden table, soft mechanical clicking and room ambience, one steady realistic shot.",
+      "required": true,
+      "bind": [
+        {
+          "node": "405:376",
+          "field": "value"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Graine",
+      "default": -1,
+      "bind": [
+        {
+          "node": "405:339",
+          "field": "noise_seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "75",
+      "type": "video",
+      "label": "MP4 H.264 avec audio"
+    }
+  ],
+  "models": [
+    {
+      "repo": "unsloth/LTX-2.5-GGUF",
+      "file": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+      "dir": "unet_gguf",
+      "gb": 12.0003,
+      "phase": "denoise",
+      "license": "LTX-2.x Community License"
+    },
+    {
+      "repo": "jameriles/LTX-2.5-22B-Distilled-Hybrid-W4A8-INT8-ConvRot",
+      "file": "gemma4-12b-ltx-2.5-w4a8.safetensors",
+      "dir": "text_encoders",
+      "gb": 10.6044,
+      "phase": "encode",
+      "license": "LTX-2.x Community License"
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
+      "dir": "vae",
+      "gb": 1.47,
+      "phase": "decode",
+      "license": "LTX-2.x Community License",
+      "gated": true
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
+      "dir": "vae",
+      "gb": 0.36,
+      "phase": "decode",
+      "license": "LTX-2.x Community License",
+      "gated": true
+    }
+  ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "notes": "LTX-2.5 preview basse résolution, limité aux 25 images à 24 ips (1,04 s) et au format 16:9. Non certifié sur AMD gfx1103 à la création. Les choix originaux LTX INT8 restent inchangés; mode opt-in non exposé tant que génération CLI non passée.",
+  "test": {
+    "prompt": "A small red ceramic robot slowly waving its right hand on a sunlit wooden table, subtle mechanical whirs and light ticking noises, cinematic close-up, smooth motion, realistic texture, a single steady shot.",
+    "seed": 202611232250
+  }
+}

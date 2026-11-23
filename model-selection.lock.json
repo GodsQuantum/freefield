@@ -7619,6 +7619,117 @@
         }
       ]
     },
+    "ltx25-q3-t2va-lite": {
+      "status": "ready",
+      "pack": "video-ltx25-q3-compact",
+      "models": [
+        {
+          "dir": "text_encoders",
+          "file": "gemma4-12b-ltx-2.5-w4a8.safetensors",
+          "repo": "jameriles/LTX-2.5-22B-Distilled-Hybrid-W4A8-INT8-ConvRot",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "unet_gguf",
+          "file": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+          "repo": "unsloth/LTX-2.5-GGUF",
+          "phase": "denoise",
+          "optional": false
+        },
+        {
+          "dir": "vae",
+          "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
+          "repo": "Lightricks/LTX-2.5",
+          "phase": "decode",
+          "optional": false
+        },
+        {
+          "dir": "vae",
+          "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
+          "repo": "Lightricks/LTX-2.5",
+          "phase": "decode",
+          "optional": false
+        }
+      ],
+      "workflow": [
+        {
+          "id": "405:344",
+          "class_type": "SamplerCustomAdvanced",
+          "inputs": {
+            "sigmas": [
+              "405:404",
+              0
+            ]
+          }
+        },
+        {
+          "id": "405:352",
+          "class_type": "KSamplerSelect",
+          "inputs": {
+            "sampler_name": "euler_ancestral"
+          }
+        },
+        {
+          "id": "405:356",
+          "class_type": "EmptyLTXVLatentVideo",
+          "inputs": {
+            "width": [
+              "405:353",
+              1
+            ],
+            "height": [
+              "405:355",
+              1
+            ]
+          }
+        },
+        {
+          "id": "405:384",
+          "class_type": "UnetLoaderGGUF",
+          "inputs": {
+            "unet_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf"
+          }
+        },
+        {
+          "id": "405:385",
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "ltx-2.5-video-vae-bf16.safetensors"
+          }
+        },
+        {
+          "id": "405:386",
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "ltx-2.5-audio-vae-bf16.safetensors"
+          }
+        },
+        {
+          "id": "405:387",
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "gemma4-12b-ltx-2.5-w4a8.safetensors"
+          }
+        },
+        {
+          "id": "405:404",
+          "class_type": "ManualSigmas",
+          "inputs": {
+            "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0"
+          }
+        },
+        {
+          "id": "409",
+          "class_type": "ResolutionSelector",
+          "inputs": {
+            "megapixels": 0.12
+          }
+        }
+      ],
+      "model_overrides": [],
+      "limits": []
+    },
     "macro-product": {
       "status": "ready",
       "pack": "image-flux3",

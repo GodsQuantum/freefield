@@ -1,0 +1,426 @@
+{
+  "75": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": [
+        "405:370",
+        0
+      ],
+      "filename_prefix": "freefield/ltx25-q3-t2va-lite",
+      "format": "mp4",
+      "codec": "h264"
+    },
+    "_meta": {
+      "title": "Save Video"
+    }
+  },
+  "405:339": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 202611232250
+    },
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "405:344": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "405:339",
+        0
+      ],
+      "guider": [
+        "405:388",
+        0
+      ],
+      "sampler": [
+        "405:352",
+        0
+      ],
+      "sigmas": [
+        "405:404",
+        0
+      ],
+      "latent_image": [
+        "405:377",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "405:352": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler_ancestral"
+    },
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "405:353": {
+    "class_type": "ComfyMathExpression",
+    "inputs": {
+      "values.a": [
+        "405:372",
+        0
+      ],
+      "expression": "a/2"
+    },
+    "_meta": {
+      "title": "Math Expression"
+    }
+  },
+  "405:355": {
+    "class_type": "ComfyMathExpression",
+    "inputs": {
+      "values.a": [
+        "405:360",
+        0
+      ],
+      "expression": "a/2"
+    },
+    "_meta": {
+      "title": "Math Expression"
+    }
+  },
+  "405:356": {
+    "class_type": "EmptyLTXVLatentVideo",
+    "inputs": {
+      "width": [
+        "405:353",
+        1
+      ],
+      "height": [
+        "405:355",
+        1
+      ],
+      "length": [
+        "405:378",
+        1
+      ],
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Empty LTXV Latent Video"
+    }
+  },
+  "405:358": {
+    "class_type": "LTXVAudioVAEDecode",
+    "inputs": {
+      "samples": [
+        "405:369",
+        1
+      ],
+      "audio_vae": [
+        "405:386",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "LTXV Audio VAE Decode"
+    }
+  },
+  "405:359": {
+    "class_type": "ComfyMathExpression",
+    "inputs": {
+      "values.a": [
+        "405:361",
+        0
+      ],
+      "expression": "a"
+    },
+    "_meta": {
+      "title": "Math Expression (fps)"
+    }
+  },
+  "405:360": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": [
+        "409",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Height"
+    }
+  },
+  "405:361": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": 24
+    },
+    "_meta": {
+      "title": "Frame Rate"
+    }
+  },
+  "405:362": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": 1
+    },
+    "_meta": {
+      "title": "Duration"
+    }
+  },
+  "405:364": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "405:387",
+        0
+      ],
+      "text": [
+        "405:376",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "405:365": {
+    "class_type": "LTXVConditioning",
+    "inputs": {
+      "positive": [
+        "405:364",
+        0
+      ],
+      "negative": [
+        "405:373",
+        0
+      ],
+      "frame_rate": [
+        "405:359",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "LTXVConditioning"
+    }
+  },
+  "405:366": {
+    "class_type": "LTXVEmptyLatentAudio",
+    "inputs": {
+      "audio_vae": [
+        "405:386",
+        0
+      ],
+      "frames_number": [
+        "405:378",
+        1
+      ],
+      "frame_rate": [
+        "405:359",
+        1
+      ],
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Empty LTXV Latent Audio"
+    }
+  },
+  "405:369": {
+    "class_type": "LTXVSeparateAVLatent",
+    "inputs": {
+      "av_latent": [
+        "405:344",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Separate AV Latent"
+    }
+  },
+  "405:370": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": [
+        "405:374",
+        0
+      ],
+      "audio": [
+        "405:358",
+        0
+      ],
+      "fps": [
+        "405:359",
+        0
+      ],
+      "bit_depth": 8
+    },
+    "_meta": {
+      "title": "Create Video"
+    }
+  },
+  "405:372": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": [
+        "409",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Width"
+    }
+  },
+  "405:373": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "405:387",
+        0
+      ],
+      "text": "pc game, console game, video game, cartoon, childish, ugly"
+    },
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "405:374": {
+    "class_type": "VAEDecodeTiled",
+    "inputs": {
+      "samples": [
+        "405:369",
+        0
+      ],
+      "vae": [
+        "405:385",
+        0
+      ],
+      "tile_size": 256,
+      "overlap": 32,
+      "temporal_size": 16,
+      "temporal_overlap": 4
+    },
+    "_meta": {
+      "title": "VAE Decode (Tiled)"
+    }
+  },
+  "405:376": {
+    "class_type": "PrimitiveStringMultiline",
+    "inputs": {
+      "value": "A small red ceramic robot slowly waving its right hand on a sunlit wooden table, subtle mechanical whirs and light ticking noises, cinematic close-up, smooth motion, realistic texture, a single steady shot."
+    },
+    "_meta": {
+      "title": "Prompt"
+    }
+  },
+  "405:377": {
+    "class_type": "LTXVConcatAVLatent",
+    "inputs": {
+      "video_latent": [
+        "405:356",
+        0
+      ],
+      "audio_latent": [
+        "405:366",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Concat AV Latent"
+    }
+  },
+  "405:378": {
+    "class_type": "ComfyMathExpression",
+    "inputs": {
+      "values.a": [
+        "405:362",
+        0
+      ],
+      "values.b": [
+        "405:361",
+        0
+      ],
+      "expression": "a * b + 1"
+    },
+    "_meta": {
+      "title": "Math Expression (length)"
+    }
+  },
+  "405:384": {
+    "class_type": "UnetLoaderGGUF",
+    "inputs": {
+      "unet_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf"
+    },
+    "_meta": {
+      "title": "Unsloth LTX 2.5 22B distilled GGUF UD-Q3_K_XL 12GB experimental"
+    }
+  },
+  "405:385": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ltx-2.5-video-vae-bf16.safetensors"
+    },
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "405:386": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ltx-2.5-audio-vae-bf16.safetensors"
+    },
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "405:387": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "gemma4-12b-ltx-2.5-w4a8.safetensors",
+      "type": "ltxv",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Load CLIP"
+    }
+  },
+  "405:388": {
+    "class_type": "LTXVDualCFGGuider",
+    "inputs": {
+      "model": [
+        "405:384",
+        0
+      ],
+      "positive": [
+        "405:365",
+        0
+      ],
+      "negative": [
+        "405:365",
+        1
+      ],
+      "video_cfg": 1,
+      "audio_cfg": 1
+    },
+    "_meta": {
+      "title": "LTXV Dual CFG Guider"
+    }
+  },
+  "405:404": {
+    "class_type": "ManualSigmas",
+    "inputs": {
+      "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0"
+    },
+    "_meta": {
+      "title": "ManualSigmas"
+    }
+  },
+  "409": {
+    "class_type": "ResolutionSelector",
+    "inputs": {
+      "aspect_ratio": "16:9 (Widescreen)",
+      "megapixels": 0.12,
+      "multiple": 64
+    },
+    "_meta": {
+      "title": "Resolution Selector"
+    }
+  }
+}

@@ -211,6 +211,13 @@
     "download_gb": 66.03,
     "needs_hf_token": true
   },
+  "video-ltx25-q3-compact": {
+    "apps": [
+      "ltx25-q3-t2va-lite"
+    ],
+    "download_gb": 24.43,
+    "needs_hf_token": true
+  },
   "video-scail": {
     "apps": [
       "recast"
