@@ -6,12 +6,12 @@
   "pack": "audio",
   "status": "ready",
   "higgsfield_feature": "Audio",
-  "summary": "A full song from a style description and optional lyrics, with MiniMax Music 3.",
+  "summary": "MiniMax Music 3 using verified Q6_K GGUF; faster 10-second audio generation. Longer songs remain unqualified.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "audio_minimax_music_3.json",
     "comfyui": "0.42.0",
-    "notes": "Official Music3 template with native SelectCLIPDevice on gpu:0 between CLIPLoader and MiniMaxMusic3TextEncode; requires the CLIP model-rebinding fix from ComfyUI PR #16970. FP16 DiT, 30 steps, stock audio decode and all user controls/defaults are unchanged. One Cloud9 10-second run completed in 373.8 s on 2026-11-19 with native compiler dependencies installed; MP3 technical checks passed, without listening or musical-quality assessment. The 60-second default and longer durations remain unqualified."
+    "notes": "Official Music3 30-step workflow and native SelectCLIPDevice gpu:0 with upstream CLIP rebinding fix PR #16970. Only diffusion model is switched from FP16 DiT to Abiray Q6_K GGUF, leaving MiniMax3 TE 8.8GB INT8, VAE/decoder, sampler and user controls unchanged. Cloud9 2026-11-23 same-seed real 10-second benchmarks: FP16 380.14s, Q6 XFS 367.59s and Q6 NVMe 358.04s. Full-decoded stereo MP3 signal objectively matches FP16 zero-lag 16kHz PCM Pearson 0.99954 and Q6 XFS 1.00000; no human subjective listening done. 60-second default and longer durations remain UNQUALIFIED. Host native memory pressure safeguards unchanged; older FP16 weights and release retained for rollback. Source evidence Freefield/ComfyUI/benchmarks/01c-minimax-q6-music3-10s-nvme-20261123.json."
   },
   "inputs": [
     {
@@ -77,10 +77,10 @@
   ],
   "models": [
     {
-      "repo": "Comfy-Org/MiniMax-Music-3",
-      "file": "diffusion_models/minimax_music3_dit_fp16.safetensors",
+      "repo": "Abiray/MiniMax-Music3-GGUF",
+      "file": "diffusion_models/MiniMax-Music3-Q6_K.gguf",
       "dir": "diffusion_models",
-      "gb": 4.91,
+      "gb": 2.116,
       "phase": "denoise",
       "license": "MiniMax-Music3 Community License"
     },
@@ -102,7 +102,8 @@
     }
   ],
   "credits": [
-    "MiniMax Music 3 (MiniMax-Music3 Community License)"
+    "MiniMax Music 3 (MiniMax-Music3 Community License)",
+    "Abiray/MiniMax-Music3-GGUF Q6_K quantized Music3 diffuser"
   ],
   "test": {
     "style": "lofi piano",

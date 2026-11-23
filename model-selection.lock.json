@@ -9458,8 +9458,8 @@
       "models": [
         {
           "dir": "diffusion_models",
-          "file": "diffusion_models/minimax_music3_dit_fp16.safetensors",
-          "repo": "Comfy-Org/MiniMax-Music-3",
+          "file": "diffusion_models/MiniMax-Music3-Q6_K.gguf",
+          "repo": "Abiray/MiniMax-Music3-GGUF",
           "phase": "denoise",
           "optional": false
         },
@@ -9488,10 +9488,9 @@
         },
         {
           "id": "37:6",
-          "class_type": "UNETLoader",
+          "class_type": "UnetLoaderGGUF",
           "inputs": {
-            "unet_name": "minimax_music3_dit_fp16.safetensors",
-            "weight_dtype": "default"
+            "unet_name": "MiniMax-Music3-Q6_K.gguf"
           }
         },
         {

@@ -22,7 +22,7 @@ test("Music3 routes autoregressive encoding to the native GPU selector while pre
     _meta: { title: "Music3 text encoder on gpu:0" },
   });
   assert.deepEqual(app.models.map((m) => [m.dir, m.file, m.gb]), [
-    ["diffusion_models", "diffusion_models/minimax_music3_dit_fp16.safetensors", 4.91],
+    ["diffusion_models", "diffusion_models/MiniMax-Music3-Q6_K.gguf", 2.116],
     ["text_encoders", "text_encoders/minimax_music3_text_encoder_pruned_int8_convrot.safetensors", 9.2],
     ["vae", "vae/minimax_music3_dav.safetensors", 0.22],
   ]);
@@ -46,7 +46,11 @@ test("Music3 routes autoregressive encoding to the native GPU selector while pre
       max_duration: values.seconds, cfg_scale: 1.7, top_k: 50,
     });
     assert.equal(graph["37:38"].inputs.seed, input.seed);
-    assert.deepEqual(graph["37:6"].inputs, { unet_name: "minimax_music3_dit_fp16.safetensors", weight_dtype: "default" });
+    assert.equal(graph["37:6"].class_type, "UnetLoaderGGUF");
+    assert.deepEqual(graph["37:6"].inputs, { unet_name: "MiniMax-Music3-Q6_K.gguf" });
+    assert.equal(app.models[0].repo, "Abiray/MiniMax-Music3-GGUF");
+    assert.equal(app.models[1].file, "text_encoders/minimax_music3_text_encoder_pruned_int8_convrot.safetensors");
+    assert.equal(app.models[2].file, "vae/minimax_music3_dav.safetensors");
     assert.deepEqual(graph["37:9"].inputs, {
       model: ["37:6", 0], positive: ["37:13", 0], negative: ["37:10", 0], latent_image: ["37:15", 0],
       seed: ["37:38", 0], steps: 30, cfg: 1.7, sampler_name: "euler", scheduler: "simple", denoise: 1,
