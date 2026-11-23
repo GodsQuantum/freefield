@@ -6,12 +6,12 @@
   "pack": "image-qwen21",
   "status": "ready",
   "higgsfield_feature": "Edit Image",
-  "summary": "General instruction-based image editing using Qwen-Image 2.1 Turbo. Modify a photo while preserving its identity and layout; 8-step native INT8 workflow.",
+  "summary": "Qwen Image 2.1 Turbo Q4_K_M GGUF: faster 8-step image editing on Cloud9. Original INT8 checkpoint retained for rollback; same VAE and Qwen3-VL encoder.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "Comfy-Org/workflow_templates/templates/image_qwen_image_2_1_turbo_image_edit.json",
     "comfyui": "0.42.0",
-    "notes": "ComfyUI native official 8step manual sigma edit graph, original Qwen3-VL 8B INT8 and QwenImage21 cache. Cloud9 2026-11-20 gfx1103 smoke 768x768 549.29 sec: red coffee cup changed to cobalt blue, all surrounding objects and framing preserved. Same 3 XFS weights already downloaded and validated for Qwen21 768px generation. Quality generalization and five specialized 2509/2511 LoRA operations not yet certified."
+    "notes": "Only the Qwen2.1 Turbo DiT loader changed from original native INT8 to validated Unsloth Q4_K_M GGUF. Full real Freefield 768px A/B and native Comfy production-profile run PASS on Cloud9 2026-11-23; original INT8 is retained as physical backup and previous immutable Docker image for rollback. No Qwen2511/2509 change. Benchmark receipt Freefield/ComfyUI/benchmarks/00f-qwen21-turbo-q4-default-runtime-20261123-retry1.json, 571.20 s. Native GGUF uses up to 10.558 GiB shared GTT vs INT8 7.734 GiB, so retain existing host memory admission and protection; no global profile change."
   },
   "inputs": [
     {
@@ -103,10 +103,10 @@
   ],
   "models": [
     {
-      "repo": "Comfy-Org/Qwen-Image-2.1",
-      "file": "diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors",
+      "repo": "unsloth/Qwen-Image-2.1-Turbo-GGUF",
+      "file": "diffusion_models/qwen-image-2.1-turbo-Q4_K_M.gguf",
       "dir": "diffusion_models",
-      "gb": 7.257,
+      "gb": 4.2,
       "phase": "denoise"
     },
     {
@@ -125,9 +125,10 @@
     }
   ],
   "credits": [
-    "Qwen Image 2.1 Turbo original multimodal generation + editing model",
-    "Comfy-Org INT8 ConvRot native weights and official ComfyUI editing workflow",
-    "No duplicate image model downloads; uses three weights already installed on XFS"
+    "Qwen Image 2.1 Turbo original multimodal image editing model",
+    "unsloth/Qwen-Image-2.1-Turbo-GGUF Q4_K_M model (quantized DiT only)",
+    "Comfy-Org Qwen3-VL 8B INT8 ConvRot text encoder and Qwen-Image-2.1 bf16 VAE unchanged",
+    "Original INT8 ConvRot diffusion weight retained locally as rollback, with no duplicate GGUF download"
   ],
   "test": {
     "image": "test/portrait.png",

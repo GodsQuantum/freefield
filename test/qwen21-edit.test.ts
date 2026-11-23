@@ -17,9 +17,13 @@ test("Qwen Image 2.1: general editor is independent of 2511 Relight and remainin
   assert.equal(optimizedRelight?.graph?.["10:37"].inputs.unet_name, "qwen_image_edit_2511_int8_convrot.safetensors");
   assert.equal(optimizedRelight?.graph?.["10:89"].inputs.lora_name, "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors");
   assert.equal(older2509?.graph?.["10:37"].inputs.unet_name, "qwen_image_edit_2509_int8_convrot.safetensors");
-  assert.equal(edit.graph["1"].class_type, "UNETLoader");
-  assert.equal(edit.graph["1"].inputs.unet_name, "qwen_image_2.1_turbo_int8_convrot.safetensors");
-  assert.equal(edit.models.length, 3, "existing Qwen2.1 DiT, text encoder and VAE, no new checkpoint");
+  assert.equal(edit.graph["1"].class_type, "UnetLoaderGGUF");
+  assert.equal(edit.graph["1"].inputs.unet_name, "qwen-image-2.1-turbo-Q4_K_M.gguf");
+  assert.equal(edit.models.length, 3, "one Q4 diffusion model, unchanged 8B INT8 text encoder and VAE");
+  assert.equal(edit.models[0].repo, "unsloth/Qwen-Image-2.1-Turbo-GGUF");
+  assert.equal(edit.models[0].file, "diffusion_models/qwen-image-2.1-turbo-Q4_K_M.gguf");
+  assert.equal(edit.models[1].file, "text_encoders/qwen3vl_8b_int8_convrot.safetensors");
+  assert.equal(edit.models[2].file, "vae/qwen_image_2.1_vae_bf16.safetensors");
 });
 
 test("Qwen Image 2.1: native eight-step sigmas, cache, reference image and conditioning", () => {

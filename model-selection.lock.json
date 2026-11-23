@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "locked_at_utc": "2026-11-23T01:44:15+00:00",
+  "locked_at_utc": "2026-11-23T11:19:33+00:00",
   "policy": "One canonical pinned checkpoint, LoRA, loader and sampler recipe per Freefield app. Change only after genuine generation evidence and synchronized lock refresh. No repeated baselines, no automatic model updates. Refer to source handoff for benchmarks.",
   "hardware": "Cloud9 AMD gfx1103 Radeon 780M, ROCm ComfyUI, GTT shared with host RAM; low-memory guard required.",
   "choices": {
@@ -35,8 +35,8 @@
     "qwen-image-general-edit": {
       "selected": "qwen21-edit",
       "assurance": "full_cli_e2e",
-      "evidence": "validation/qwen21-general-edit-freefield-e2e-20261120.json",
-      "decision": "Qwen-Image 2.1 Turbo 2026 already tested on actual Freefield 768px 635.57s. Do not rerun as new."
+      "evidence": "Freefield/ComfyUI/benchmarks/00f-qwen21-turbo-q4-default-runtime-20261123-retry1.json",
+      "decision": "Selected Qwen Image 2.1 Turbo Q4_K_M GGUF (Unsloth 4.1996GB), true 768px E2E original production Comfy profile 571.20s vs prior INT8 635.57s (10.13% faster). Visual PASS_SINGLE_SCENE, 42.13% less DiT disk, GTT10.558GiB vs7.734GiB higher, no OOM. Original INT8 retained as rollback, global guard untouched; no effect on Qwen2511/2509."
     },
     "qwen-specialized-angles": {
       "selected": "angles",
@@ -10437,8 +10437,8 @@
       "models": [
         {
           "dir": "diffusion_models",
-          "file": "diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors",
-          "repo": "Comfy-Org/Qwen-Image-2.1",
+          "file": "diffusion_models/qwen-image-2.1-turbo-Q4_K_M.gguf",
+          "repo": "unsloth/Qwen-Image-2.1-Turbo-GGUF",
           "phase": "denoise",
           "optional": false
         },
@@ -10460,10 +10460,9 @@
       "workflow": [
         {
           "id": "1",
-          "class_type": "UNETLoader",
+          "class_type": "UnetLoaderGGUF",
           "inputs": {
-            "unet_name": "qwen_image_2.1_turbo_int8_convrot.safetensors",
-            "weight_dtype": "default"
+            "unet_name": "qwen-image-2.1-turbo-Q4_K_M.gguf"
           }
         },
         {
