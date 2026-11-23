@@ -1,0 +1,27 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { loadRegistry } from "../server/registry.ts";
+const { apps, problems } = loadRegistry();
+test("H3 Ref2VA INT4 preview accepts the historically validated 1.625s source, without changing its 1s output", () => {
+  const app = apps.find((x) => x.id === "reshoot-int4");
+  assert.ok(app?.graph);
+  assert.equal(problems.filter((p) => p.app === app.id).length, 0);
+  const clip = app.inputs.find((i) => i.id === "clip");
+  const duration = app.inputs.find((i) => i.id === "duration");
+  assert.ok(clip && duration);
+  assert.equal(clip.type, "video");
+  assert.deepEqual(clip.limits?.seconds, [1, 15]);
+  assert.ok(1.625 >= clip.limits.seconds[0] && 1.625 <= clip.limits.seconds[1]);
+  assert.equal(duration.min, 1);
+  assert.equal(duration.max, 1);
+  assert.equal(duration.default, 1);
+  assert.equal(app.graph["2"].class_type, "CrossViewPrepareClip");
+  assert.equal(app.graph["2"].inputs.duration, 1);
+  assert.equal(app.graph["2"].inputs.megapixels, 0.1);
+  assert.deepEqual(app.outputs.map((x) => x.node), ["38", "41"]);
+  assert.equal(app.models[0].file, "diffusion_models/minimax_h3_ref2va_pruned_int4_convrot.safetensors");
+  const original = apps.find((x) => x.id === "reshoot");
+  assert.ok(original);
+  const originalClip = original.inputs.find((i) => i.id === "clip");
+  assert.deepEqual(originalClip?.limits?.seconds, [5, 15], "Legacy long form input must stay unchanged");
+});

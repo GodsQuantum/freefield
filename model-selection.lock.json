@@ -82,9 +82,11 @@
     },
     "video-upscale": {
       "selected": "upscale-video",
-      "assurance": "native_generated",
-      "evidence": "validation/seedvr2-temporal33f-gpu-20261119.json",
-      "decision": "SeedVR2 temporal 33f on GPU passed, no successor tested."
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/07a-seedvr2-upscalevideo-native-source33f-20261123.json",
+      "decision": "SeedVR2 INT8 ConvRot 3B native source unmodified Freefield CLI E2E on current Comfy core a89de7b: 33/33 frames 24fps 256x144->512x288 H264 in 149.28 s, visual input/output reviewed. New source/seed, genuine GPU job; earlier 2026-11-19 overridden recipe was same 20-node graph. No model swap, history 20261123-230328868-1eb3 replayable with original input and hardlink. See 07c QA receipt.",
+      "previous_evidence": "validation/seedvr2-temporal33f-gpu-20261119.json",
+      "quality_limits": "Brief 1.375s source; 2x output 512x288, no audio input or audio generated; tested single scene; not proof of full20s or all video content."
     },
     "video-text-to-video": {
       "selected": "video-t2v",
@@ -15799,5 +15801,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-23T09:25:52+00:00"
+  "last_selection_review_utc": "2026-11-23T23:08:49.032033+00:00"
 }

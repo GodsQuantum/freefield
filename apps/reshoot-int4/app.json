@@ -22,7 +22,7 @@
       "limits": {
         "max_mb": 100,
         "seconds": [
-          5,
+          1,
           15
         ]
       },
@@ -31,7 +31,8 @@
           "node": "1",
           "field": "file"
         }
-      ]
+      ],
+      "help": "The current validated INT4 preview uses only the first 1 s of a source clip; a 1.625 s clip worked in the actual native generation. Longer input does not increase the output duration."
     },
     {
       "id": "azimuth",
@@ -213,5 +214,6 @@
     "reshoot",
     "reshoot-int4"
   ],
-  "mode_label": "Re-shoot precision"
+  "mode_label": "Re-shoot precision",
+  "notes": " Accepted input clip metadata range 1-15 s (was falsely 5-15); native 00d source 1.625 s proven. Output remains strictly 1 s, low-resolution preview. No model or graph change."
 }
