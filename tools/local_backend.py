@@ -62,14 +62,33 @@ def setup(comfy: Path, models: Path) -> None:
         sh(["git", "clone", "https://github.com/Comfy-Org/ComfyUI.git", comfy])
     sh(["git", "checkout", "--quiet", COMFYUI_COMMIT], cwd=comfy)
     pip("-r", comfy / "requirements.txt")
-    pinned = {c["repo"]: c["commit"] for p in packs().values() for c in p.get("custom_nodes", [])}
-    for repo, commit in sorted(pinned.items()):
+    pinned = {c["repo"]: c for p in packs().values() for c in p.get("custom_nodes", [])}
+    for repo, pin in sorted(pinned.items()):
+        commit = pin["commit"]
         dst = comfy / "custom_nodes" / repo.rstrip("/").rsplit("/", 1)[-1]
         if not dst.exists():
             sh(["git", "clone", repo, dst])
         sh(["git", "checkout", "--quiet", commit], cwd=dst)
         if (dst / "requirements.txt").exists():
             pip("-r", dst / "requirements.txt")
+        subdir = pin.get("install_subdirectory")
+        if subdir:
+            parts = Path(subdir).parts
+            if Path(subdir).is_absolute() or any(p in (".", "..") for p in parts):
+                raise ValueError(f"Unsafe node package location: {subdir!r}")
+            package = dst / subdir
+            if not (package / "__init__.py").is_file():
+                raise FileNotFoundError(f"Pinned node package missing: {package}")
+            alias = comfy / "custom_nodes" / (dst.name + "-" + "-".join(parts))
+            if alias.is_symlink():
+                if alias.resolve() != package.resolve():
+                    raise ValueError(f"Custom node alias mismatch: {alias}")
+            elif alias.exists():
+                raise FileExistsError(f"Refuse replacing custom node alias: {alias}")
+            else:
+                alias.symlink_to(package, target_is_directory=True)
+            if (package / "requirements.txt").exists():
+                pip("-r", package / "requirements.txt")
     pip(COMFY_API_PROXY, "aiohttp", "huggingface_hub[hf-xet]")
     lines = ["freefield:", f"  base_path: {models.as_posix()}"] + [f"  {d}: {d}" for d in MODEL_DIRS]
     (comfy / "extra_model_paths.yaml").write_text("\n".join(lines) + "\n", encoding="utf-8")

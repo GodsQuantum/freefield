@@ -23,7 +23,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
-import { loadRegistry, repoRoot, isFileInput, type App } from "./registry.ts";
+import { loadRegistry, repoRoot, isFileInput, missingRequiredModels, type App } from "./registry.ts";
 import { explainSubmitError, InputError, resolveValues, Runner, type Values } from "./runner.ts";
 import { History, replayValues } from "./history.ts";
 import { Flags } from "./flags.ts";
@@ -117,7 +117,7 @@ const runnable = (a: App) => Boolean(a.workflowPath) && (a.status === "ready" ||
  */
 function missingPack(a: App, files: Set<string> | null): string | null {
   if (!files) return null;
-  const lacks = a.models.some((m) => !m.optional && !files.has(`${m.dir}/${m.file.split("/").pop()}`));
+  const lacks = missingRequiredModels(a, files).length > 0;
   return lacks ? a.pack ?? "?" : null;
 }
 

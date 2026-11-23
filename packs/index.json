@@ -4,7 +4,7 @@
       "music",
       "sfx"
     ],
-    "download_gb": 31.56,
+    "download_gb": 28.77,
     "needs_hf_token": false
   },
   "audio-ace15": {
@@ -105,14 +105,21 @@
       "style-reference",
       "styles"
     ],
-    "download_gb": 23.73,
+    "download_gb": 24.17,
     "needs_hf_token": false
   },
   "image-moss": {
     "apps": [
       "moss-image"
     ],
-    "download_gb": 13.0,
+    "download_gb": 14.19,
+    "needs_hf_token": false
+  },
+  "image-nitro": {
+    "apps": [
+      "nitrofusion2"
+    ],
+    "download_gb": 10.99,
     "needs_hf_token": false
   },
   "image-qwen-edit": {
@@ -124,6 +131,13 @@
       "zooms"
     ],
     "download_gb": 53.17,
+    "needs_hf_token": false
+  },
+  "image-qwen21": {
+    "apps": [
+      "qwen21-edit"
+    ],
+    "download_gb": 14.23,
     "needs_hf_token": false
   },
   "upscale": {
@@ -141,11 +155,22 @@
   "video-h3": {
     "apps": [
       "extend-video",
+      "extend-video-int4",
       "h3-photo",
+      "h3-photo-int4",
       "h3-video",
-      "reshoot"
+      "h3-video-int4",
+      "reshoot",
+      "reshoot-int4"
     ],
-    "download_gb": 75.72,
+    "download_gb": 113.35,
+    "needs_hf_token": false
+  },
+  "video-kandinsky6-lite": {
+    "apps": [
+      "kandinsky6-lite"
+    ],
+    "download_gb": 14.87,
     "needs_hf_token": false
   },
   "video-ltx25": {

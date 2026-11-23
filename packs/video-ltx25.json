@@ -153,9 +153,8 @@
       "name": "LTX-2.3-22b-AV-LoRA-talking-head-v1.safetensors",
       "gated": false,
       "license": "OpenRAIL",
-      "used_by": [
-        "talking"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Cseti/LTX2.3-22B_IC-LoRA-Cameraman_v2",
@@ -332,36 +331,8 @@
       "name": "gemma4_e2b_it_int8_convrot.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "asmr-host",
-        "asmr-product",
-        "asmr-whisper",
-        "behind-the-scenes",
-        "camera-copy",
-        "chameleon",
-        "cinema-video",
-        "cloud-surf",
-        "dub",
-        "idol",
-        "kick-ad",
-        "magic-button",
-        "melting-doodle",
-        "morph",
-        "mukbang",
-        "rap-video",
-        "roller-coaster",
-        "speak",
-        "storm-creature",
-        "talking",
-        "transitions",
-        "truck-ad",
-        "vfx-clean-plate",
-        "vfx-day-to-night",
-        "vfx-water",
-        "video",
-        "video-t2v",
-        "volcano-ad"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "black-forest-labs/flux-3-image-klein-comfy",

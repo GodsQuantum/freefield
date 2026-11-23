@@ -27,7 +27,7 @@ COMFY_DIR = "/comfyui"
 MODELS_DIR = "/models"
 MODEL_DIRS = ["diffusion_models", "unet_gguf", "clip_gguf", "text_encoders", "vae", "loras", "checkpoints", "clip_vision",
               "latent_upscale_models", "upscale_models", "model_patches", "geometry_estimation",
-              "background_removal", "frame_interpolation", "audio_encoders", "embeddings", "detection"]
+              "background_removal", "frame_interpolation", "audio_encoders", "audio_vae", "embeddings", "detection"]
 
 models_volume = modal.Volume.from_name("freefield-models", create_if_missing=True)
 lab_volume = modal.Volume.from_name("freefield-lab", create_if_missing=True)
@@ -35,14 +35,17 @@ hf_secret = modal.Secret.from_name("huggingface")        # HF_TOKEN, for gated r
 freefield_secret = modal.Secret.from_name("freefield")   # FREEFIELD_TOKEN, the gateway's bearer token
 
 
-def custom_nodes() -> dict[str, str]:
-    """repo URL → commit, from every packs/*.json (run tools/catalog.py packs first)."""
-    out: dict[str, str] = {}
+def custom_nodes() -> dict[str, dict]:
+    """Pinned repo URL to commit and optional loadable subdirectory."""
+    out: dict[str, dict] = {}
     for f in sorted((ROOT / "packs").glob("*.json")):
         if f.name == "index.json":
             continue
         for c in json.loads(f.read_text(encoding="utf-8")).get("custom_nodes", []):
-            out[c["repo"]] = c["commit"]
+            previous = out.get(c["repo"])
+            if previous is not None and previous != c:
+                raise ValueError(f"Conflicting node pins for {c['repo']}")
+            out[c["repo"]] = c
     return out
 
 
@@ -62,13 +65,24 @@ def build_image() -> modal.Image:
         )
         .pip_install(COMFY_API_PROXY, "aiohttp", "huggingface_hub[hf-xet]")   # hf-xet: fast downloads (hf_transfer is gone in hub 1.x)
     )
-    for repo, commit in custom_nodes().items():
+    for repo, pinned in custom_nodes().items():
+        commit = pinned["commit"]
         name = repo.rstrip("/").rsplit("/", 1)[-1]
         target = f"{COMFY_DIR}/custom_nodes/{name}"
         img = img.run_commands(
             f"git clone {repo} {target} && cd {target} && git checkout {commit}",
             f"if [ -f {target}/requirements.txt ]; then pip install -r {target}/requirements.txt; fi",
         )
+        subdir = pinned.get("install_subdirectory")
+        if subdir:
+            parts = Path(subdir).parts
+            if Path(subdir).is_absolute() or any(p in (".", "..") for p in parts):
+                raise ValueError(f"Unsafe custom node subdir {subdir!r}")
+            alias = f"{COMFY_DIR}/custom_nodes/{name}-" + "-".join(parts)
+            img = img.run_commands(
+                f"test -f {target}/{subdir}/__init__.py && ln -s {target}/{subdir} {alias}",
+                f"if [ -f {target}/{subdir}/requirements.txt ]; then pip install -r {target}/{subdir}/requirements.txt; fi",
+            )
     yaml = extra_model_paths().replace("\n", "\\n")
     img = img.run_commands(f"printf '{yaml}' > {COMFY_DIR}/extra_model_paths.yaml")
     # code last, so editing it does not rebuild the layers above
@@ -92,7 +106,9 @@ def ensure_models(models: list[dict], token: str | None = None) -> tuple[list[st
     failed: dict[str, str] = {}
     tmp = Path(MODELS_DIR) / ".incoming"
     for m in models:
-        name = m["file"].rsplit("/", 1)[-1]
+        name = m.get("name") or m.get("install_name") or m["file"].rsplit("/", 1)[-1]
+        if Path(name).is_absolute() or any(p in (".", "..") for p in Path(name).parts):
+            raise ValueError(f"Unsafe model install destination {name!r}")
         dest = Path(MODELS_DIR) / m["dir"] / name
         if dest.exists() and dest.stat().st_size > 0:
             continue

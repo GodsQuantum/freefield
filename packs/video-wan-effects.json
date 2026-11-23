@@ -61,9 +61,8 @@
       "name": "360_Orbit.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Arc_shot",
@@ -73,9 +72,8 @@
       "name": "Arc_shot.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Hero-run",
@@ -85,9 +83,8 @@
       "name": "Hero_run.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "joyfox/Wan2.1-BulletTime-LoRA",
@@ -97,12 +94,8 @@
       "name": "Wan21_I2V_rotation_000003750.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "bullet-time-scene",
-        "bullet-time-splash",
-        "bullet-time-white",
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/angry-face",
@@ -112,9 +105,8 @@
       "name": "angry_face_5_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Cakeify",
@@ -136,9 +128,8 @@
       "name": "car_chase.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Crane-down",
@@ -148,9 +139,8 @@
       "name": "crane_down.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Crane_over_the_head",
@@ -160,9 +150,8 @@
       "name": "crane_overhead.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Crane_up",
@@ -172,9 +161,8 @@
       "name": "crane_up.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Crash-zoom-in",
@@ -184,9 +172,8 @@
       "name": "crash_zoom_in.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Crush",
@@ -196,9 +183,8 @@
       "name": "crush_20_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/crying",
@@ -208,9 +194,8 @@
       "name": "crying_20_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Deflate",
@@ -220,9 +205,8 @@
       "name": "deflate_20_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Electrify",
@@ -232,9 +216,8 @@
       "name": "electrify_50_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Explode",
@@ -244,9 +227,8 @@
       "name": "explode_30_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Inflate",
@@ -256,9 +238,8 @@
       "name": "inflate_20_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Laughing",
@@ -268,9 +249,8 @@
       "name": "laughing_15_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Kijai/WanVideo_comfy",
@@ -280,12 +260,8 @@
       "name": "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "bullet-time-scene",
-        "bullet-time-splash",
-        "bullet-time-white",
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "joyfox/WAN2.1-I2V-480P-Falling_US_dollars",
@@ -295,9 +271,8 @@
       "name": "money_000003000.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Puppy",
@@ -307,9 +282,8 @@
       "name": "puppy_50_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Rotate",
@@ -319,9 +293,8 @@
       "name": "rotate_20_epochs.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Remade-AI/Squish",
@@ -331,9 +304,8 @@
       "name": "squish_18.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "lvfengchun/wan21_i2v_boiling_point",
@@ -343,9 +315,8 @@
       "name": "wan21_penqi_000003500.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "ostris/wan21_i2v_dolly_zoom_lora",
@@ -355,9 +326,8 @@
       "name": "wan_21_i2v_dolly_zoom.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "effects"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "black-forest-labs/flux-3-image-klein-comfy",

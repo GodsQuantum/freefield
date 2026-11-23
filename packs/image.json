@@ -27,9 +27,8 @@
       "name": "Z-Image-AbliteratedV1.Q6_K.gguf",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "z-image"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/z_image_turbo",

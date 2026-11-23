@@ -2,13 +2,15 @@
   "pack": "video-h3",
   "apps": [
     "extend-video",
+    "extend-video-int4",
     "h3-photo",
+    "h3-photo-int4",
     "h3-video",
-    "reshoot",
     "h3-video-int4",
-    "h3-photo-int4"
+    "reshoot",
+    "reshoot-int4"
   ],
-  "download_gb": 75.72,
+  "download_gb": 113.35,
   "needs_hf_token": false,
   "custom_nodes": [
     {
@@ -17,6 +19,21 @@
     }
   ],
   "models": [
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "diffusion_models/minimax_h3_fl2va_pruned_int4_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 11.34,
+      "name": "minimax_h3_fl2va_pruned_int4_convrot.safetensors",
+      "gated": false,
+      "license": "MiniMax H3 Community License",
+      "used_by": [
+        "extend-video-int4",
+        "h3-photo-int4",
+        "h3-video-int4"
+      ],
+      "optional": true
+    },
     {
       "repo": "Comfy-Org/MiniMax-H3",
       "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
@@ -30,6 +47,19 @@
         "h3-photo",
         "h3-video"
       ]
+    },
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "diffusion_models/minimax_h3_ref2va_pruned_int4_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 11.34,
+      "name": "minimax_h3_ref2va_pruned_int4_convrot.safetensors",
+      "gated": false,
+      "license": "MiniMax H3 Community License",
+      "used_by": [
+        "reshoot-int4"
+      ],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/MiniMax-H3",
@@ -52,7 +82,8 @@
       "gated": false,
       "license": "MIT",
       "used_by": [
-        "reshoot"
+        "reshoot",
+        "reshoot-int4"
       ]
     },
     {
@@ -64,7 +95,8 @@
       "gated": false,
       "license": "MiniMax H3 Community License",
       "used_by": [
-        "reshoot"
+        "reshoot",
+        "reshoot-int4"
       ]
     },
     {
@@ -76,8 +108,25 @@
       "gated": false,
       "license": "Not stated on the model card (its code, ModelTC/Minimax-H3-Turbo, is Apache-2.0)",
       "used_by": [
-        "reshoot"
+        "reshoot",
+        "reshoot-int4"
       ]
+    },
+    {
+      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
+      "file": "text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "dir": "text_encoders",
+      "gb": 14.95,
+      "name": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "gated": false,
+      "license": "MiniMax H3 Community License",
+      "used_by": [
+        "extend-video-int4",
+        "h3-photo-int4",
+        "h3-video-int4",
+        "reshoot-int4"
+      ],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/MiniMax-H3",
@@ -104,9 +153,13 @@
       "license": "MiniMax H3 Community License",
       "used_by": [
         "extend-video",
+        "extend-video-int4",
         "h3-photo",
+        "h3-photo-int4",
         "h3-video",
-        "reshoot"
+        "h3-video-int4",
+        "reshoot",
+        "reshoot-int4"
       ]
     },
     {
@@ -119,37 +172,13 @@
       "license": "MiniMax H3 Community License",
       "used_by": [
         "extend-video",
+        "extend-video-int4",
         "h3-photo",
+        "h3-photo-int4",
         "h3-video",
-        "reshoot"
-      ]
-    },
-    {
-      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
-      "file": "minimax_h3_fl2va_pruned_int4_convrot.safetensors",
-      "dir": "diffusion_models",
-      "gb": 11.34,
-      "name": "minimax_h3_fl2va_pruned_int4_convrot.safetensors",
-      "gated": false,
-      "optional": true,
-      "license": "MiniMax H3 Community License",
-      "used_by": [
         "h3-video-int4",
-        "h3-photo-int4"
-      ]
-    },
-    {
-      "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
-      "file": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
-      "dir": "text_encoders",
-      "gb": 14.95,
-      "name": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
-      "gated": false,
-      "optional": true,
-      "license": "MiniMax H3 Community License",
-      "used_by": [
-        "h3-video-int4",
-        "h3-photo-int4"
+        "reshoot",
+        "reshoot-int4"
       ]
     }
   ]

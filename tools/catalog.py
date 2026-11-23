@@ -57,22 +57,44 @@ def build_packs(apps: list[dict]) -> dict[str, dict]:
         p = packs[a["pack"]]
         p["apps"].append(a["id"])
         for m in a.get("models", []):
-            key = f"{m['dir']}/{basename(m['file'])}"
+            name = m.get("install_name") or basename(m["file"])
+            if Path(name).is_absolute() or any(part in ("", ".", "..") for part in Path(name).parts):
+                raise ValueError(f"Unsafe model install destination {name!r}")
+            key = f"{m['dir']}/{name}"
             entry = p["models"].setdefault(key, {**{k: m[k] for k in ("repo", "file", "dir", "gb")},
-                                                 "name": basename(m["file"]), "gated": bool(m.get("gated")),
-                                                 "license": m.get("license"), "used_by": []})
-            entry["used_by"].append(a["id"])
+                                                 "name": name, "gated": bool(m.get("gated")),
+                                                 "license": m.get("license"), "used_by": [],
+                                                 "optional": True})
+            if entry["repo"] != m["repo"] or entry["file"] != m["file"]:
+                raise ValueError(f"Conflicting models targeting {key} in pack {a['pack']}")
+            # Optional for pack download != optional to an individual app.
+            # Opt-in H3 INT4 apps need their weights but bulk H3 INT8 packs
+            # should not turn these 26GB alternatives into mandatory assets.
+            if not m.get("optional"):
+                entry["used_by"].append(a["id"])
+            if not (m.get("optional") or m.get("pack_optional")):
+                entry["optional"] = False
         for c in a.get("custom_nodes", []):
-            p["custom_nodes"][c["repo"]] = c["commit"]
+            subdir = c.get("install_subdirectory")
+            if subdir and (Path(subdir).is_absolute() or
+                           any(part in ("", ".", "..") for part in Path(subdir).parts)):
+                raise ValueError(f"Unsafe pinned node subdirectory {subdir!r}")
+            old = p["custom_nodes"].get(c["repo"])
+            if old and old != c:
+                raise ValueError(f"Conflicting pinned node metadata for {c['repo']}")
+            p["custom_nodes"][c["repo"]] = c
     out = {}
     for name, p in sorted(packs.items()):
         models = sorted(p["models"].values(), key=lambda m: (m["dir"], m["name"]))
+        for m in models:
+            if not m["optional"]:
+                del m["optional"]
         out[name] = {
             "pack": name,
             "apps": sorted(p["apps"]),
             "download_gb": round(sum(m["gb"] for m in models), 2),
             "needs_hf_token": any(m["gated"] for m in models),
-            "custom_nodes": [{"repo": r, "commit": c} for r, c in sorted(p["custom_nodes"].items())],
+            "custom_nodes": [c for _, c in sorted(p["custom_nodes"].items())],
             "models": models,
         }
     return out

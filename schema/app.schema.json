@@ -207,11 +207,15 @@
           "enum": [
             "diffusion_models", "unet_gguf", "clip_gguf", "text_encoders", "vae", "loras", "checkpoints", "clip_vision",
             "latent_upscale_models", "upscale_models", "model_patches", "geometry_estimation",
-            "background_removal", "frame_interpolation", "audio_encoders", "embeddings", "detection"
+             "background_removal", "frame_interpolation", "audio_encoders", "audio_vae", "embeddings", "detection"
           ],
           "description": "ComfyUI models/ subfolder."
         },
         "gb": { "type": "number", "exclusiveMinimum": 0, "description": "File size in GB (10^9 bytes), from the Hub." },
+        "install_name": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$",
+          "description": "Optional relative path in models directory for nested checkpoints or renamed projectors." },
+        "pack_optional": { "type": "boolean",
+          "description": "Checkpoint mandatory for this opt-in app, but optionally downloadable within a shared pack; does not affect app modelKey." },
         "phase": {
           "enum": ["encode", "denoise", "denoise2", "decode", "aux", "all"],
           "description": "When it has to be on the GPU. encode = text/image encoders; denoise = DiT and its LoRAs; denoise2 = a second DiT that takes over after the first (Wan 2.2's low-noise expert) and its LoRAs; decode = VAEs; aux = runs on its own step; all = single checkpoint used throughout."
@@ -227,7 +231,9 @@
       "required": ["repo", "commit"],
       "properties": {
         "repo": { "type": "string", "pattern": "^https://" },
-        "commit": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" }
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" },
+        "install_subdirectory": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$",
+          "description": "Optional nested package inside the pinned ComfyUI node Git repo." }
       }
     }
   }

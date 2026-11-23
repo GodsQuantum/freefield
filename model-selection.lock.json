@@ -5193,14 +5193,16 @@
           "file": "diffusion_models/minimax_h3_fl2va_pruned_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "denoise",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "text_encoders",
           "file": "text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "encode",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "vae",
@@ -6331,14 +6333,16 @@
           "file": "diffusion_models/minimax_h3_fl2va_pruned_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "denoise",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "text_encoders",
           "file": "text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "encode",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "vae",
@@ -6591,14 +6595,16 @@
           "file": "diffusion_models/minimax_h3_fl2va_pruned_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "denoise",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "text_encoders",
           "file": "text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "encode",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "vae",
@@ -7329,6 +7335,118 @@
           "max": 32
         }
       ]
+    },
+    "kandinsky6-lite": {
+      "status": "ready",
+      "pack": "video-kandinsky6-lite",
+      "models": [
+        {
+          "dir": "audio_vae",
+          "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": false,
+          "install_name": "bigvgan_vocoder/bigvgan_generator.pt"
+        },
+        {
+          "dir": "audio_vae",
+          "file": "audio_vae/bigvgan_vocoder/config.json",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": true,
+          "install_name": "bigvgan_vocoder/config.json"
+        },
+        {
+          "dir": "audio_vae",
+          "file": "audio_vae/v1-44.pth",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": false
+        },
+        {
+          "dir": "diffusion_models",
+          "file": "transformer/diffusion_pytorch_model.safetensors",
+          "repo": "kandinskylab/Kandinsky-6.0-Lite-distill-5s-Diffusers",
+          "phase": "denoise",
+          "optional": false,
+          "install_name": "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors"
+        },
+        {
+          "dir": "text_encoders",
+          "file": "mmproj-BF16.gguf",
+          "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+          "phase": "encode",
+          "optional": true,
+          "install_name": "mmproj-Qwen2.5-VL-7B-Instruct-BF16.gguf"
+        },
+        {
+          "dir": "text_encoders",
+          "file": "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+          "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "text_encoders",
+          "file": "text_encoders/clip_l.safetensors",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "vae",
+          "file": "vae/hunyuan_video_vae_bf16.safetensors",
+          "repo": "t8star/Kandinsky-Comfy",
+          "phase": "decode",
+          "optional": false
+        }
+      ],
+      "workflow": [
+        {
+          "id": "1",
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        {
+          "id": "2",
+          "class_type": "DualCLIPLoaderGGUF",
+          "inputs": {
+            "clip_name1": "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+            "clip_name2": "clip_l.safetensors"
+          }
+        },
+        {
+          "id": "3",
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "hunyuan_video_vae_bf16.safetensors"
+          }
+        },
+        {
+          "id": "7",
+          "class_type": "Kandinsky6EmptyLatent",
+          "inputs": {
+            "width": 448,
+            "height": 256
+          }
+        },
+        {
+          "id": "8",
+          "class_type": "Kandinsky6Sampler",
+          "inputs": {
+            "steps": 10,
+            "cfg": 1,
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "denoise": 1
+          }
+        }
+      ],
+      "model_overrides": [],
+      "limits": []
     },
     "kick-ad": {
       "status": "ready",
@@ -11468,7 +11586,8 @@
           "file": "diffusion_models/minimax_h3_ref2va_pruned_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "denoise",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "geometry_estimation",
@@ -11496,7 +11615,8 @@
           "file": "text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
           "repo": "Merserk/MiniMax-H3-INT4-ConvRot",
           "phase": "encode",
-          "optional": false
+          "optional": false,
+          "pack_optional": true
         },
         {
           "dir": "vae",

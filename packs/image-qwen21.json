@@ -1,0 +1,47 @@
+{
+  "pack": "image-qwen21",
+  "apps": [
+    "qwen21-edit"
+  ],
+  "download_gb": 14.23,
+  "needs_hf_token": false,
+  "custom_nodes": [],
+  "models": [
+    {
+      "repo": "unsloth/Qwen-Image-2.1-Turbo-GGUF",
+      "file": "diffusion_models/qwen-image-2.1-turbo-Q4_K_M.gguf",
+      "dir": "diffusion_models",
+      "gb": 4.2,
+      "name": "qwen-image-2.1-turbo-Q4_K_M.gguf",
+      "gated": false,
+      "license": null,
+      "used_by": [
+        "qwen21-edit"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/Qwen-Image-2.1",
+      "file": "text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+      "dir": "text_encoders",
+      "gb": 9.351,
+      "name": "qwen3vl_8b_int8_convrot.safetensors",
+      "gated": false,
+      "license": null,
+      "used_by": [
+        "qwen21-edit"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/Qwen-Image-2.1",
+      "file": "vae/qwen_image_2.1_vae_bf16.safetensors",
+      "dir": "vae",
+      "gb": 0.676,
+      "name": "qwen_image_2.1_vae_bf16.safetensors",
+      "gated": false,
+      "license": null,
+      "used_by": [
+        "qwen21-edit"
+      ]
+    }
+  ]
+}

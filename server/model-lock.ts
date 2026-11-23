@@ -16,6 +16,8 @@ export function recipeSnapshot(app: App) {
     pack: app.pack,
     models: app.models.map((m) => ({
       dir: m.dir, file: m.file, repo: m.repo, phase: m.phase, optional: m.optional === true,
+      ...(m.install_name ? { install_name: m.install_name } : {}),
+      ...(m.pack_optional ? { pack_optional: true } : {}),
     })).sort((a, b) => (a.dir + "/" + a.file).localeCompare(b.dir + "/" + b.file)),
     workflow: Object.entries(app.graph ?? {}).flatMap(([id, node]) => {
       const values = Object.fromEntries(

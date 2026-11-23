@@ -4,7 +4,7 @@
     "style-reference",
     "styles"
   ],
-  "download_gb": 23.73,
+  "download_gb": 24.17,
   "needs_hf_token": false,
   "custom_nodes": [],
   "models": [
@@ -29,9 +29,8 @@
       "name": "krea2_darkbrush.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",
@@ -41,9 +40,8 @@
       "name": "krea2_dotmatrix.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",
@@ -53,9 +51,8 @@
       "name": "krea2_kidsdrawing.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",
@@ -65,9 +62,8 @@
       "name": "krea2_neondrip.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",
@@ -77,9 +73,8 @@
       "name": "krea2_rainywindow.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",
@@ -89,9 +84,8 @@
       "name": "krea2_retroanime.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",
@@ -125,9 +119,19 @@
       "name": "krea2_sunsetblur.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
+    },
+    {
+      "repo": "lvladikov/Krea2-Turbo-Distill-2step-LoRA",
+      "file": "loras/krea2_turbo_2step_rank_64_lora_comfyui.safetensors",
+      "dir": "loras",
+      "gb": 0.438,
+      "name": "krea2_turbo_2step_rank_64_lora_comfyui.safetensors",
+      "gated": false,
+      "license": "Krea 2 Community License",
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "lvladikov/Krea2-Turbo-Distill-3step-LoRA",
@@ -137,9 +141,8 @@
       "name": "krea2_turbo_3step_rank_64_lora_comfyui.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",
@@ -149,9 +152,8 @@
       "name": "krea2_vintagetarot.safetensors",
       "gated": false,
       "license": "Krea 2 Community License",
-      "used_by": [
-        "styles"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Krea-2",

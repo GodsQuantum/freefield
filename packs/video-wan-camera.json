@@ -39,9 +39,8 @@
       "name": "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "camera-moves"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
@@ -51,9 +50,8 @@
       "name": "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
       "gated": false,
       "license": "Apache-2.0",
-      "used_by": [
-        "camera-moves"
-      ]
+      "used_by": [],
+      "optional": true
     },
     {
       "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",

@@ -1,0 +1,157 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "kandinsky6-lite",
+  "name": "Kandinsky 6 Lite AV",
+  "section": "video",
+  "pack": "video-kandinsky6-lite",
+  "status": "ready",
+  "summary": "Aperçu vidéo + son de 1,04 seconde, 448×256, 10 étapes. Générations longues non qualifiées.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "Kandinsky 6.0 Text to Video+Audio official 21-node GUI, sampled into 12-node API graph",
+    "comfyui": "0.45.0",
+    "notes": "Pin kandinskylab/kandinsky-6@73b892b730885e02ab58fbf7fc5cb10b78e1e3da (comfyui/ subdirectory). Official 3B BF16 K6 model. Cloud9 validation 03b with native VAEDecodeTiled spatial256 temporal16/4, 25f 448x256, audio; GPU time 298.57s and host memory available minimum 12.39GiB. Actual Freefield CLI to be qualified separately; no claim of 5s, no uncensored guarantee. Vision projector must be named mmproj-Qwen2.5-VL-7B-Instruct-BF16.gguf and audio BigVGAN directory preserved, not flattened by generic pack installer."
+  },
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Scène vidéo",
+      "required": true,
+      "default": "A natural cinematic shot of a clear mountain stream flowing over smooth rocks in daylight. Rippling water moves continuously; leaves and grasses gently sway in the breeze. A locked-off camera, realistic lighting, a single uncut shot.",
+      "bind": [
+        {
+          "node": "5",
+          "field": "video_caption"
+        }
+      ]
+    },
+    {
+      "id": "sound",
+      "type": "textarea",
+      "label": "Ambiance sonore",
+      "required": true,
+      "default": "Gentle flowing water and soft wind rustling through nearby leaves, subtle distant birds.",
+      "bind": [
+        {
+          "node": "5",
+          "field": "audio_caption"
+        }
+      ]
+    },
+    {
+      "id": "negative",
+      "type": "textarea",
+      "label": "Éléments à éviter",
+      "default": "Static, still frame, 2D cartoon, text, blur, unnatural motion, flicker, deformed objects, low quality.",
+      "bind": [
+        {
+          "node": "6",
+          "field": "video_caption"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Graine",
+      "default": -1,
+      "help": "-1 choisit une nouvelle graine",
+      "bind": [
+        {
+          "node": "8",
+          "field": "seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "12",
+      "type": "video",
+      "label": "Vidéo MP4 H264 + audio AAC"
+    }
+  ],
+  "models": [
+    {
+      "repo": "kandinskylab/Kandinsky-6.0-Lite-distill-5s-Diffusers",
+      "file": "transformer/diffusion_pytorch_model.safetensors",
+      "dir": "diffusion_models",
+      "gb": 6.382,
+      "phase": "denoise",
+      "install_name": "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors"
+    },
+    {
+      "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+      "file": "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+      "dir": "text_encoders",
+      "gb": 4.683,
+      "phase": "encode"
+    },
+    {
+      "repo": "unsloth/Qwen2.5-VL-7B-Instruct-GGUF",
+      "file": "mmproj-BF16.gguf",
+      "dir": "text_encoders",
+      "gb": 1.354,
+      "phase": "encode",
+      "optional": true,
+      "install_name": "mmproj-Qwen2.5-VL-7B-Instruct-BF16.gguf"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "text_encoders/clip_l.safetensors",
+      "dir": "text_encoders",
+      "gb": 0.246,
+      "phase": "encode"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "vae/hunyuan_video_vae_bf16.safetensors",
+      "dir": "vae",
+      "gb": 0.493,
+      "phase": "decode"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "audio_vae/v1-44.pth",
+      "dir": "audio_vae",
+      "gb": 1.222,
+      "phase": "decode"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
+      "dir": "audio_vae",
+      "gb": 0.489,
+      "phase": "decode",
+      "install_name": "bigvgan_vocoder/bigvgan_generator.pt"
+    },
+    {
+      "repo": "t8star/Kandinsky-Comfy",
+      "file": "audio_vae/bigvgan_vocoder/config.json",
+      "dir": "audio_vae",
+      "gb": 2e-06,
+      "phase": "decode",
+      "optional": true,
+      "install_name": "bigvgan_vocoder/config.json"
+    }
+  ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/kandinskylab/kandinsky-6",
+      "commit": "73b892b730885e02ab58fbf7fc5cb10b78e1e3da",
+      "install_subdirectory": "comfyui"
+    },
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "test": {
+    "prompt": "A natural cinematic shot of a clear mountain stream flowing over smooth rocks in daylight. Rippling water moves continuously; leaves and grasses gently sway in the breeze. A locked-off camera, realistic lighting, a single uncut shot.",
+    "sound": "Gentle flowing water and soft wind rustling through nearby leaves, subtle distant birds.",
+    "negative": "Static, still frame, 2D cartoon, text, blur, unnatural motion, flicker, deformed objects, low quality.",
+    "seed": 202611231643
+  },
+  "notes": "Prévisualisation Cloud9 testée 25 images/24 ips, sans autre durée ou format exposé. Version opt-in séparée des apps Wan/H3/LTX. Le modèle vidéo n’est pas garanti uncensored. La qualité du rendu se juge dans Bibliothèque."
+}

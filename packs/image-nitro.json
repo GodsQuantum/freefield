@@ -1,0 +1,47 @@
+{
+  "pack": "image-nitro",
+  "apps": [
+    "nitrofusion2"
+  ],
+  "download_gb": 10.99,
+  "needs_hf_token": false,
+  "custom_nodes": [],
+  "models": [
+    {
+      "repo": "PedroMarinhoDev/NitroFusion2-ComfyUI",
+      "file": "diffusion_models/nitrofusion2_w6a8_gptq.safetensors",
+      "dir": "diffusion_models",
+      "gb": 5.024,
+      "name": "nitrofusion2_w6a8_gptq.safetensors",
+      "gated": false,
+      "license": null,
+      "used_by": [
+        "nitrofusion2"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/z_image_turbo",
+      "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
+      "dir": "text_encoders",
+      "gb": 5.63,
+      "name": "qwen_3_4b_fp8_mixed.safetensors",
+      "gated": false,
+      "license": null,
+      "used_by": [
+        "nitrofusion2"
+      ]
+    },
+    {
+      "repo": "Comfy-Org/z_image_turbo",
+      "file": "split_files/vae/ae.safetensors",
+      "dir": "vae",
+      "gb": 0.34,
+      "name": "ae.safetensors",
+      "gated": false,
+      "license": null,
+      "used_by": [
+        "nitrofusion2"
+      ]
+    }
+  ]
+}

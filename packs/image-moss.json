@@ -3,7 +3,7 @@
   "apps": [
     "moss-image"
   ],
-  "download_gb": 13.0,
+  "download_gb": 14.19,
   "needs_hf_token": false,
   "custom_nodes": [],
   "models": [
@@ -13,6 +13,18 @@
       "dir": "diffusion_models",
       "gb": 5.41,
       "name": "moss_image_sft_int8_convrot.safetensors",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "moss-image"
+      ]
+    },
+    {
+      "repo": "akhaliq/MOSS-Image-SFT-4-steps",
+      "file": "loras/moss_image_sft_4step_v2.0.safetensors",
+      "dir": "loras",
+      "gb": 1.19,
+      "name": "moss_image_sft_4step_v2.0.safetensors",
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [

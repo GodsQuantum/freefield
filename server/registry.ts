@@ -35,6 +35,10 @@ export type Model = {
   file: string;
   dir: string;
   gb: number;
+  /** Optional relative destination path in the model dir. */
+  install_name?: string;
+  /** Opt-in checkpoint: keep optional download annotation in shared packs. */
+  pack_optional?: boolean;
   phase: "encode" | "denoise" | "denoise2" | "decode" | "aux" | "all";
   gated?: boolean;
   license?: string;
@@ -78,6 +82,28 @@ export function isFileInput(input: Input): boolean {
   return FILE_TYPES.has(input.type);
 }
 
+/**
+ * Required model names absent from the backend native ComfyUI catalogue.
+ * GGUF diffusion checkpoints can be registered under unet_gguf even when
+ * a source manifest declares diffusion_models, and CLIP GGUF under clip_gguf.
+ * Do NOT accept a different checkpoint/version as a substitute.
+ */
+export function missingRequiredModels(app: AppManifest, installed: ReadonlySet<string>): string[] {
+  const missing: string[] = [];
+  for (const m of app.models) {
+    if (m.optional) continue;
+    const name = basename(m.install_name ?? m.file);
+    const expected = m.dir + "/" + name;
+    const choices = [expected];
+    if (name.toLowerCase().endsWith(".gguf")) {
+      if (m.dir === "diffusion_models") choices.push("unet_gguf/" + name);
+      if (m.dir === "text_encoders") choices.push("clip_gguf/" + name);
+    }
+    if (!choices.some((candidate) => installed.has(candidate))) missing.push(expected);
+  }
+  return missing;
+}
+
 /** Names of the {placeholders} a template uses. */
 export function templateVars(template: string): string[] {
   return [...template.matchAll(/\{([a-z][a-z0-9_]*)\}/g)].map((m) => m[1]);
@@ -91,7 +117,7 @@ export function templateVars(template: string): string[] {
 export function modelKey(app: AppManifest, values?: Readonly<Record<string, unknown>>): string {
   const files = app.models
     .filter((m) => !m.optional && m.dir !== "loras")
-    .map((m) => `${m.dir}/${basename(m.file)}`);
+    .map((m) => `${m.dir}/${m.install_name ?? basename(m.file)}`);
   // Gateway compares this opaque key to unload prior base models. A selected
   // checkpoint override must change the key, even when the opt-in model is
   // absent from the required pack list (and LoRA-only choices need no unload).
@@ -185,6 +211,10 @@ function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]
   const referenced = new Set<string>();
   for (const n of Object.values(g)) for (const v of Object.values(n.inputs)) if (typeof v === "string") referenced.add(v);
   for (const m of app.models) {
+    if (m.install_name && m.install_name.split("/").some((part) =>
+      !part || part === "." || part === "..")) {
+      problems.push({ app: app.id, severity, message: "Unsafe model install_name: " + m.install_name });
+    }
     const name = basename(m.file);
     // ComfyUI-GGUF implicitly loads the required Qwen3-VL mmproj vision
     // tower matching the CLIPLoaderGGUF text encoder, with no separate node.
@@ -194,7 +224,18 @@ function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]
         && typeof node.inputs.clip_name === "string"
         && node.inputs.clip_name.startsWith(name.slice("mmproj-".length, -"-f16.gguf".length) + "-")
       );
-    if (!m.optional && !referenced.has(name) && !implicitVisionTower) {
+    // A native loader may display a model under a nested namespace (e.g. a
+    // Diffusers transformer), while HF's file name stays a basename.
+    const nestedNativePath = [...referenced].some((value) =>
+      typeof value === "string" && value.endsWith("/" + name));
+    // Kandinsky 6's official audio loader takes the BigVGAN directory rather
+    // than its generator checkpoint name, so retain its explicit pack input.
+    const directoryLoader = app.graph && Object.values(app.graph).some((node) =>
+      node.class_type === "Kandinsky6AudioVAELoader"
+      && typeof node.inputs.bigvgan_dir === "string"
+      && m.dir === "audio_vae"
+      && m.file.endsWith("/" + node.inputs.bigvgan_dir + "/bigvgan_generator.pt"));
+    if (!m.optional && !referenced.has(name) && !nestedNativePath && !implicitVisionTower && !directoryLoader) {
       problems.push({ app: app.id, severity: "warning", message: "model " + name + " is declared but no node loads it" });
     }
   }
