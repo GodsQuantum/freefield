@@ -105,6 +105,57 @@ class QualifiedHistoryImportTest(unittest.TestCase):
         again = imp.import_one(name, self.history, self.outputs, True, benchmark=True)
         self.assertEqual("ALREADY_IMPORTED", again["result"])
 
+    def test_nested_cli_history_true_output_is_hardlinked_not_input_or_metadata(self):
+        name, image = self.fixture(workflow_override=True, with_input=True)
+        entry = "20261123-110000000-abc1"
+        node_dir = self.outputs / "lab-success" / "history" / entry
+        node_dir.mkdir(parents=True)
+        actual = node_dir / "out-01.png"
+        actual.write_bytes(image.read_bytes())
+        (node_dir / "input-image.png").write_bytes(b"\\x89PNG\\r\\n\\x1a\\nFAKE_INPUT")
+        (node_dir / "meta.json").write_text("{}")
+        receipt_path = self.receipts / name
+        data = json.loads(receipt_path.read_text())
+        data["output_files"] = [
+            {"name": f"history/{entry}/input-image.png",
+             "bytes": (node_dir / "input-image.png").stat().st_size},
+            {"name": f"history/{entry}/meta.json", "bytes": 2},
+            {"name": f"history/{entry}/out-01.png", "bytes": actual.stat().st_size},
+        ]
+        data["media"] = [{"path": str(actual), "bytes": actual.stat().st_size,
+                           "sha256": hashlib.sha256(actual.read_bytes()).hexdigest()}]
+        receipt_path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, "temporary workflow override|requires reviewed benchmark"):
+            imp.import_one(name, self.history, self.outputs, False)
+        response = imp.import_one(name, self.history, self.outputs, True, benchmark=True)
+        self.assertEqual("IMPORTED", response["result"])
+        folder = self.history / response["id"]
+        record = json.loads((folder / "meta.json").read_text())
+        self.assertEqual(1, len(record["outputs"]))
+        self.assertEqual("out-01.png", record["outputs"][0]["file"])
+        self.assertEqual(actual.stat().st_ino, (folder / "out-01.png").stat().st_ino)
+        self.assertEqual("input-image.png", record["inputs"][0]["file"])
+        self.assertNotEqual((node_dir / "input-image.png").stat().st_ino,
+                            (folder / "out-01.png").stat().st_ino)
+        self.assertTrue(record["validation"]["benchmark_only"])
+        self.assertFalse(record["validation"]["replayable"])
+        self.assertEqual("ALREADY_IMPORTED",
+                         imp.import_one(name, self.history, self.outputs, True, benchmark=True)["result"])
+
+    def test_nested_cli_history_without_generated_output_is_never_accepted(self):
+        name, _ = self.fixture(workflow_override=True)
+        entry = "20261123-110000000-abc1"
+        file = self.receipts / name
+        data = json.loads(file.read_text())
+        data["output_files"] = [
+            {"name": f"history/{entry}/input-image.png", "bytes": 100},
+            {"name": f"history/{entry}/meta.json", "bytes": 200},
+        ]
+        file.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, "no generated output"):
+            imp.import_one(name, self.history, self.outputs, False, benchmark=True)
+        self.assertEqual([], list(self.history.iterdir()))
+
     def test_benchmark_rejects_failed_qa_and_unreviewed_output(self):
         name, _ = self.fixture(quality="VISUAL_QUALITY_FAIL", workflow_override=True)
         with self.assertRaisesRegex(ValueError, "not a qualified"):

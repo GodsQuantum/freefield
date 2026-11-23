@@ -7,6 +7,7 @@ The explicit --benchmark option archives only reviewed, successful native
 benchmarks with immutable provenance and replayable=False, including legitimate
 temporary workflow overrides. Visually rejected samples are excluded.
 Files remain in validation/ and are hard-linked without extra media bytes.
+Supports CLI out/history/<run-id>/out-01 media from named benchmark receipts.
 Deterministic IDs and atomic rename make retries safe.
 """
 import argparse
@@ -129,10 +130,34 @@ def plan(name, history, validation_out, benchmark=False):
     ]
     if not isinstance(candidates, list) or not candidates:
         raise ValueError(f"{filename}: no persisted output files")
+    # CLI with FREEFIELD_OUT=/out writes input-image.png plus a meta.json
+    # under the run's private history. Only its true generated out-* media
+    # are eligible for benchmark import. Never mislabel an uploaded input
+    # as a generated image.
+    def is_cli_history_item(item):
+        if not isinstance(item, dict):
+            return False
+        parts = Path(str(item.get("name") or "")).parts
+        return len(parts) == 3 and parts[0] == "history"
+    if any(is_cli_history_item(item) for item in candidates):
+        if not benchmark:
+            raise ValueError(f"{filename}: nested CLI history requires reviewed benchmark mode")
+        candidates = [item for item in candidates if is_cli_history_item(item)
+                      and re.fullmatch(r"out-[0-9]{2}\.(png|jpg|jpeg|webp|mp4|webm|mp3|wav|flac)",
+                                       Path(str(item.get("name") or "")).name)]
+        if not candidates:
+            raise ValueError(f"{filename}: no generated output (only CLI input/meta files)")
     outputs = []
     for i, candidate in enumerate(candidates, 1):
         rel = Path(str(candidate.get("name") or ""))
-        if rel.is_absolute() or rel.name != str(rel) or rel.suffix.lower() not in EXT_KIND:
+        nested = len(rel.parts) == 3 and rel.parts[0] == "history" and benchmark
+        if nested:
+            if (not ENTRY_ID.fullmatch(rel.parts[1])
+                    or not re.fullmatch(r"out-[0-9]{2}\.(png|jpg|jpeg|webp|mp4|webm|mp3|wav|flac)", rel.name)):
+                raise ValueError(f"{filename}: unsafe nested CLI output")
+        elif rel.name != str(rel):
+            raise ValueError(f"{filename}: unsafe output file")
+        if rel.is_absolute() or rel.suffix.lower() not in EXT_KIND:
             raise ValueError(f"{filename}: unsafe output file")
         source = (media_dir / rel).resolve(strict=True)
         if not source.is_relative_to(media_dir) or source.is_symlink() or not source.is_file():
@@ -216,15 +241,18 @@ def import_one(name, history, validation_out, apply, benchmark=False):
 
 
 def main():
+    global RECEIPTS
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("receipt", nargs="+", help="Existing qualified validation receipts")
     parser.add_argument("--apply", action="store_true", help="Actually add history entries")
     parser.add_argument("--benchmark", action="store_true", help="Import named, reviewed technical benchmarks as non-replayable (never production-quality claims)")
+    parser.add_argument("--receipts-dir", type=Path, default=RECEIPTS, help="Receipt directory, e.g. existing Freefield/ComfyUI/benchmarks; never a GPU runner")
     parser.add_argument("--history-dir", type=Path, default=OUT / "history")
     parser.add_argument("--validation-out", type=Path, default=OUT / "validation")
     a = parser.parse_args()
-    if not a.history_dir.is_dir() or not a.validation_out.is_dir():
-        parser.error("History or validation output folder is missing")
+    if not a.history_dir.is_dir() or not a.validation_out.is_dir() or not a.receipts_dir.is_dir():
+        parser.error("History, validation output or receipts folder is missing")
+    RECEIPTS = a.receipts_dir.resolve()
     results = []
     for name in a.receipt:
         results.append(import_one(name, a.history_dir, a.validation_out, a.apply, benchmark=a.benchmark))
