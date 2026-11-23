@@ -4,14 +4,14 @@
   "name": "Re-shoot INT4 compact",
   "section": "video",
   "pack": "video-h3",
-  "status": "draft",
+  "status": "ready",
   "higgsfield_feature": "Re-shoot (Merserk INT4 low-memory preview)",
-  "summary": "Experimental low-memory Re-shoot with Merserk Ref2VA INT4, CrossView, MoGe and Turbo8. Original INT8 remains the default.",
+  "summary": "Native-qualified 1-second MiniMax H3 Ref2VA INT4 video reshoot with CrossView, Turbo8 and MoGe. Low-memory opt-in, original INT8 fallback retained.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "Comfy-Org/comfy-reshoot workflows/generate.api.json (dc53fc7)",
     "comfyui": "0.42.0",
-    "notes": "Staged for native 00d E2E only; static preflight confirms CrossView LoRA target names 200/200 and Turbo8 208/208, but quantized patch runtime and visual results remain unverified. Never replace native INT8 until true video and audio pass."
+    "notes": "Native 00d GPU output PASS with 3 H264 outputs, H264/AAC for new angle + original audio, no OOM, NVMe models + --reserve-vram66.5. Original camera change subtle, low-resolution 1-second preview only, Freefield CLI generation not separately repeated. Receipt: Freefield/ComfyUI/benchmarks/00d-reshoot-merserk-int4-nvme66_5-native-retry-20261123.json; Library 20261123-010519880-50f9."
   },
   "inputs": [
     {

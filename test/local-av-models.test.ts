@@ -436,6 +436,6 @@ test("Re-shoot INT4 retains original CrossView warp, Turbo8 LoRAs, camera contro
   }
   assert.equal(candidate.inputs.find((x) => x.id === "duration")?.default, 1);
   assert.equal(candidate.test?.duration, 1, "smoke fixture must be within supported bounds");
-  assert.equal(candidate.status,"draft","do not expose before actual GPU output");
+  assert.equal(candidate.status,"ready","enable only after qualified native real GPU output");
   assert.equal(problems.some((problem) => problem.app === candidate.id && problem.severity === "error"), false);
 });
