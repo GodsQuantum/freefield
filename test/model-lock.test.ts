@@ -42,3 +42,18 @@ test("H3 compact selections stay present and older INT8 variants remain availabl
   assert.equal(qwen.selected, "qwen21-edit");
   assert.equal(qwen.assurance, "full_cli_e2e");
 });
+
+test("Qwen2511 specialized angle selection keeps real INT8 E2E; GGUF Q4 remains unqualified after two guarded runs", () => {
+  const winner = lock.choices["qwen-specialized-angles"];
+  assert.equal(winner.selected, "angles");
+  assert.equal(winner.assurance, "full_cli_e2e");
+  assert.equal(winner.evidence, "validation/qwen2511-angles-native-subquad-cli1024-20261119.json");
+  const q4 = lock.challengers_unqualified.find((entry: { id: string }) => entry.id === "qwen-image-edit-2511-gguf-q4");
+  assert.ok(q4, "rejected experimental model must be recorded for no-duplicate future benchmarks");
+  assert.equal(q4.evidence,
+    "Freefield/ComfyUI/benchmarks/00-qwen2511-q4_k_m-angles-1024-20261123-retry2.json");
+  assert.match(q4.reason, /two|2.*(safety|abort)|both|both ended|attempted twice/i);
+  assert.match(q4.reason, /0\s?OOM|zero\s?OOM/i);
+  assert.ok(q4.additional_evidence.some((receipt: string) => receipt.endsWith("-retry1.json")));
+  assert.ok(current.angles.models.some((m) => m.file.endsWith("/qwen_image_edit_2511_int8_convrot.safetensors")));
+});

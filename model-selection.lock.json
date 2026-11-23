@@ -40,9 +40,9 @@
     },
     "qwen-specialized-angles": {
       "selected": "angles",
-      "assurance": "retained_no_better_proven",
-      "evidence": "Freefield/ComfyUI/batches/00-int8-heavy.json",
-      "decision": "Edit2511 kept for specialized multi-angle LoRA capabilities until a truly equivalent newer pipeline is validated."
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/qwen2511-angles-native-subquad-cli1024-20261119.json",
+      "decision": "INT8 2511 remains proven specialized 1024px 617.59s visually reviewed. W4A8 728.22s slower. Unsloth Q4 GGUF attempted twice (127.40s,172.73s) both ended memory-pressure SAFETY_ABORT without generated PNG, 0 OOM. No quality or speed proof for Q4; rejected on current gfx1103 hardware only; do not repeat. Original models intact."
     },
     "image-default": {
       "selected": "create-image",
@@ -124,8 +124,12 @@
     },
     {
       "id": "qwen-image-edit-2511-gguf-q4",
-      "reason": "Weights staged, static graph pass; no real image, cannot replace specialized angles app. Earlier W4A8 slower than INT8.",
-      "evidence": "Freefield/ComfyUI/batches/00-int8-heavy.json"
+      "reason": "Q4 12.843GB actually submitted on Cloud9. retry1 127.4s, PSI5.86%, host minimum15.194GiB; retry2 172.73s, PSI17.26%, host minimum13.002GiB, original INT8 617.59s preserved, both safe abort before generated PNG, 0 OOM; current hardware disqualified, not global model defect. XFS weight preserved, disposable NVMe duplicate removed, service reserve66.5 restored.",
+      "evidence": "Freefield/ComfyUI/benchmarks/00-qwen2511-q4_k_m-angles-1024-20261123-retry2.json",
+      "additional_evidence": [
+        "Freefield/ComfyUI/benchmarks/00-qwen2511-q4_k_m-angles-1024-20261123-retry1.json",
+        "Freefield/ComfyUI/preflight/00e-qwen2511-q4-rejected-rollback-20261123.json"
+      ]
     },
     {
       "id": "flux3-q4-q5",
@@ -15454,5 +15458,6 @@
       "model_overrides": [],
       "limits": []
     }
-  }
+  },
+  "last_selection_review_utc": "2026-11-23T09:25:52+00:00"
 }
