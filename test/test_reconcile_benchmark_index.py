@@ -56,6 +56,39 @@ class BenchmarkLedgerTests(unittest.TestCase):
         self.assertEqual(RECONCILE.prompt_ids(history), ["native-prompt"])
         self.assertEqual(RECONCILE.graph_models(history), ["encoder.safetensors", "model-Q4.gguf"])
 
+    def test_native_comfy_k6_benchmark_is_not_freefield_runner_success(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            file = root / "actual-video.mp4"
+            file.write_bytes(b"real native Comfy video with audio marker")
+            digest = hashlib.sha256(file.read_bytes()).hexdigest()
+            receipt = root / "benchmarks" / "k6-native.json"
+            receipt.parent.mkdir()
+            evidence = {
+                "status": "PASSED_K6_03B_REAL_MP4_WITH_AUDIO_AWAIT_VISUAL_AND_LIBRARY_INTEGRATION",
+                "prompt_id": "native-comfy-prompt",
+                "runtime_seconds": 298.57,
+                "min_mem_available_gib": 12.39,
+                "max_psi_full10": 8.38,
+                "native_history_status": {"status_str": "success", "completed": True},
+                "output_files": [{"path": str(file), "filename": file.name}],
+                "freefield_library_archive": {"app": "kandinsky6-lite", "benchmark_only": True,
+                                               "sha256": digest, "bytes": file.stat().st_size},
+            }
+            receipt.write_text(json.dumps(evidence))
+            item = RECONCILE.parse_receipt(root, "benchmarks", receipt)
+            self.assertEqual(item["generation_status"], "GENERATED_SUCCESS")
+            self.assertEqual(item["execution_surface"], "NATIVE_COMFY_ONLY")
+            self.assertEqual(item["app"], "kandinsky6-lite")
+            self.assertEqual(item["seconds"], 298.57)
+            self.assertEqual(item["min_available_gib"], 12.39)
+            self.assertEqual(item["media_files_verified"], 1)
+            self.assertEqual(item["media_checks"][0]["sha_check"], "MATCH")
+            evidence["native_history_status"] = {"status_str": "error", "completed": False}
+            receipt.write_text(json.dumps(evidence))
+            item = RECONCILE.parse_receipt(root, "benchmarks", receipt)
+            self.assertNotEqual(item["generation_status"], "GENERATED_SUCCESS")
+
     def test_successful_generated_image_can_be_rejected_for_quality(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

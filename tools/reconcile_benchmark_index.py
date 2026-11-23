@@ -187,6 +187,21 @@ def media_evidence(d, source, stem):
     if not isinstance(candidates, list):
         candidates = []
     candidates = list(candidates)
+    # The native MP4 hash may live in the verified Library receipt, not in
+    # the SaveVideo filename descriptor. Compare it with the actual bytes.
+    archive = d.get("freefield_library_archive")
+    if isinstance(archive, dict) and archive.get("benchmark_only") is True:
+        digest, size = archive.get("sha256"), archive.get("bytes")
+        if isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest):
+            candidates = [
+                {**item, **({"sha256": digest, "bytes": size}
+                           if isinstance(item, dict)
+                           and isinstance(item.get("filename"), str)
+                           and item["filename"].lower().endswith(".mp4")
+                           and not item.get("sha256")
+                           else {})}
+                for item in candidates
+            ]
     # Other successful runners use a single CLI history path rather than an
     # output_files list. Preserve its independently recorded size and checksum.
     if isinstance(d.get("cli_output"), str):
@@ -292,9 +307,13 @@ def classify(source, status, app, ids, media_rows, d):
         native = {}
     if not native and isinstance(d.get("history"), dict):
         native = d["history"].get("status", {})
+    # Direct ComfyUI benchmarks may store the native /history status under
+    # this key. They remain native GPU results, not Freefield runner tests.
+    if not native and isinstance(d.get("native_history_status"), dict):
+        native = d["native_history_status"]
     if not isinstance(native, dict):
         native = {}
-    native_success = isinstance(native, dict) and native.get("status_str") == "success"
+    native_success = native.get("status_str") == "success" and native.get("completed", True) is True
     real_success = (
         run_status == "SUCCESS"
         or run_status.startswith(("PASS_REAL_", "PASS_NATIVE_REAL_", "PASS_REAL_VIDEO_", "SUCCESS_REAL_"))
@@ -321,7 +340,14 @@ def parse_receipt(root, source, p):
     config = d.get("config") if isinstance(d.get("config"), dict) else {}
     native_history_status = d.get("history", {}).get("status") if isinstance(d.get("history"), dict) else None
     status = scalar_status(summary.get("status") or d.get("status") or d.get("native_status") or native_history_status)
+    archive = d.get("freefield_library_archive")
+    native_benchmark_archived = (
+        isinstance(archive, dict) and archive.get("benchmark_only") is True
+        and isinstance(d.get("native_history_status"), dict)
+    )
     app = summary.get("app") or d.get("app") or config.get("app")
+    if not isinstance(app, str) and native_benchmark_archived:
+        app = archive.get("app")
     if not isinstance(app, str):
         app = None
     ids = prompt_ids(d)
@@ -329,15 +355,18 @@ def parse_receipt(root, source, p):
     samples = d.get("samples") if isinstance(d.get("samples"), list) else []
     samples = [x for x in samples if isinstance(x, dict)]
     wall = first_number(summary.get("seconds"), d.get("elapsed_seconds"),
+                        d.get("runtime_seconds"), d.get("generation_elapsed_seconds"),
                         d.get("wall_seconds"), d.get("native_wall_s"), d.get("wall_s"),
                         d.get("total"), d.get("metrics", {}).get("wall_s") if isinstance(d.get("metrics"), dict) else None,
                         samples[-1].get("elapsed_s") if samples else None)
     reading = d.get("metrics", {}) if isinstance(d.get("metrics"), dict) else {}
     min_ram = first_number(summary.get("min_available_gib"), d.get("min_available_gib"),
+                           d.get("min_mem_available_gib"), d.get("sample_mem_available_min_gib"),
                            reading.get("min_host_available_gib"), reading.get("min_available_gib"))
     max_gtt = first_number(summary.get("max_gtt_gib"), d.get("max_gtt_gib"),
                            reading.get("max_GTT_gib"), reading.get("max_gtt_gib"))
     psi = first_number(summary.get("max_psi_full"), d.get("max_psi_full"),
+                       d.get("max_psi_full10"), d.get("sample_max_psi_full10_pct"),
                        reading.get("max_psi_full10_pct"))
     if samples:
         ram_samples = [x["host_available_gib"] for x in samples if isinstance(x.get("host_available_gib"), (int, float))]
@@ -369,6 +398,8 @@ def parse_receipt(root, source, p):
     ) else []
     # Legacy index fields retained for existing readers.
     row = {"file": p.name, "source": source, "relative_path": rel,
+           "execution_surface": "NATIVE_COMFY_ONLY" if native_benchmark_archived
+               else "RUN_OR_RECEIPT_SURFACE_NOT_EXPLICITLY_MARKED",
            "size": p.stat().st_size, "receipt_sha256": sha(p),
            "status": status, "app": app, "seconds": wall,
            "min_available_gib": min_ram, "max_gtt_gib": max_gtt,
