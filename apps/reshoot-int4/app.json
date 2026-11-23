@@ -205,7 +205,7 @@
   ],
   "test": {
     "clip": "test/clip.mp4",
-    "duration": 5
+    "duration": 1
   },
   "modes": [
     "reshoot",
