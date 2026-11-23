@@ -39,8 +39,8 @@ test("Kandinsky6 Lite is a separate opt-in video app with only the verified safe
   const manifest = JSON.parse(readFileSync(new URL("../apps/kandinsky6-lite/app.json", import.meta.url), "utf8"));
   const pinnedPlugin = manifest.custom_nodes.find((x: { repo: string; commit: string }) => x.repo === "https://github.com/kandinskylab/kandinsky-6");
   assert.equal(pinnedPlugin?.commit, "73b892b730885e02ab58fbf7fc5cb10b78e1e3da");
-  assert.ok(app.models.some((m) => m.dir === "audio_vae" && m.file.endsWith("/v1-44.pth")));
-  assert.ok(app.models.some((m) => m.dir === "audio_vae" && m.file.endsWith("/bigvgan_generator.pt")));
+  assert.ok(app.models.some((m) => m.dir === "kandinsky6_audio_vae" && m.file.endsWith("/v1-44.pth")));
+  assert.ok(app.models.some((m) => m.dir === "kandinsky6_audio_vae" && m.file.endsWith("/bigvgan_generator.pt")));
   assert.ok(modelKey(app).includes("diffusion_models/Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors"));
 });
 

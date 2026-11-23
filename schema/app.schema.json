@@ -207,7 +207,7 @@
           "enum": [
             "diffusion_models", "unet_gguf", "clip_gguf", "text_encoders", "vae", "loras", "checkpoints", "clip_vision",
             "latent_upscale_models", "upscale_models", "model_patches", "geometry_estimation",
-             "background_removal", "frame_interpolation", "audio_encoders", "audio_vae", "embeddings", "detection"
+             "background_removal", "frame_interpolation", "audio_encoders", "audio_vae", "kandinsky6_audio_vae", "embeddings", "detection"
           ],
           "description": "ComfyUI models/ subfolder."
         },

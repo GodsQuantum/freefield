@@ -130,18 +130,17 @@ def plan(name, history, validation_out, benchmark=False):
     ]
     if not isinstance(candidates, list) or not candidates:
         raise ValueError(f"{filename}: no persisted output files")
-    # CLI with FREEFIELD_OUT=/out writes input-image.png plus a meta.json
-    # under the run's private history. Only its true generated out-* media
-    # are eligible for benchmark import. Never mislabel an uploaded input
-    # as a generated image.
+    # CLI with FREEFIELD_OUT=/out stores the actual generated out-* media
+    # inside a private history/<id> directory alongside input-* and meta.json.
+    # Legitimate CLI SUCCESS without an override is fully reproducible and can
+    # be imported as a normal library item after QA; reviewed native benchmarks
+    # with overrides remain explicitly non-replayable. Never count input-*.
     def is_cli_history_item(item):
         if not isinstance(item, dict):
             return False
         parts = Path(str(item.get("name") or "")).parts
         return len(parts) == 3 and parts[0] == "history"
     if any(is_cli_history_item(item) for item in candidates):
-        if not benchmark:
-            raise ValueError(f"{filename}: nested CLI history requires reviewed benchmark mode")
         candidates = [item for item in candidates if is_cli_history_item(item)
                       and re.fullmatch(r"out-[0-9]{2}\.(png|jpg|jpeg|webp|mp4|webm|mp3|wav|flac)",
                                        Path(str(item.get("name") or "")).name)]
@@ -150,7 +149,7 @@ def plan(name, history, validation_out, benchmark=False):
     outputs = []
     for i, candidate in enumerate(candidates, 1):
         rel = Path(str(candidate.get("name") or ""))
-        nested = len(rel.parts) == 3 and rel.parts[0] == "history" and benchmark
+        nested = len(rel.parts) == 3 and rel.parts[0] == "history"
         if nested:
             if (not ENTRY_ID.fullmatch(rel.parts[1])
                     or not re.fullmatch(r"out-[0-9]{2}\.(png|jpg|jpeg|webp|mp4|webm|mp3|wav|flac)", rel.name)):

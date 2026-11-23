@@ -18,9 +18,21 @@
   ],
   "models": [
     {
+      "repo": "shadwosii/Kandinsky-6.0",
+      "file": "diffusion_models/Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
+      "dir": "diffusion_models",
+      "gb": 4.1662,
+      "name": "Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
+      "gated": false,
+      "license": "MIT (converted checkpoint repository); underlying Kandinsky original terms apply",
+      "used_by": [
+        "kandinsky6-lite-int8"
+      ]
+    },
+    {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 0.489,
       "name": "bigvgan_vocoder/bigvgan_generator.pt",
       "gated": false,
@@ -32,7 +44,7 @@
     {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/bigvgan_vocoder/config.json",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 2e-06,
       "name": "bigvgan_vocoder/config.json",
       "gated": false,
@@ -43,23 +55,11 @@
     {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/v1-44.pth",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 1.222,
       "name": "v1-44.pth",
       "gated": false,
       "license": null,
-      "used_by": [
-        "kandinsky6-lite-int8"
-      ]
-    },
-    {
-      "repo": "shadwosii/Kandinsky-6.0",
-      "file": "diffusion_models/Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
-      "dir": "diffusion_models",
-      "gb": 4.1662,
-      "name": "Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
-      "gated": false,
-      "license": "MIT (converted checkpoint repository); underlying Kandinsky original terms apply",
       "used_by": [
         "kandinsky6-lite-int8"
       ]

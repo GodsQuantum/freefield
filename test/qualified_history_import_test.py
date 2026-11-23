@@ -142,6 +142,44 @@ class QualifiedHistoryImportTest(unittest.TestCase):
         self.assertEqual("ALREADY_IMPORTED",
                          imp.import_one(name, self.history, self.outputs, True, benchmark=True)["result"])
 
+    def test_actual_cli_nested_generated_media_imports_as_normal_replayable_library_item(self):
+        name, image = self.fixture()
+        entry = "20261123-220650715-8dd3"
+        own = self.outputs / "lab-success" / "history" / entry
+        own.mkdir(parents=True)
+        source = own / "out-01.png"
+        source.write_bytes(image.read_bytes())
+        (own / "meta.json").write_text("{}")
+        (own / "input-image.png").write_bytes(b"\\x89PNG\\r\\n\\x1a\\nFAKE")
+        receipt = self.receipts / name
+        proof = json.loads(receipt.read_text())
+        proof["output_files"] = [
+            {"name": f"history/{entry}/input-image.png", "bytes": (own / "input-image.png").stat().st_size},
+            {"name": f"history/{entry}/meta.json", "bytes": 2},
+            {"name": f"history/{entry}/out-01.png", "bytes": source.stat().st_size},
+        ]
+        proof["media"] = [{"path": str(source), "bytes": source.stat().st_size,
+                           "sha256": hashlib.sha256(source.read_bytes()).hexdigest()}]
+        receipt.write_text(json.dumps(proof))
+        result = imp.import_one(name, self.history, self.outputs, False)
+        self.assertEqual("DRY_RUN_OK", result["result"])
+        self.assertEqual(["out-01.png"], result["media"])
+        self.assertEqual(0, len(list(self.history.iterdir())))
+        result = imp.import_one(name, self.history, self.outputs, True)
+        self.assertEqual("IMPORTED", result["result"])
+        produced = self.history / result["id"]
+        record = json.loads((produced / "meta.json").read_text())
+        self.assertEqual("cloud9-cli-qualification", record["validation"]["origin"])
+        self.assertEqual("PASS_SINGLE_SCENE", record["validation"]["visual_review"])
+        self.assertEqual([], record["inputs"])
+        self.assertEqual(1, len(record["outputs"]))
+        self.assertNotIn("benchmark_only", record["validation"])
+        self.assertNotEqual(record["validation"].get("replayable"), False)
+        self.assertEqual(source.stat().st_ino, (produced / "out-01.png").stat().st_ino)
+        self.assertNotEqual((own / "input-image.png").stat().st_ino, (produced / "out-01.png").stat().st_ino)
+        self.assertEqual("ALREADY_IMPORTED",
+                         imp.import_one(name, self.history, self.outputs, True)["result"])
+
     def test_nested_cli_history_without_generated_output_is_never_accepted(self):
         name, _ = self.fixture(workflow_override=True)
         entry = "20261123-110000000-abc1"

@@ -233,7 +233,7 @@ function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]
     const directoryLoader = app.graph && Object.values(app.graph).some((node) =>
       node.class_type === "Kandinsky6AudioVAELoader"
       && typeof node.inputs.bigvgan_dir === "string"
-      && m.dir === "audio_vae"
+      && m.dir === "kandinsky6_audio_vae"
       && m.file.endsWith("/" + node.inputs.bigvgan_dir + "/bigvgan_generator.pt"));
     if (!m.optional && !referenced.has(name) && !nestedNativePath && !implicitVisionTower && !directoryLoader) {
       problems.push({ app: app.id, severity: "warning", message: "model " + name + " is declared but no node loads it" });

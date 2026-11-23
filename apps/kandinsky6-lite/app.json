@@ -114,14 +114,14 @@
     {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/v1-44.pth",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 1.222,
       "phase": "decode"
     },
     {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 0.489,
       "phase": "decode",
       "install_name": "bigvgan_vocoder/bigvgan_generator.pt"
@@ -129,7 +129,7 @@
     {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/bigvgan_vocoder/config.json",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 2e-06,
       "phase": "decode",
       "optional": true,

@@ -18,9 +18,21 @@
   ],
   "models": [
     {
+      "repo": "kandinskylab/Kandinsky-6.0-Lite-distill-5s-Diffusers",
+      "file": "transformer/diffusion_pytorch_model.safetensors",
+      "dir": "diffusion_models",
+      "gb": 6.382,
+      "name": "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors",
+      "gated": false,
+      "license": null,
+      "used_by": [
+        "kandinsky6-lite"
+      ]
+    },
+    {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 0.489,
       "name": "bigvgan_vocoder/bigvgan_generator.pt",
       "gated": false,
@@ -32,7 +44,7 @@
     {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/bigvgan_vocoder/config.json",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 2e-06,
       "name": "bigvgan_vocoder/config.json",
       "gated": false,
@@ -43,21 +55,9 @@
     {
       "repo": "t8star/Kandinsky-Comfy",
       "file": "audio_vae/v1-44.pth",
-      "dir": "audio_vae",
+      "dir": "kandinsky6_audio_vae",
       "gb": 1.222,
       "name": "v1-44.pth",
-      "gated": false,
-      "license": null,
-      "used_by": [
-        "kandinsky6-lite"
-      ]
-    },
-    {
-      "repo": "kandinskylab/Kandinsky-6.0-Lite-distill-5s-Diffusers",
-      "file": "transformer/diffusion_pytorch_model.safetensors",
-      "dir": "diffusion_models",
-      "gb": 6.382,
-      "name": "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors",
       "gated": false,
       "license": null,
       "used_by": [

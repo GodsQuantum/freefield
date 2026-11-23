@@ -7341,7 +7341,15 @@
       "pack": "video-kandinsky6-lite",
       "models": [
         {
-          "dir": "audio_vae",
+          "dir": "diffusion_models",
+          "file": "transformer/diffusion_pytorch_model.safetensors",
+          "repo": "kandinskylab/Kandinsky-6.0-Lite-distill-5s-Diffusers",
+          "phase": "denoise",
+          "optional": false,
+          "install_name": "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors"
+        },
+        {
+          "dir": "kandinsky6_audio_vae",
           "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
           "repo": "t8star/Kandinsky-Comfy",
           "phase": "decode",
@@ -7349,7 +7357,7 @@
           "install_name": "bigvgan_vocoder/bigvgan_generator.pt"
         },
         {
-          "dir": "audio_vae",
+          "dir": "kandinsky6_audio_vae",
           "file": "audio_vae/bigvgan_vocoder/config.json",
           "repo": "t8star/Kandinsky-Comfy",
           "phase": "decode",
@@ -7357,19 +7365,11 @@
           "install_name": "bigvgan_vocoder/config.json"
         },
         {
-          "dir": "audio_vae",
+          "dir": "kandinsky6_audio_vae",
           "file": "audio_vae/v1-44.pth",
           "repo": "t8star/Kandinsky-Comfy",
           "phase": "decode",
           "optional": false
-        },
-        {
-          "dir": "diffusion_models",
-          "file": "transformer/diffusion_pytorch_model.safetensors",
-          "repo": "kandinskylab/Kandinsky-6.0-Lite-distill-5s-Diffusers",
-          "phase": "denoise",
-          "optional": false,
-          "install_name": "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors"
         },
         {
           "dir": "text_encoders",
@@ -7453,7 +7453,14 @@
       "pack": "video-kandinsky6-lite-int8",
       "models": [
         {
-          "dir": "audio_vae",
+          "dir": "diffusion_models",
+          "file": "diffusion_models/Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
+          "repo": "shadwosii/Kandinsky-6.0",
+          "phase": "denoise",
+          "optional": false
+        },
+        {
+          "dir": "kandinsky6_audio_vae",
           "file": "audio_vae/bigvgan_vocoder/bigvgan_generator.pt",
           "repo": "t8star/Kandinsky-Comfy",
           "phase": "decode",
@@ -7461,7 +7468,7 @@
           "install_name": "bigvgan_vocoder/bigvgan_generator.pt"
         },
         {
-          "dir": "audio_vae",
+          "dir": "kandinsky6_audio_vae",
           "file": "audio_vae/bigvgan_vocoder/config.json",
           "repo": "t8star/Kandinsky-Comfy",
           "phase": "decode",
@@ -7469,17 +7476,10 @@
           "install_name": "bigvgan_vocoder/config.json"
         },
         {
-          "dir": "audio_vae",
+          "dir": "kandinsky6_audio_vae",
           "file": "audio_vae/v1-44.pth",
           "repo": "t8star/Kandinsky-Comfy",
           "phase": "decode",
-          "optional": false
-        },
-        {
-          "dir": "diffusion_models",
-          "file": "diffusion_models/Kandinsky6_Lite_distill_5s_int8_convrot.safetensors",
-          "repo": "shadwosii/Kandinsky-6.0",
-          "phase": "denoise",
           "optional": false
         },
         {

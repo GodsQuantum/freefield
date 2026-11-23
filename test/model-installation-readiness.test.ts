@@ -41,7 +41,23 @@ test("Kandinsky nested loader paths and audio directory model inventory resolve 
   const candidate = app("kandinsky6-lite");
   const installed = new Set(withoutAliases(candidate.id));
   assert.deepEqual(missingRequiredModels(candidate, installed), []);
-  const removed = "audio_vae/bigvgan_generator.pt";
+  const removed = "kandinsky6_audio_vae/bigvgan_generator.pt";
   installed.delete(removed);
   assert.ok(missingRequiredModels(candidate, installed).includes(removed));
+});
+
+test("both Kandinsky 6 manifests use official registered audio VAE category, and never silently accept a missing mandatory vocoder", () => {
+  for (const id of ["kandinsky6-lite", "kandinsky6-lite-int8"]) {
+    const a = app(id);
+    const list = a.models.filter((m) => m.dir === "kandinsky6_audio_vae");
+    assert.equal(list.length, 3);
+    assert.ok(list.some((m) => m.file.endsWith("v1-44.pth")));
+    assert.ok(list.some((m) => m.file.endsWith("bigvgan_vocoder/bigvgan_generator.pt")));
+    const installed = new Set(withoutAliases(id));
+    assert.deepEqual(missingRequiredModels(a, installed), []);
+    installed.delete("kandinsky6_audio_vae/bigvgan_generator.pt");
+    assert.ok(missingRequiredModels(a, installed).includes("kandinsky6_audio_vae/bigvgan_generator.pt"));
+    const wrongDir = new Set(withoutAliases(id).map((v) => v.replace("kandinsky6_audio_vae/", "audio_vae/")));
+    assert.ok(missingRequiredModels(a, wrongDir).length>=2);
+  }
 });
