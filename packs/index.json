@@ -40,7 +40,6 @@
       "cafe-60s",
       "character",
       "character-3",
-      "character-swap",
       "cinema-studio",
       "color-grade",
       "comic-book",
@@ -135,6 +134,7 @@
   },
   "image-qwen21": {
     "apps": [
+      "character-swap",
       "qwen21-edit"
     ],
     "download_gb": 14.23,

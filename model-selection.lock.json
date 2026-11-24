@@ -182,6 +182,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/09c-headshot-tiled-native-cli-20261124.json",
       "decision": "Actual tiled 0.75MP/12 step FLUX3 INT8 portrait 264.49s, visual pass single scene. Previous 1MP/16 step full decode safety abort288.54s PSI6.62%; new PSI2.17%, min available18.32GiB. No runtime or guard changes."
+    },
+    "image-character-swap": {
+      "selected": "character-swap",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/09g-character-swap-qwen21-two-ref-512-20261124.json",
+      "decision": "Actual two-reference Qwen Image 2.1 Turbo Q4 512px native vision conditioning; 672x384 correct subject replacement, 439.59s; peak PSI1.96%, min available16.751GiB. Rejected Flux3 asymmetric result that kept original subject. Latest official Qwen Image family checked 2026-11-24. Original general-purpose Qwen edit unchanged."
     }
   },
   "challengers_unqualified": [
@@ -3091,26 +3097,26 @@
     },
     "character-swap": {
       "status": "ready",
-      "pack": "image-flux3",
+      "pack": "image-qwen21",
       "models": [
         {
           "dir": "diffusion_models",
-          "file": "diffusion_models/flux3-image-klein-int8-convrot.safetensors",
-          "repo": "black-forest-labs/flux-3-image-klein-comfy",
+          "file": "diffusion_models/qwen-image-2.1-turbo-Q4_K_M.gguf",
+          "repo": "unsloth/Qwen-Image-2.1-Turbo-GGUF",
           "phase": "denoise",
           "optional": false
         },
         {
           "dir": "text_encoders",
-          "file": "text_encoders/qwen3vl_4b_int8_convrot.safetensors",
-          "repo": "black-forest-labs/flux-3-image-klein-comfy",
+          "file": "text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+          "repo": "Comfy-Org/Qwen-Image-2.1",
           "phase": "encode",
           "optional": false
         },
         {
           "dir": "vae",
-          "file": "vae/flux2-vae.safetensors",
-          "repo": "black-forest-labs/flux-3-image-klein-comfy",
+          "file": "vae/qwen_image_2.1_vae_bf16.safetensors",
+          "repo": "Comfy-Org/Qwen-Image-2.1",
           "phase": "decode",
           "optional": false
         }
@@ -3118,47 +3124,66 @@
       "workflow": [
         {
           "id": "1",
-          "class_type": "UNETLoader",
+          "class_type": "UnetLoaderGGUF",
           "inputs": {
-            "unet_name": "flux3-image-klein-int8-convrot.safetensors",
-            "weight_dtype": "default"
+            "unet_name": "qwen-image-2.1-turbo-Q4_K_M.gguf"
+          }
+        },
+        {
+          "id": "10",
+          "class_type": "KSamplerSelect",
+          "inputs": {
+            "sampler_name": "euler"
+          }
+        },
+        {
+          "id": "11",
+          "class_type": "SamplerCustomAdvanced",
+          "inputs": {
+            "sigmas": [
+              "9",
+              0
+            ]
           }
         },
         {
           "id": "2",
-          "class_type": "CLIPLoader",
+          "class_type": "QwenImage21Cache",
           "inputs": {
-            "clip_name": "qwen3vl_4b_int8_convrot.safetensors"
+            "dtype": "default"
           }
         },
         {
           "id": "3",
-          "class_type": "VAELoader",
+          "class_type": "CLIPLoader",
           "inputs": {
-            "vae_name": "flux2-vae.safetensors"
+            "clip_name": "qwen3vl_8b_int8_convrot.safetensors"
           }
         },
         {
-          "id": "7",
-          "class_type": "KSampler",
+          "id": "4",
+          "class_type": "VAELoader",
           "inputs": {
-            "steps": 16,
-            "cfg": 1,
-            "sampler_name": "euler",
-            "scheduler": "simple",
-            "denoise": 1
+            "vae_name": "qwen_image_2.1_vae_bf16.safetensors"
+          }
+        },
+        {
+          "id": "8",
+          "class_type": "CFGGuider",
+          "inputs": {
+            "cfg": 8
+          }
+        },
+        {
+          "id": "9",
+          "class_type": "ManualSigmas",
+          "inputs": {
+            "sigmas": "1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0"
           }
         }
       ],
       "model_overrides": [],
-      "limits": [
-        {
-          "id": "steps",
-          "default": 16,
-          "min": 8,
-          "max": 32
-        }
-      ]
+      "limits": []
     },
     "cinema-studio": {
       "status": "ready",
@@ -15928,5 +15953,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T22:43:39.579579+00:00"
+  "last_selection_review_utc": "2026-11-24T22:52:31.770763+00:00"
 }

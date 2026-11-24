@@ -1,6 +1,7 @@
 {
   "pack": "image-qwen21",
   "apps": [
+    "character-swap",
     "qwen21-edit"
   ],
   "download_gb": 14.23,
@@ -16,6 +17,7 @@
       "gated": false,
       "license": null,
       "used_by": [
+        "character-swap",
         "qwen21-edit"
       ]
     },
@@ -28,6 +30,7 @@
       "gated": false,
       "license": null,
       "used_by": [
+        "character-swap",
         "qwen21-edit"
       ]
     },
@@ -40,6 +43,7 @@
       "gated": false,
       "license": null,
       "used_by": [
+        "character-swap",
         "qwen21-edit"
       ]
     }

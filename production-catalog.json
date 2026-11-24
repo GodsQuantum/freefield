@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261124-certified-v3",
+  "revision": "cloud9-20261124-certified-v4",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -303,6 +303,16 @@
       "defaults": {
         "steps": 12
       }
+    },
+    "character-swap": {
+      "evidence": "validation/09g-character-swap-qwen21-two-ref-512-20261124.json",
+      "evidence_sha256": "f5e297a544aaa33f403712a25f559229f9ffc46a4279a30bf26f7c8fdc7652eb",
+      "app_sha256": "6af4e4e294c318977ea423a99e7fc98eb8bc389eaf03710c5b5d37c5b5976ae1",
+      "workflow_sha256": "ca43676d53bc970e03c3db3fc1e16398fc0c6c67b429359ee1e49af0a3b95fd7",
+      "measured_seconds": 439.59,
+      "scope": "Real two-reference subject replacement, Qwen Image 2.1 Turbo Q4, 672 x 384; single visually reviewed scene, 512px preview",
+      "review": "visual",
+      "defaults": {}
     }
   }
 }

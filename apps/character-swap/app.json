@@ -3,15 +3,15 @@
   "id": "character-swap",
   "name": "Character Swap",
   "section": "image",
-  "summary": "Replaces the person in a scene with the person from a second photo.",
+  "summary": "Replace the main person in a photo using a second reference photo while retaining the original scene. Qwen Image 2.1 Turbo Q4, memory-bounded 512px preview.",
   "higgsfield_feature": "Character Swap",
-  "pack": "image-flux3",
+  "pack": "image-qwen21",
   "status": "ready",
   "workflow": "workflow.api.json",
   "source": {
-    "template": "image_flux3_klein_distilled_image_edit.json",
+    "template": "Comfy-Org/workflow_templates/templates/image_qwen_image_2_1_turbo_image_edit.json",
     "comfyui": "0.42.0",
-    "notes": "Template app written by tools/template_apps.py: the workflow is apps/edit's (built by tools/build_apps.py) plus a second LoadImage on ReferenceMultiLatent's images.image1; the prompt below is fixed and \"Extra direction\" is appended to it."
+    "notes": "Cloud9 actual two-reference character replacement passed direct visual review (672x384, 439.59s); native Qwen Image 2.1 Turbo Q4 and 8-step schedule. Scope: one clearly described subject, two distinct images, preview resolution. See qualification receipt."
   },
   "inputs": [
     {
@@ -24,7 +24,7 @@
       },
       "bind": [
         {
-          "node": "11",
+          "node": "5",
           "field": "image"
         }
       ]
@@ -39,7 +39,7 @@
       },
       "bind": [
         {
-          "node": "12",
+          "node": "14",
           "field": "image"
         }
       ]
@@ -47,29 +47,14 @@
     {
       "id": "details",
       "type": "textarea",
-      "label": "Extra direction",
+      "label": "Replacement instructions",
       "default": "",
-      "help": "Added at the end of the app's prompt.",
+      "help": "Describe the person to replace and what must remain unchanged (scene, pose, clothes, framing). Use one clear reference photo of the replacement person.",
       "bind": [
         {
-          "node": "4",
-          "field": "text",
-          "template": "The scene from <ref_image_0> with its main person replaced by the person from <ref_image_1>: same pose, framing, lighting and clothing as the scene; the new person's face, hair and build. {details}"
-        }
-      ]
-    },
-    {
-      "id": "steps",
-      "type": "slider",
-      "label": "Steps",
-      "min": 8,
-      "max": 32,
-      "step": 1,
-      "default": 16,
-      "bind": [
-        {
-          "node": "7",
-          "field": "steps"
+          "node": "6",
+          "field": "prompt",
+          "template": "Edit the first image. Replace its main person with the person in the second image, including face, hair, and body. Keep the first image background, composition, pose, clothing, perspective and lighting. Photorealistic seamless replacement. {details}"
         }
       ]
     },
@@ -82,7 +67,7 @@
       "bind": [
         {
           "node": "7",
-          "field": "seed"
+          "field": "noise_seed"
         }
       ]
     }
@@ -96,31 +81,25 @@
   ],
   "models": [
     {
-      "repo": "black-forest-labs/flux-3-image-klein-comfy",
-      "file": "diffusion_models/flux3-image-klein-int8-convrot.safetensors",
+      "repo": "unsloth/Qwen-Image-2.1-Turbo-GGUF",
+      "file": "diffusion_models/qwen-image-2.1-turbo-Q4_K_M.gguf",
       "dir": "diffusion_models",
-      "gb": 5.83,
-      "phase": "denoise",
-      "gated": true,
-      "license": "FLUX Kommunity License"
+      "gb": 4.2,
+      "phase": "denoise"
     },
     {
-      "repo": "black-forest-labs/flux-3-image-klein-comfy",
-      "file": "text_encoders/qwen3vl_4b_int8_convrot.safetensors",
+      "repo": "Comfy-Org/Qwen-Image-2.1",
+      "file": "text_encoders/qwen3vl_8b_int8_convrot.safetensors",
       "dir": "text_encoders",
-      "gb": 4.86,
-      "phase": "encode",
-      "gated": true,
-      "license": "FLUX Kommunity License"
+      "gb": 9.351,
+      "phase": "encode"
     },
     {
-      "repo": "black-forest-labs/flux-3-image-klein-comfy",
-      "file": "vae/flux2-vae.safetensors",
+      "repo": "Comfy-Org/Qwen-Image-2.1",
+      "file": "vae/qwen_image_2.1_vae_bf16.safetensors",
       "dir": "vae",
-      "gb": 0.34,
-      "phase": "decode",
-      "gated": true,
-      "license": "FLUX Kommunity License"
+      "gb": 0.676,
+      "phase": "decode"
     }
   ],
   "credits": [
