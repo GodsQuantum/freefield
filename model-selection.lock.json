@@ -27,10 +27,11 @@
     },
     "h3-reshoot": {
       "selected": "reshoot-int4",
-      "assurance": "native_generated",
-      "evidence": "Freefield/ComfyUI/benchmarks/00d-reshoot-merserk-int4-nvme66_5-native-retry-20261123.json",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/08a-reshoot-int4-real-freefield-cli-20261124.json",
       "fallback": "reshoot",
-      "decision": "One native 39-frame 1s H264/AAC video plus warp preview and original audio, 0OOM; camera-angle effect subtle. Freefield CLI infer not repeated. Only low-memory opt-in."
+      "decision": "H3 REF2VA INT4, actual production-recipe Freefield CLI 1485.17s, 39-frame 416x256 H264/AAC 1.625s, two outputs and original input imported and authenticated API 200/206 verified. Visual PASS_WITH_LIMITATION, coherent robot and no magenta holes in final; subtle view change, low-res only, subjective audio not assessed. Original INT8 remains rollback.",
+      "previous_evidence": "Freefield/ComfyUI/benchmarks/00d-reshoot-merserk-int4-nvme66_5-native-retry-20261123.json"
     },
     "qwen-image-general-edit": {
       "selected": "qwen21-edit",
@@ -15813,5 +15814,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T11:20:49.171137+00:00"
+  "last_selection_review_utc": "2026-11-24T11:32:47.335903+00:00"
 }
