@@ -90,16 +90,20 @@
       "quality_limits": "Brief 1.375s source; 2x output 512x288, no audio input or audio generated; tested single scene; not proof of full20s or all video content."
     },
     "video-text-to-video": {
-      "selected": "video-t2v",
-      "assurance": "retained_no_better_proven",
-      "evidence": "Freefield/ComfyUI/batches/00-int8-heavy.json",
-      "decision": "LTX2.5 official INT8 while pack/LoRA and newer quantized compatibility remain incomplete; do not promote a nonworking lighter candidate."
+      "selected": "h3-video-int4",
+      "assurance": "full_cli_e2e",
+      "evidence": "Freefield/ComfyUI/benchmarks/00a-h3-int4-freefield-cli-e2e-20261122.json",
+      "decision": "Best currently generation-backed local alternative for this input modality, limited to validated low-resolution short preview. Not feature-equivalent to LTX; original LTX app remains preserved and blocked by its pack; no automatic graph/model substitution.",
+      "original_unqualified_ltx_app": "video-t2v",
+      "previous_evidence": "Freefield/ComfyUI/batches/00-int8-heavy.json"
     },
     "video-image-to-video": {
-      "selected": "video",
-      "assurance": "retained_no_better_proven",
-      "evidence": "Freefield/ComfyUI/batches/00-int8-heavy.json",
-      "decision": "LTX2.5 existing workflow; H3 compact available separately for low-res validated use."
+      "selected": "h3-photo-int4",
+      "assurance": "full_cli_e2e",
+      "evidence": "Freefield/ComfyUI/benchmarks/00b-h3-photo-int4-freefield-cli-e2e-20261122.json",
+      "decision": "Best currently generation-backed local alternative for this input modality, limited to validated low-resolution short preview. Not feature-equivalent to LTX; original LTX app remains preserved and blocked by its pack; no automatic graph/model substitution.",
+      "original_unqualified_ltx_app": "video",
+      "previous_evidence": "Freefield/ComfyUI/batches/00-int8-heavy.json"
     },
     "audio-music": {
       "selected": "music-ace15-local",
@@ -124,6 +128,18 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/03m-k6lite-int8-25f-20261123.json",
       "decision": "Kandinsky 6 Lite INT8 ConvRot 4.166GB, 25 frames 448x256 (1.04s) H264/AAC in 294.8s, visual QA and real Freefield Library. Quiet audio, only short preview qualified; not 5s or unrestricted behavior."
+    },
+    "video-frame-interpolation": {
+      "selected": "smooth",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/coverage-film-smooth33f-20261119.json",
+      "decision": "Existing real FILM CLI success: 33 source frames, factor 2, 9.90s. Only measured configuration."
+    },
+    "image-depth-map": {
+      "selected": "depth-map",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/coverage-moge-depth-20261119.json",
+      "decision": "Existing real MoGe CLI success: depth_colored, detail2, 24.96s. Normals/detail6 not individually proven."
     }
   },
   "challengers_unqualified": [
@@ -163,8 +179,13 @@
     },
     {
       "id": "ltx25-public-gemma4-q4",
-      "reason": "Public 7.51GB Gemma4 Q4 raw Comfy-key GGUF header, all 682 tensor shapes/names vs same-source int8 except tokenizer size, dual LTX projection, 48 layer scalars and actual tokenizer JSON verified; full weights not downloaded and runtime not qualified; cannot assume less RAM or unrestricted behavior.",
-      "evidence": "Freefield/ComfyUI/preflight/06h-ltx25-public-gemma4-q4-native-raw-projection-tokenizer-20261124.json"
+      "reason": "Full 7.509634752GB Gemma4 Q4 weights downloaded and SHA256 verified. Real GPU encoder + Q3 native split generated 25 frames 224x128, 1.041667s H264/AAC, 399.64s total compute; visual pass with limitations and very quiet audio. One-click Q3 subsequently safety-aborted at 206.65s, PSI10.15%, zero output despite verified GPU encoder release. Not a production selection; Q2 NVMe alternate separately tracked. No unrestricted behavior or longer-duration claim.",
+      "evidence": "Freefield/ComfyUI/preflight/06v-ltx25-native-split-real-video-audio-qa-20261124.json",
+      "additional_evidence": [
+        "Freefield/ComfyUI/preflight/06k-ltx25-gemma4-q4-full-sha-stage-20261124.json",
+        "validation/06u-ltx25-q3-gemma4-q4-gpu-native-split-20261124.json",
+        "validation/06w-ltx25-q3-gemma4-q4-gpu-oneclick-20261124.json"
+      ]
     }
   ],
   "recipes": {
@@ -15814,5 +15835,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T11:32:47.335903+00:00"
+  "last_selection_review_utc": "2026-11-24T14:14:42.644478+00:00"
 }
