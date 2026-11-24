@@ -5,12 +5,12 @@
   "section": "video",
   "pack": "video-kandinsky6-lite-int8",
   "status": "ready",
-  "summary": "Aperçu 1,04 s de vidéo + son, 25 images 448×256, modèle INT8 ConvRot compact pour Cloud9. Génération à certifier avant exposition.",
+  "summary": "Aperçu vidéo + son de 1,04 s (25 images, 448 × 256), génération Freefield validée sur Cloud9 avec INT8 ConvRot. Durées plus longues non qualifiées.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "Kandinsky 6 Lite-distill original 12-node PiFlow T2VA full video+audio native graph, only node1 checkpoint replaced by SHA-pinned native INT8 ConvRot",
     "comfyui": "0.45.0",
-    "notes": "Model shadwosii/Kandinsky-6.0 pinned revision 68c1f666395f3d0bbb57cbe8093b6220ac0cb828, source LFS SHA256 523522487aeb9009a93e77f5d74bc1c817b1469aa6ce99b2b564c3da69c0f96e, 4166194712 bytes. Repackaged native Comfy int8 ConvRot quant. Official Kandinsky adapter on native CT410 already passed BF16 generation; quant needs real gfx1103 E2E. 25f 448x256 10steps, audio kept. No other source model replaced."
+    "notes": "Model shadwosii/Kandinsky-6.0 pinned revision 68c1f666395f3d0bbb57cbe8093b6220ac0cb828, source LFS SHA256 523522487aeb9009a93e77f5d74bc1c817b1469aa6ce99b2b564c3da69c0f96e, 4166194712 bytes. Repackaged native Comfy int8 ConvRot quant. Official Kandinsky adapter on native CT410 already passed BF16 generation; quant subsequently passed real gfx1103 Freefield E2E. 25f 448x256 10steps, audio kept. No other source model replaced. Real Freefield CLI SUCCESS on 2026-11-23: 294.80s, H264/AAC, 25 frames 448x256, visual QA and replayable Library 20261123-220648916-5351; quiet audio and 1.04s only. Receipt validation/03m-k6lite-int8-25f-20261123.json."
   },
   "inputs": [
     {

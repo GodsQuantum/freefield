@@ -35,8 +35,8 @@
     "qwen-image-general-edit": {
       "selected": "qwen21-edit",
       "assurance": "full_cli_e2e",
-      "evidence": "Freefield/ComfyUI/benchmarks/00f-qwen21-turbo-q4-default-runtime-20261123-retry1.json",
-      "decision": "Selected Qwen Image 2.1 Turbo Q4_K_M GGUF (Unsloth 4.1996GB), true 768px E2E original production Comfy profile 571.20s vs prior INT8 635.57s (10.13% faster). Visual PASS_SINGLE_SCENE, 42.13% less DiT disk, GTT10.558GiB vs7.734GiB higher, no OOM. Original INT8 retained as rollback, global guard untouched; no effect on Qwen2511/2509."
+      "evidence": "Freefield/ComfyUI/benchmarks/00g-qwen21-turbo-q4-deployed-real-cli-e2e-20261123.json",
+      "decision": "Qwen Image 2.1 Turbo Q4_K_M GGUF (Unsloth 4.1996GB), production no-override Freefield CLI E2E 768px 574.27s vs INT8 635.57s (9.6% faster), 42.1% smaller DiT, greater GTT. Original INT8 rollback preserved."
     },
     "qwen-specialized-angles": {
       "selected": "angles",
@@ -110,15 +110,22 @@
       "selected": "sfx",
       "assurance": "full_cli_e2e",
       "evidence": "validation/sfx-web-after-ace-20261119.json",
-      "decision": "Stable Audio small current successful sound-effect generation."
+      "decision": "Stable Audio 3 Medium remains default with real Freefield generation; Small-SFX opt-in separately proven for short sound effects, not a general replacement."
+    },
+    "audio-music-minimax": {
+      "selected": "music",
+      "assurance": "full_cli_e2e",
+      "evidence": "Freefield/ComfyUI/benchmarks/01d-minimax-q6-music3-10s-live-nooverride-20261123.json",
+      "decision": "MiniMax Music3 Q6_K NVMe, 10s production CLI generation 340.52s vs FP16 380.14s; 57% smaller DiT and 10.4% faster. Decoded waveform correlation 0.99954 vs FP16. ACE-Step remains separate 30s alternative; default 60s and longer Music3 durations not yet qualified; subjective listening not certified."
+    },
+    "video-kandinsky-lite": {
+      "selected": "kandinsky6-lite-int8",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/03m-k6lite-int8-25f-20261123.json",
+      "decision": "Kandinsky 6 Lite INT8 ConvRot 4.166GB, 25 frames 448x256 (1.04s) H264/AAC in 294.8s, visual QA and real Freefield Library. Quiet audio, only short preview qualified; not 5s or unrestricted behavior."
     }
   },
   "challengers_unqualified": [
-    {
-      "id": "qwen-image-2.1-turbo-q4-gguf",
-      "reason": "Same already-proven Qwen2.1 Turbo generation with quantized weights only; Q4 gfx1103 relative quality and wall time have no real Freefield proof. No repeat baseline; benchmark challenger only if worth change.",
-      "evidence": "Freefield/ComfyUI/preflight/20261123-qwen-family-latest-replacement-policy.json"
-    },
     {
       "id": "chatrlabs-omni-8step-uncensored",
       "reason": "Old 35step Omni timed out without output. New Turbo LoRA may be different, but not generated: not selected.",
@@ -152,6 +159,11 @@
       "id": "qwen-2.5-image",
       "reason": "Qwen2.5-VL is vision-language encoder, not new Qwen image generator. No official Qwen Image 2.5 downloadable repo in live publisher scan.",
       "evidence": "Freefield/ComfyUI/preflight/huggingface-official-publishers-recent-check-20261123.json"
+    },
+    {
+      "id": "ltx25-public-gemma4-q4",
+      "reason": "Public 7.51GB Gemma4 Q4 raw Comfy-key GGUF header, all 682 tensor shapes/names vs same-source int8 except tokenizer size, dual LTX projection, 48 layer scalars and actual tokenizer JSON verified; full weights not downloaded and runtime not qualified; cannot assume less RAM or unrestricted behavior.",
+      "evidence": "Freefield/ComfyUI/preflight/06h-ltx25-public-gemma4-q4-native-raw-projection-tokenizer-20261124.json"
     }
   ],
   "recipes": {
@@ -15801,5 +15813,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-23T23:08:49.032033+00:00"
+  "last_selection_review_utc": "2026-11-24T11:20:49.171137+00:00"
 }

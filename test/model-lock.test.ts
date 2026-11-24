@@ -57,3 +57,19 @@ test("Qwen2511 specialized angle selection keeps real INT8 E2E; GGUF Q4 remains 
   assert.ok(q4.additional_evidence.some((receipt: string) => receipt.endsWith("-retry1.json")));
   assert.ok(current.angles.models.some((m) => m.file.endsWith("/qwen_image_edit_2511_int8_convrot.safetensors")));
 });
+
+test("production Qwen Q4, Music3 Q6 and Kandinsky INT8 have explicit generation-backed choices", () => {
+  const choices = lock.choices;
+  assert.equal(choices["qwen-image-general-edit"].evidence,
+    "Freefield/ComfyUI/benchmarks/00g-qwen21-turbo-q4-deployed-real-cli-e2e-20261123.json");
+  assert.ok(!lock.challengers_unqualified.some((entry: { id: string }) =>
+    entry.id === "qwen-image-2.1-turbo-q4-gguf"));
+  for (const [key, app, evidence] of [
+    ["audio-music-minimax", "music", "Freefield/ComfyUI/benchmarks/01d-minimax-q6-music3-10s-live-nooverride-20261123.json"],
+    ["video-kandinsky-lite", "kandinsky6-lite-int8", "validation/03m-k6lite-int8-25f-20261123.json"],
+  ]) {
+    assert.equal(choices[key].selected, app);
+    assert.equal(choices[key].assurance, "full_cli_e2e");
+    assert.equal(choices[key].evidence, evidence);
+  }
+});
