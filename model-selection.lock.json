@@ -144,8 +144,32 @@
     "image-background-removal": {
       "selected": "remove-bg",
       "assurance": "full_cli_e2e",
-      "evidence": "validation/03p-birefnet-image-real-cli-20261124.json",
-      "decision": "Existing BiRefNet production recipe actual CLI 31.18s, 768x1280 RGBA with visually verified correct silhouette, transparent background and retained subject. Native text-encoder device policy uses CPU under current low-VRAM profile; not a GPU acceleration claim. Library 20261124-141743162-f1e1 replayable."
+      "evidence": "validation/03s-birefnet-image-native-gpu-20261124.json",
+      "decision": "Native GPU BiRefNet 768x1280 RGBA 9.71s E2E, vs CPU31.18s on same image. Binary alpha IoU1.0, normalized mean absolute difference1.59569e-8. Warm GPU vs earlier CPU observational. Exact tested native compute-device patch deployed in ComfyUI 8b540a7c5f88f9a247ac0477fb3bb26d40f23ef8; unchanged graph/profile. Replayable library 20261124-175442485-e3e7.",
+      "previous_evidence": "validation/03p-birefnet-image-real-cli-20261124.json"
+    },
+    "video-background-removal": {
+      "selected": "video-remove-bg",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/03r-birefnet-video-native-gpu-20261124.json",
+      "decision": "BiRefNet on selected GPU, unchanged native production graph/profile, 1s at 16fps 734x1286 cutout H264/AAC plus matte H264, both fully decoded. 101s E2E vs CPU timeout368.66s no generated output. Mask/foreground checked, some edge flicker; slow and no long-clip proof. Exact native core 8b540a7c5f88f9a247ac0477fb3bb26d40f23ef8. Replayable library 20261124-175249517-fcbd.",
+      "previous_evidence": "validation/03q-birefnet-video-real-cli-20261124.json"
+    },
+    "image-relight": {
+      "selected": "relight",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/qwen2511-relight-2509lora-native-substitution-20261120.json",
+      "decision": "Previously measured 618.58s E2E versus 814.8s old 2509; exact tested 18-node override equals deployed recipe. Visual A/B PASS_WITH_LIMITATIONS on one portrait; background may change."
+    },
+    "audio-sfx-fast": {
+      "selected": "sfx",
+      "assurance": "full_cli_e2e",
+      "evidence": "Freefield/ComfyUI/benchmarks/02-sa3-small-sfx-3s-warm.json",
+      "additional_evidence": [
+        "Freefield/ComfyUI/benchmarks/02-sa3-small-sfx-3s.json",
+        "Freefield/ComfyUI/preflight/02-sfx-web-optin-deployment-20261122.json"
+      ],
+      "decision": "Stable Audio 3 Small-SFX opt-in, deployed. 3s rain warm 6.64s, cold 45.96s; no subjective audio quality or apples-to-apples Medium speedup claim. Medium remains default."
     }
   },
   "challengers_unqualified": [
@@ -201,6 +225,29 @@
         "validation/06z-ltx25-ud-q2-xl-nvme-gpu-oneclick-448-20261124.json",
         "Freefield/ComfyUI/preflight/06x-ltx25-ud-q2-xl-nvme-stage-20261124.json"
       ]
+    },
+    {
+      "id": "wan-animate2-turbo-q4-stock-loader",
+      "reason": "Actual GPU 33f experiment stopped at 60.28s while loading/encoding FP8 UMT5 + vision, PSI full peak10.02%, min available14.373GiB, zero output. Further live header inspection confirmed original GGUF has architecture wan but no config.transformer.model_type, whereas native Animate2 checkpoint has animate2; publisher documents stock loader silently selects wrong I2V model. No valid performance transfer even if a generic video would generate. Do not repeat stock loader test. Original INT8 recipe preserved; distinct explicit metadata + compact encoder trial tracked separately.",
+      "evidence": "validation/03n-motion-transfer-wan-animate2-q4-33f-20261124.json",
+      "additional_evidence": [
+        "Freefield/ComfyUI/preflight/03o-remaining-installed-models-20261124.json",
+        "Freefield/ComfyUI/preflight/03u-motion-transfer-wan-animate2-q4-umt5q4-17f-20261124-config.json"
+      ]
+    },
+    {
+      "id": "wan-animate2-q4-umt5q4-explicit-metadata",
+      "reason": "Correct WAN_Animate2 architecture verified, compact Q4 UMT5 on GPU, 17-frame test, one real prompt. 182.89s SAFETY_ABORT before sampler progress/output; PSI peak22.66%, min available14.615GiB, GTT11.258GiB. Original native guard intact; scoped campaign start24GiB vs25GiB for smaller encoder. All temporary patches and profile restored. Preserve INT8 and do not repeat identical candidate.",
+      "evidence": "validation/03u-motion-transfer-wan-animate2-q4-umt5q4-17f-20261124.json",
+      "additional_evidence": [
+        "Freefield/ComfyUI/preflight/03u-motion-transfer-wan-animate2-q4-umt5q4-17f-20261124-integration.json",
+        "Freefield/ComfyUI/preflight/03t-umt5-q4-nvme-stage-20261124.json"
+      ]
+    },
+    {
+      "id": "krea-style-reference-fidelity",
+      "reason": "Existing E2E success 346.52s, red teapot/table/plant coherent but watercolor output despite photographic reference and requested photographic palette. Technical success does not establish reference fidelity; no new winner or model replacement.",
+      "evidence": "validation/krea-style-reference-lazy-switch-e2e-halfmp-20261120.json"
     }
   ],
   "recipes": {
@@ -15850,5 +15897,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T14:21:37.962424+00:00"
+  "last_selection_review_utc": "2026-11-24T18:05:37.209225+00:00"
 }
