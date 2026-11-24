@@ -170,6 +170,12 @@
         "Freefield/ComfyUI/preflight/02-sfx-web-optin-deployment-20261122.json"
       ],
       "decision": "Stable Audio 3 Small-SFX opt-in, deployed. 3s rain warm 6.64s, cold 45.96s; no subjective audio quality or apples-to-apples Medium speedup claim. Medium remains default."
+    },
+    "image-inpaint": {
+      "selected": "inpaint",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/09a-inpaint-flux3-current-native-cli-20261124.json",
+      "decision": "Real 1024x1024 FLUX3 INT8 masked edit in 325.04s. Red to cobalt blue cup/saucer, visually coherent; coarse rectangular mask leaves slight transition. Outside expanded box unchanged 874588/874588 pixels. No changed runtime or workflow. Positive single scene with limitations."
     }
   },
   "challengers_unqualified": [
@@ -15897,5 +15903,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T18:05:37.209225+00:00"
+  "last_selection_review_utc": "2026-11-24T20:01:25.733302+00:00"
 }

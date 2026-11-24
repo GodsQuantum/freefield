@@ -30,6 +30,7 @@ import { Flags } from "./flags.ts";
 import { DOOR_HTML, foreign, Guard, plainHttpToIp } from "./guard.ts";
 import { toRequest, uploadLimitBytes } from "./uploads.ts";
 import { handleFreefieldMcp } from "./mcp.ts";
+import { certifiedCatalog } from "./certified-catalog.ts";
 
 const root = repoRoot();
 const { apps: catalog, problems } = loadRegistry(root);
@@ -37,7 +38,8 @@ const { apps: catalog, problems } = loadRegistry(root);
 // validated against the available hardware, without editing upstream manifests.
 const enabledIds = process.env.FREEFIELD_ENABLED_APPS?.split(",").map(v => v.trim()).filter(Boolean);
 const allowed = enabledIds?.length ? new Set(enabledIds) : null;
-const apps = allowed ? catalog.filter(app => allowed.has(app.id)) : catalog;
+const certified = process.env.FREEFIELD_CERTIFIED_ONLY === "1" ? certifiedCatalog(root, catalog, enabledIds) : null;
+const apps = certified ? certified.apps : allowed ? catalog.filter(app => allowed.has(app.id)) : catalog;
 for (const p of problems.filter((x) => x.severity === "error")) console.error(`[registry] ${p.app}: ${p.message}`);
 const byId = new Map(apps.map((a) => [a.id, a]));
 
@@ -49,7 +51,7 @@ const vram = new Map<string, VramRow>(
 );
 let runner: Runner | null = null;
 const getRunner = () => (runner ??= new Runner());
-const draftsAllowed = process.env.FREEFIELD_DRAFTS === "1";
+const draftsAllowed = !certified && process.env.FREEFIELD_DRAFTS === "1";
 const outDir = process.env.FREEFIELD_OUT || join(root, "out");
 const guard = Guard.fromEnv(join(outDir, "limits.json"));
 const maxUploadBodyBytes = uploadLimitBytes(process.env.FREEFIELD_MAX_UPLOAD_MB, guard.hosted);
@@ -143,10 +145,11 @@ async function installedFiles(): Promise<Set<string> | null> {
 function publicApp(a: App, files: Set<string> | null = null) {
   return {
     id: a.id, name: a.name, section: a.section, summary: a.summary ?? "", status: a.status, pack: a.pack,
-    runnable: runnable(a),
+    runnable: runnable(a) && (!certified || (files !== null && !missingPack(a, files))),
     missing_pack: missingPack(a, files),
+    qualification: certified?.proofs.get(a.id) ? { ...certified.proofs.get(a.id), revision: certified.revision } : null,
     higgsfield_feature: a.higgsfield_feature ?? null,
-    modes: a.modes ?? null,
+    modes: a.modes?.filter(id => byId.has(id)) ?? null,
     mode_label: a.mode_label ?? null,
     inputs: a.inputs.map(({ bind: _bind, options, ...rest }) => ({
       ...rest, ...(options ? { options: options.map(({ sets: _sets, ...o }) => o) } : {}),
@@ -329,7 +332,9 @@ const server = createServer(async (req, res) => {
           if (refused) throw new InputError(refused);
           admitting++;
           try {
-            const lacking = missingPack(app, await installedFiles());
+            const files = await installedFiles();
+            if (certified && !files) throw new InputError("Model inventory temporarily unavailable; generation not submitted");
+            const lacking = missingPack(app, files);
             if (lacking) throw new InputError(id + " requires unavailable model pack " + lacking);
             const resolved = resolveValues(app, values);
             const view = startRun(app, resolved, preset, me);
@@ -357,7 +362,7 @@ const server = createServer(async (req, res) => {
         const examples = loadExamples();
         const files = await installedFiles();
         return send(res, 200, { apps: sorted.map((a) => ({ ...publicApp(a, files), example: examples[a.id] ?? null })), drafts: draftsAllowed,
-          hosted: guard.hosted, upload: { max_body_bytes: maxUploadBodyBytes } });
+          certified_only: Boolean(certified), hosted: guard.hosted, upload: { max_body_bytes: maxUploadBodyBytes } });
       }
       if (req.method === "GET" && area === "apps" && sub === "workflow") {
         // the app's ComfyUI workflow (API format) as a file: drag it onto ComfyUI's canvas to open the app as nodes
@@ -373,7 +378,9 @@ const server = createServer(async (req, res) => {
         if (!app) return send(res, 404, { error: "unknown app" });
         if (!app.workflowPath) throw new InputError(`${app.id} has no workflow yet`);
         if (!runnable(app)) throw new InputError(`${app.id} is a draft; start the server with FREEFIELD_DRAFTS=1 to run it anyway`);
-        const lacking = missingPack(app, await installedFiles());
+        const files = await installedFiles();
+        if (certified && !files) return send(res, 503, { error: "Model inventory temporarily unavailable; generation not submitted" });
+        const lacking = missingPack(app, files);
         if (lacking) throw new InputError(`${app.id} needs the ${lacking} pack, which this backend has not downloaded: add it to FREEFIELD_PACKS and restart the pod`);
         const refused = guard.refuse(activeRuns());
         if (refused) return send(res, 429, { error: refused });

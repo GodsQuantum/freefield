@@ -4,7 +4,7 @@
 //   #/library          history and lab examples                       #/vram      the VRAM map
 import { el, closePopover, toast, api } from "./util.js";
 import { t } from "./i18n.js";
-import { loadCatalog, byId, lastAppFor, studioOf, FEATURED, hosted } from "./catalog.js";
+import { loadCatalog, byId, lastAppFor, studioOf, FEATURED, hosted, certifiedOnly } from "./catalog.js";
 import { topbar, gpuState, pollGpu } from "./nav.js";
 import { exploreView, appsView, libraryView, vramView } from "./views.js";
 import { workspaceView, recreate, useIn } from "./workspace.js";
@@ -18,9 +18,11 @@ let bar = null;
 let current = null;
 
 function route() {
+  if (!location.hash && certifiedOnly) { location.replace(`#/app/${lastAppFor("image")}`); return null; }
   const hash = location.hash || "#/";
   const m = /^#\/app\/([\w-]+)/.exec(hash);
   if (m) {
+    if (certifiedOnly && !byId.has(m[1])) { location.replace("#/apps"); return null; }
     const view = workspaceView(m[1]);
     const app = view.app;
     const featured = app && FEATURED.some((f) => f.id === app.id);

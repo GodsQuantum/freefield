@@ -1,5 +1,5 @@
 // The pages that are not a workspace: Explore (home), Apps (the store), Library and the VRAM map.
-import { el, icon, masonry } from "./util.js";
+import { el, icon, masonry, fmtShort } from "./util.js";
 import { t } from "./i18n.js";
 import { apps, byId, CATEGORIES, HERO, START_HERE, hosted, tagline, iconOf, fitOf, categoryOf, studioOf, menuGroups } from "./catalog.js";
 import { exampleItem, thumb, hoverPlay, optionTile } from "./media.js";
@@ -119,11 +119,13 @@ function appCard(a) {
   const media = item ? thumb(item, { play: "hover" }) : el("div", { class: "media" }, el("span", { class: "placeholder" }, icon(iconOf(a))));
   const fit = fitOf(a);
   media.append(el("div", { class: "badges" },
+    a.qualification ? el("span", { class: "tag dark", title: a.qualification.scope }, a.qualification.review === "limited" ? "Validated preview" : a.qualification.review === "audio" ? "Audio verified" : "Validated") : null,
     a.status === "draft" ? el("span", { class: "tag dark" }, t("tag.draft")) : null,
     a.missing_pack ? el("span", { class: "tag dark", title: t("ws.nopack", { pack: a.missing_pack }) }, t("tag.nopack")) : null,
     fit && fit[1] === "big" ? el("span", { class: "tag violet" }, `48 ${t("unit.gb")}`) : null));
   const card = el("a", { class: "app-card", href: `#/app/${a.id}` }, media,
     el("h3", {}, a.name), el("p", {}, a.summary),
+    a.qualification ? el("p", { class: "help", title: a.qualification.scope }, "Cloud9: " + fmtShort(a.qualification.measured_seconds) + " · " + a.qualification.scope) : null,
     el("span", { class: "btn white small" }, icon("play"), t("apps.try")));
   hoverPlay(card, media._video);
   return card;
@@ -133,7 +135,7 @@ export function appsView() {
   const body = el("div");
   const search = el("input", { type: "search", placeholder: t("apps.search"), value: appsQuery, "aria-label": t("apps.search") });
   const pills = el("div", { class: "pills", role: "group" });
-  const cats = [...CATEGORIES.map((c) => c.id), ...(apps.some((a) => categoryOf(a.id) === "more") ? ["more"] : [])];
+  const cats = [...CATEGORIES.filter(c => c.apps.some(id => byId.has(id))).map((c) => c.id), ...(apps.some((a) => categoryOf(a.id) === "more") ? ["more"] : [])];
   const draw = () => {
     pills.replaceChildren(...["all", ...cats].map((c) => el("button", { type: "button", "aria-pressed": String(appsCat === c),
       onclick: () => { appsCat = c; draw(); } }, c === "all" ? t("apps.all") : t(`cat.${c}.t`))));

@@ -31,6 +31,12 @@ export function formFor(app) {
   let f = forms.get(app.id);
   if (f) return f;
   const saved = store.get(`values.${app.id}`) || {};
+  // Preserve prompts and user files. Adopt measured defaults once per certification revision.
+  if (app.qualification && store.get(`qualification.${app.id}`) !== app.qualification.revision) {
+    for (const id of Object.keys(app.qualification.defaults ?? {})) delete saved[id];
+    store.set(`values.${app.id}`, saved);
+    store.set(`qualification.${app.id}`, app.qualification.revision);
+  }
   const values = {};
   for (const inp of app.inputs) {
     if (isMedia(inp.type)) continue;
@@ -329,7 +335,7 @@ function genButton(app, onClick, { wide = false } = {}) {
   const est = estimate(app);
   const b = el("button", { class: `generate${wide ? " wide" : ""}`, type: "button", disabled: !app.runnable || Boolean(app.missing_pack),
     title: !app.runnable ? (app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"))
-      : app.missing_pack ? t("ws.nopack", { pack: app.missing_pack }) : est ? t("ws.est", { gpu: est.gpu }) : null },
+      : app.missing_pack ? t("ws.nopack", { pack: app.missing_pack }) : app.qualification ? "Measured on Cloud9: " + fmtShort(app.qualification.measured_seconds) + " · " + app.qualification.scope : est ? t("ws.est", { gpu: est.gpu }) : null },
     t("ws.generate"), est ? el("span", { class: "cost" }, icon("spark"), fmtShort(est.seconds)) : el("span", { class: "cost" }, icon("spark")));
   b.addEventListener("click", async () => {
     if (b.dataset.busy) return;
@@ -430,6 +436,7 @@ function composerBar(app, rerenderBar) {
   const gen = genButton(app, go);
   if (!app.runnable) { hint.hidden = false; hint.textContent = app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"); }
   else if (app.missing_pack) { hint.hidden = false; hint.textContent = t("ws.nopack", { pack: app.missing_pack }); }
+  else if (app.qualification) { hint.hidden = false; hint.textContent = "Cloud9 · " + fmtShort(app.qualification.measured_seconds) + " measured · " + app.qualification.scope; }
 
   const bar = el("div", { class: "composer" },
     hint,
@@ -637,7 +644,7 @@ function sidebarPanel(app, rerenderSide) {
   const f = formFor(app);
   const ui = { refs: {} };
   const tab = videoTabOf(app.id);
-  const tabs = tab ? el("div", { class: "side-tabs", role: "tablist" }, ...VIDEO_TABS.map((vt) => el("button", { type: "button", role: "tab",
+  const tabs = tab ? el("div", { class: "side-tabs", role: "tablist" }, ...VIDEO_TABS.filter(vt => vt.apps.some(id => byId.has(id))).map((vt) => el("button", { type: "button", role: "tab",
     "aria-selected": String(vt.id === tab),
     onclick: () => {
       if (vt.id === tab) return;
@@ -665,7 +672,7 @@ function sidebarPanel(app, rerenderSide) {
   if (app.presets?.length) adv.unshift(presetField(app, f));
   const advanced = adv.length ? el("details", { class: "adv" }, el("summary", {}, t("ws.advanced"), icon("chevD", "i-chev")), el("div", { class: "in" }, ...adv)) : null;
 
-  const scroll = el("div", { class: "side-scroll" }, card, modeSwitch(app), ...main, advanced);
+  const scroll = el("div", { class: "side-scroll" }, card, app.qualification ? el("p", { class: "help" }, "Cloud9 · " + fmtShort(app.qualification.measured_seconds) + " measured · " + app.qualification.scope) : null, modeSwitch(app), ...main, advanced);
   const note = el("p", { class: "side-note" }, !app.runnable ? (app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"))
     : app.missing_pack ? t("ws.nopack", { pack: app.missing_pack })
       : maxUploadBodyBytes && app.inputs.some((i) => isMedia(i.type)) ? t("ws.upload.budget", { mib: maxUploadBodyBytes / 2 ** 20 }) : "");

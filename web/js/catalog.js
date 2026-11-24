@@ -5,6 +5,7 @@ import { lang } from "./i18n.js";
 import { localizeApp } from "./app-locale.js";
 
 export let apps = [];
+export let certifiedOnly = false;
 export const byId = new Map();
 export let draftsAllowed = false;
 export let maxUploadBodyBytes = null; // total HTTP body bytes; null means no advertised cap
@@ -14,6 +15,7 @@ const DEV = new URLSearchParams(location.search).has("dev");   // ?dev shows the
 
 export async function loadCatalog() {
   const d = await api("/api/apps");
+  certifiedOnly = Boolean(d.certified_only);
   draftsAllowed = Boolean(d.drafts);
   hosted = Boolean(d.hosted);
   const limit = d.upload?.max_body_bytes;
@@ -26,11 +28,11 @@ export async function loadCatalog() {
 
 /** Apps grouped like a store: a card can only sit in one row. */
 export const CATEGORIES = [
-  { id: "create", apps: ["create-image", "cinema-studio", "cinema-video", "z-image", "moss-image", "moodboard", "styles", "video-t2v", "video", "h3-video", "h3-photo", "music", "sfx"] },
+  { id: "create", apps: ["create-image", "cinema-studio", "cinema-video", "z-image", "moss-image", "nitrofusion2", "h3-video-int4", "h3-photo-int4", "kandinsky6-lite-int8", "music-ace15-local", "moodboard", "styles", "video-t2v", "video", "h3-video", "h3-photo", "music", "sfx"] },
   { id: "identity", apps: ["character", "character-3", "speak", "talking", "recast", "motion-transfer", "genjutsu", "dub", "character-swap", "face-swap"] },
-  { id: "camera", apps: ["camera-moves", "camera-copy", "reshoot", "reframe", "extend-video", "transitions", "angles", "shots", "zooms", "whats-next", "bullet-time-scene", "bullet-time-white", "bullet-time-splash"] },
+  { id: "camera", apps: ["camera-moves", "camera-copy", "reshoot", "reshoot-int4", "reframe", "extend-video", "extend-video-int4", "transitions", "angles", "shots", "zooms", "whats-next", "bullet-time-scene", "bullet-time-white", "bullet-time-splash"] },
   { id: "style", apps: ["relight", "style-reference", "mixed-media", "upscale", "upscale-video", "sdr-hdr", "smooth", "remove-bg", "video-remove-bg", "depth-map", "expand-image"] },
-  { id: "vfx", apps: ["effects", "morph", "edit", "inpaint", "vfx-clean-plate", "vfx-day-to-night", "vfx-water"] },
+  { id: "vfx", apps: ["effects", "morph", "edit", "qwen21-edit", "inpaint", "vfx-clean-plate", "vfx-day-to-night", "vfx-water"] },
   { id: "ads", apps: ["product-shot", "poster", "packshot", "macro-scene", "macro-product", "giant-product", "billboard", "graffiti-ad", "fridge-ad", "ugc-shot",
     "asmr-product", "chameleon", "magic-button", "truck-ad", "kick-ad", "volcano-ad"] },
   { id: "portraits", apps: ["ai-influencer", "ai-influencer-photo", "photodump", "headshot", "commercial-faces", "style-snap", "skin-enhancer", "outfit-vending", "glitter-sticker", "fashion-factory", "try-on", "outfit-swap", "outfit-shot"] },
@@ -44,8 +46,8 @@ export function categoryOf(id) {
 
 /** The video studio's three tabs, like a camera crew: shoot, fix, move. */
 export const VIDEO_TABS = [
-  { id: "create", apps: ["video", "cinema-video", "h3-video", "h3-photo", "effects", "morph", "video-t2v", "genjutsu", "speak", "talking", "dub", "transitions", "camera-moves"] },
-  { id: "edit", apps: ["recast", "mixed-media", "reframe", "extend-video", "vfx-clean-plate", "vfx-day-to-night", "vfx-water", "sdr-hdr", "upscale-video", "smooth", "reshoot", "video-remove-bg"] },
+  { id: "create", apps: ["video", "cinema-video", "h3-video", "h3-photo", "h3-video-int4", "h3-photo-int4", "kandinsky6-lite-int8", "effects", "morph", "video-t2v", "genjutsu", "speak", "talking", "dub", "transitions", "camera-moves"] },
+  { id: "edit", apps: ["recast", "mixed-media", "reframe", "extend-video", "vfx-clean-plate", "vfx-day-to-night", "vfx-water", "sdr-hdr", "upscale-video", "smooth", "reshoot", "reshoot-int4", "extend-video-int4", "video-remove-bg"] },
   { id: "motion", apps: ["motion-transfer", "camera-copy"] },
   { id: "templates", apps: ["behind-the-scenes", "asmr-product", "asmr-whisper", "asmr-host", "chameleon", "magic-button", "truck-ad", "kick-ad", "volcano-ad",
     "roller-coaster", "storm-creature", "cloud-surf", "mukbang", "melting-doodle", "rap-video", "idol", "bullet-time-scene", "bullet-time-white", "bullet-time-splash"] },
@@ -127,10 +129,11 @@ export function studioOf(app) {
 }
 
 const DEFAULT_APP = { image: "z-image", video: "video", audio: "music" };
+const CERTIFIED_DEFAULT = { image: "create-image", video: "kandinsky6-lite-int8", audio: "music-ace15-local" };
 export function lastAppFor(studio) {
   const id = store.get(`last.${studio}`);
   if (id && byId.has(id)) return id;
-  const fallback = DEFAULT_APP[studio];
+  const fallback = (certifiedOnly ? CERTIFIED_DEFAULT : DEFAULT_APP)[studio];
   if (byId.has(fallback)) return fallback;
   return apps.find((a) => studioOf(a) === studio)?.id ?? apps[0]?.id;
 }
@@ -279,6 +282,7 @@ export function promptInput(app) {
 
 /** Seconds the lab example took, as an estimate for the Generate button. */
 export function estimate(app) {
+  if (app.qualification) return { seconds: app.qualification.measured_seconds, gpu: "Cloud9" };
   const s = app.example?.seconds;
   return s ? { seconds: s, gpu: (app.example.gpu || "").split(",")[0] || "GPU" } : null;
 }
