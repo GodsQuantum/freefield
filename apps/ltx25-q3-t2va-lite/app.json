@@ -5,12 +5,12 @@
   "section": "video",
   "pack": "video-ltx25-q3-compact",
   "status": "ready",
-  "summary": "Vidéo + audio courte 1 s, 8 étapes, mono-étape sans upscale. Variante expérimentale très basse résolution ; la qualité doit être vérifiée.",
+  "summary": "LTX-2.5 Q3 audio/vidéo, 1,04 s, 8 étapes, basse résolution. Un seul encodage Gemma4 sur CPU. Non certifié.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "LTX-2.5 official T2VA template, single-stage only from SHA-verified native 43-node baseline; reused seed/condition path",
     "comfyui": "0.45.0",
-    "notes": "Unsloth UD-Q3_K_XL 12.000GB 4349-tensor complete SHA, jameriles Gemma4 W4A8 10.604GB SHA; deliberately 8-step single-stage at original first-stage half-resolution, 24fps/25frames, spatial tiled256 temporal16/4; no upscale or prompt enhancer, no claims of full two-stage image quality."
+    "notes": "Unsloth UD-Q3_K_XL 12.000GB 4349-tensor complete SHA, jameriles Gemma4 W4A8 10.604GB SHA; deliberately 8-step single-stage at original first-stage half-resolution, 24fps/25frames, spatial tiled256 temporal16/4; no upscale or prompt enhancer, no claims of full two-stage image quality. Revision 2026-11-24 after previous 30-node real CLI safety abort at PSI5.21 with 23.126GiB host RAM free before sampling: supported CLIPLoader device=cpu, duplicate negative CLIPTextEncode removed; LTXVConditioning receives shared positive output for both inputs at dual CFG video/audio=1. Native LTXAVDualCFGGuider equal scales delegates to CFGGuider, and cfg1 disregards the unconditional branch. 29 nodes (was30); distinct new GPU test required. Source no original model/weights changed."
   },
   "inputs": [
     {
@@ -88,7 +88,7 @@
       "commit": "6ea2651"
     }
   ],
-  "notes": "LTX-2.5 preview basse résolution, limité aux 25 images à 24 ips (1,04 s) et au format 16:9. Non certifié sur AMD gfx1103 à la création. Les choix originaux LTX INT8 restent inchangés; mode opt-in non exposé tant que génération CLI non passée.",
+  "notes": "LTX-2.5 preview basse résolution, limité aux 25 images à 24 ips (1,04 s) et au format 16:9. Non certifié sur AMD gfx1103 à la création. Les choix originaux LTX INT8 restent inchangés; mode opt-in non exposé tant que génération CLI non passée. CPU encoder & shared CFG=1 positive/negative eliminate duplicate Gemma4 pass; previous Q3 default CLIPLoader trial aborted before sampling. Not a successful qualification yet.",
   "test": {
     "prompt": "A small red ceramic robot slowly waving its right hand on a sunlit wooden table, subtle mechanical whirs and light ticking noises, cinematic close-up, smooth motion, realistic texture, a single steady shot.",
     "seed": 202611232250

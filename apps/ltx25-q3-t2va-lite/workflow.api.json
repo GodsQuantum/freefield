@@ -190,7 +190,7 @@
         0
       ],
       "negative": [
-        "405:373",
+        "405:364",
         0
       ],
       "frame_rate": [
@@ -266,19 +266,6 @@
     },
     "_meta": {
       "title": "Width"
-    }
-  },
-  "405:373": {
-    "class_type": "CLIPTextEncode",
-    "inputs": {
-      "clip": [
-        "405:387",
-        0
-      ],
-      "text": "pc game, console game, video game, cartoon, childish, ugly"
-    },
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
     }
   },
   "405:374": {
@@ -375,7 +362,7 @@
     "inputs": {
       "clip_name": "gemma4-12b-ltx-2.5-w4a8.safetensors",
       "type": "ltxv",
-      "device": "default"
+      "device": "cpu"
     },
     "_meta": {
       "title": "Load CLIP"

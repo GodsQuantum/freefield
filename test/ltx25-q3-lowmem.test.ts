@@ -14,7 +14,15 @@ test("LTX2.5 Q3: separate reproducible 8-step 25-frame opt-in first-stage audio/
   assert.equal(app.pack, "video-ltx25-q3-compact");
   assert.equal(problems.filter((p) => p.app === app.id).length, 0);
   assert.deepEqual(app.inputs.map((i) => i.id), ["prompt", "seed"]);
-  assert.equal(Object.keys(app.graph).length, 30);
+  assert.equal(Object.keys(app.graph).length, 29);
+  assert.equal(app.graph["405:387"].inputs.device, "cpu");
+  assert.deepEqual(app.graph["405:365"].inputs.positive, ["405:364", 0]);
+  assert.deepEqual(app.graph["405:365"].inputs.negative, ["405:364", 0]);
+  assert.equal(app.graph["405:373"], undefined);
+  assert.equal(app.graph["405:388"].inputs.video_cfg, 1);
+  assert.equal(app.graph["405:388"].inputs.audio_cfg, 1);
+  assert.equal(Object.values(app.graph).filter((n) => n.class_type === "CLIPTextEncode").length, 1);
+
   assert.equal(app.graph["405:344"].class_type, "SamplerCustomAdvanced");
   assert.equal(app.graph["405:384"].class_type, "UnetLoaderGGUF");
   assert.equal(app.graph["405:384"].inputs.unet_name, "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf");
