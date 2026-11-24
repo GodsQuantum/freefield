@@ -140,6 +140,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/coverage-moge-depth-20261119.json",
       "decision": "Existing real MoGe CLI success: depth_colored, detail2, 24.96s. Normals/detail6 not individually proven."
+    },
+    "image-background-removal": {
+      "selected": "remove-bg",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/03p-birefnet-image-real-cli-20261124.json",
+      "decision": "Existing BiRefNet production recipe actual CLI 31.18s, 768x1280 RGBA with visually verified correct silhouette, transparent background and retained subject. Native text-encoder device policy uses CPU under current low-VRAM profile; not a GPU acceleration claim. Library 20261124-141743162-f1e1 replayable."
     }
   },
   "challengers_unqualified": [
@@ -185,6 +191,15 @@
         "Freefield/ComfyUI/preflight/06k-ltx25-gemma4-q4-full-sha-stage-20261124.json",
         "validation/06u-ltx25-q3-gemma4-q4-gpu-native-split-20261124.json",
         "validation/06w-ltx25-q3-gemma4-q4-gpu-oneclick-20261124.json"
+      ]
+    },
+    {
+      "id": "ltx25-ud-q2-xl-nvme",
+      "reason": "Exact 9.500270976GB UD-Q2_K_XL on NVMe and public Gemma4 Q4, temporary scoped GPU-first profile/packed-row fix and sequential native loader. Actual one-click CLI SUCCESS 306.29s, 448x256 25f 1.041667s H264/AAC, 25 distinct decoded frames, min available 14.207GiB, max GTT 12.046GiB, PSI full 2.89%. Visual PASS_WITH_LIMITATION (weak prompt fidelity and motion artifacts), quiet audio. Not production-quality or broadly usable at this rate; experimental library only 20261124-141021640-6332. Profile/ops/node restored; no general LTX pack promotion. Do not repeat identical test.",
+      "evidence": "Freefield/ComfyUI/preflight/06za-ltx25-q2-448-real-video-audio-qa-20261124.json",
+      "additional_evidence": [
+        "validation/06z-ltx25-ud-q2-xl-nvme-gpu-oneclick-448-20261124.json",
+        "Freefield/ComfyUI/preflight/06x-ltx25-ud-q2-xl-nvme-stage-20261124.json"
       ]
     }
   ],
@@ -15835,5 +15850,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T14:14:42.644478+00:00"
+  "last_selection_review_utc": "2026-11-24T14:21:37.962424+00:00"
 }
