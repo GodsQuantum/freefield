@@ -260,6 +260,25 @@
       "id": "krea-style-reference-fidelity",
       "reason": "Existing E2E success 346.52s, red teapot/table/plant coherent but watercolor output despite photographic reference and requested photographic palette. Technical success does not establish reference fidelity; no new winner or model replacement.",
       "evidence": "validation/krea-style-reference-lazy-switch-e2e-halfmp-20261120.json"
+    },
+    {
+      "id": "recast-scail2-q3-umt5q4-tracker",
+      "reason": "17f 512x512 real native CLI aborted at67.42s during SAM3 tracking, min RAM9.904GiB GTT18.249GiB; Q3 weights fully SHA verified, not a model decode failure. Second distinct serial SAM3 384x384 test aborted at60.04s (5/17 tracking frames, min10.648GiB, GTT17.099GiB, PSI4.19%). All temporary runtime patches and profile restored. No video, no promotion. Do not repeat unchanged tracker.",
+      "evidence": "validation/09f-recast-scail2-serial-sam3-384-17f-20261124.json",
+      "additional_evidence": [
+        "validation/09d-recast-scail2-q3-umt5q4-17f-20261124.json",
+        "Freefield/ComfyUI/preflight/09d-recast-scail2-q3-stage-20261124.json",
+        "Freefield/ComfyUI/preflight/09f-recast-scail2-serial-sam3-384-17f-20261124-integration.json"
+      ]
+    },
+    {
+      "id": "character-swap-flux3-asymmetric",
+      "reason": "Actual 928x560 PNG in206.93s, 12/12 denoise, min RAM18.081GiB, peak PSI1.74%. Visual review FAIL: original person remains, second identity not transferred. Prior symmetric 0.625MP two-ref stopped after2/12. No promotion despite technical success. Distinct native Qwen2.1 multimodal candidate uses both refs in vision encoder.",
+      "evidence": "validation/09e-character-swap-asymmetric-ref-native-20261124.json",
+      "additional_evidence": [
+        "validation/09c-character-swap-tiled-native-cli-20261124.json",
+        "Freefield/ComfyUI/preflight/09g-character-swap-qwen21-two-ref-512-20261124-candidate.json"
+      ]
     }
   ],
   "recipes": {
@@ -15909,5 +15928,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T20:19:21.752088+00:00"
+  "last_selection_review_utc": "2026-11-24T22:43:39.579579+00:00"
 }
