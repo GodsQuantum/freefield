@@ -176,6 +176,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/09a-inpaint-flux3-current-native-cli-20261124.json",
       "decision": "Real 1024x1024 FLUX3 INT8 masked edit in 325.04s. Red to cobalt blue cup/saucer, visually coherent; coarse rectangular mask leaves slight transition. Outside expanded box unchanged 874588/874588 pixels. No changed runtime or workflow. Positive single scene with limitations."
+    },
+    "image-headshot": {
+      "selected": "headshot",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/09c-headshot-tiled-native-cli-20261124.json",
+      "decision": "Actual tiled 0.75MP/12 step FLUX3 INT8 portrait 264.49s, visual pass single scene. Previous 1MP/16 step full decode safety abort288.54s PSI6.62%; new PSI2.17%, min available18.32GiB. No runtime or guard changes."
     }
   },
   "challengers_unqualified": [
@@ -6875,7 +6881,7 @@
           "id": "7",
           "class_type": "KSampler",
           "inputs": {
-            "steps": 16,
+            "steps": 12,
             "cfg": 1,
             "sampler_name": "euler",
             "scheduler": "simple",
@@ -6887,7 +6893,7 @@
       "limits": [
         {
           "id": "steps",
-          "default": 16,
+          "default": 12,
           "min": 8,
           "max": 32
         }
@@ -15903,5 +15909,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T20:01:25.733302+00:00"
+  "last_selection_review_utc": "2026-11-24T20:19:21.752088+00:00"
 }

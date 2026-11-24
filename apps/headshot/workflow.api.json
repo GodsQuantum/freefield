@@ -62,7 +62,7 @@
         2
       ],
       "seed": 563228241303057,
-      "steps": 16,
+      "steps": 12,
       "cfg": 1,
       "sampler_name": "euler",
       "scheduler": "simple",
@@ -73,7 +73,7 @@
     }
   },
   "8": {
-    "class_type": "VAEDecode",
+    "class_type": "VAEDecodeTiled",
     "inputs": {
       "samples": [
         "7",
@@ -82,7 +82,11 @@
       "vae": [
         "3",
         0
-      ]
+      ],
+      "tile_size": 384,
+      "overlap": 64,
+      "temporal_size": 64,
+      "temporal_overlap": 8
     },
     "_meta": {
       "title": "VAE Decode"
@@ -130,7 +134,7 @@
         0
       ],
       "resolution": "resize",
-      "resolution.megapixels": 1
+      "resolution.megapixels": 0.75
     },
     "_meta": {
       "title": "Set Reference Multi Latent"

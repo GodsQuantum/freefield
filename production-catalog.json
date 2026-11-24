@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261124-certified-v2",
+  "revision": "cloud9-20261124-certified-v3",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -290,6 +290,18 @@
       "review": "limited",
       "defaults": {
         "steps": 16
+      }
+    },
+    "headshot": {
+      "evidence": "validation/09c-headshot-tiled-native-cli-20261124.json",
+      "evidence_sha256": "af8de8d437a7ff0e31f7413e9c8cdb1bc6c3b8cda5374ea402291de5b80ff169",
+      "app_sha256": "5d016984298dc28d370310bdf086ceb977dde9c79462de21e7fb97b9cebe11c9",
+      "workflow_sha256": "b6e44d5e60f3a6de291e258d952ec88e09939aba4996f7274617deec61e15903",
+      "measured_seconds": 264.49,
+      "scope": "672 x 1136 realistic portrait, 12 steps, tiled decode",
+      "review": "visual",
+      "defaults": {
+        "steps": 12
       }
     }
   }
