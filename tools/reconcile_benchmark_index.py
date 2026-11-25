@@ -232,6 +232,14 @@ def media_evidence(d, source, stem):
             continue
         raw = obj.get("path")
         path = Path(raw) if isinstance(raw, str) and raw else None
+        # Native benchmark receipts also declare a plain output basename.
+        # Resolve it inside the corresponding validation run, never arbitrary cwd.
+        if path is not None and not path.is_absolute() and path.name == raw:
+            for root in (Path("/srv/lxc/ia-studio/appdata/freefield/out/validation") / stem,
+                         Path("/srv/lxc/ia-compute/data/repos/ComfyUI/output/freefield/validation") / stem):
+                if (root / path.name).is_file():
+                    path = root / path.name
+                    break
         # Early web benchmarks persist a stable authenticated Library URL,
         # not an absolute media path. Resolve to the existing mounted history
         # on this host rather than treating their MP3 as unverified.
