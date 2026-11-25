@@ -13,6 +13,8 @@ import comfy.model_management as mm
 
 paths, extensions=folder_paths.folder_names_and_paths["audio_encoders"]
 folder_paths.folder_names_and_paths["audio_encoders"]=(paths,set(extensions)|{".gguf"})
+# A previous node can populate the folder inventory before GGUF registration.
+folder_paths.filename_list_cache.pop("audio_encoders", None)
 NAMES=("zonos3-backbone-ptq.gguf","zonos3-spk-encoder.gguf","zonos3-zac-full-mr.gguf")
 class ZonosVoiceClone:
     @classmethod
