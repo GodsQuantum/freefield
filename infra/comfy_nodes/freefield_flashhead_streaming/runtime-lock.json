@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "engine_repo": "https://github.com/atfa/SoulX-FlashHead-ROCm",
+  "engine_commit": "32b98ccf4f27e4d2e6baed6235b29ef5960f1579",
+  "patch_sha256": "b962e13c5db63a732387537abc27b82fa5ecf221ac99f8f6c488ec649ee498c4",
+  "adapter_sha256": "ccf083530f646c0b01124827e1305a3256df4e47185b6d33b3051421cc1c873d",
+  "tested_runtime": {
+    "python": "3.14.8",
+    "torch": "2.14.1+rocm7.14",
+    "transformers": "5.16.1",
+    "loguru": "0.8.0 (isolated overlay)"
+  },
+  "files": [
+    {
+      "repo": "Soul-AILab/SoulX-FlashHead-1_3B",
+      "revision": "74d81686a7bd750b276ec1ade295bc4077c5868a",
+      "file": "Model_Lite/config.json",
+      "relative_path": "SoulX-FlashHead-1_3B/Model_Lite/config.json",
+      "bytes": 357,
+      "sha256": "2ac56ba975a80da49f8ef1b27bfe740be473a1b250fced52f8f1df9ac101bc2c"
+    },
+    {
+      "repo": "Soul-AILab/SoulX-FlashHead-1_3B",
+      "revision": "74d81686a7bd750b276ec1ade295bc4077c5868a",
+      "file": "VAE_LTX/config.json",
+      "relative_path": "SoulX-FlashHead-1_3B/VAE_LTX/config.json",
+      "bytes": 501,
+      "sha256": "e8f12ad5305b1508f6e456797d48ab8e9fdd091c686ccf814a293ee96ce89dbb"
+    },
+    {
+      "repo": "Soul-AILab/SoulX-FlashHead-1_3B",
+      "revision": "74d81686a7bd750b276ec1ade295bc4077c5868a",
+      "file": "VAE_LTX/diffusion_pytorch_model.safetensors",
+      "relative_path": "SoulX-FlashHead-1_3B/VAE_LTX/diffusion_pytorch_model.safetensors",
+      "bytes": 1676798532,
+      "sha256": "265ca87cb5dff5e37f924286e957324e282fe7710a952a7dafc0df43883e2010"
+    },
+    {
+      "repo": "Soul-AILab/SoulX-FlashHead-1_3B",
+      "revision": "74d81686a7bd750b276ec1ade295bc4077c5868a",
+      "file": "Model_Lite/diffusion_pytorch_model.safetensors",
+      "relative_path": "SoulX-FlashHead-1_3B/Model_Lite/diffusion_pytorch_model.safetensors",
+      "bytes": 6107542048,
+      "sha256": "aaf1cde6e80ca23f740aae236c47954249f65b151db133cc0f77d3a138ccdf6e"
+    },
+    {
+      "repo": "facebook/wav2vec2-base-960h",
+      "revision": "22aad52d435eb6dbaf354bdad9b0da84ce7d6156",
+      "file": "feature_extractor_config.json",
+      "relative_path": "wav2vec2-base-960h/feature_extractor_config.json",
+      "bytes": 158,
+      "sha256": "d3de0c797bf9b65f90bc65c30cb7b303ebeda341f6fc80af33628c4b26b95632"
+    },
+    {
+      "repo": "facebook/wav2vec2-base-960h",
+      "revision": "22aad52d435eb6dbaf354bdad9b0da84ce7d6156",
+      "file": "preprocessor_config.json",
+      "relative_path": "wav2vec2-base-960h/preprocessor_config.json",
+      "bytes": 159,
+      "sha256": "b225d617c025463b9e157e06afea8b90dc7078fc70b013c533328423e0486b4a"
+    },
+    {
+      "repo": "facebook/wav2vec2-base-960h",
+      "revision": "22aad52d435eb6dbaf354bdad9b0da84ce7d6156",
+      "file": "config.json",
+      "relative_path": "wav2vec2-base-960h/config.json",
+      "bytes": 1596,
+      "sha256": "d3ec255c063d9f95057b553b19c20135b259875834a4fe9deb218a6be25b4cf3"
+    },
+    {
+      "repo": "facebook/wav2vec2-base-960h",
+      "revision": "22aad52d435eb6dbaf354bdad9b0da84ce7d6156",
+      "file": "model.safetensors",
+      "relative_path": "wav2vec2-base-960h/model.safetensors",
+      "bytes": 377607901,
+      "sha256": "8aa76ab2243c81747a1f832954586bc566090c83a0ac167df6f31f0fa917d74a"
+    }
+  ],
+  "aliases": [
+    {
+      "directory": "diffusion_models",
+      "name": "soulx-flashhead-lite-dit.safetensors",
+      "relative_path": "SoulX-FlashHead-1_3B/Model_Lite/diffusion_pytorch_model.safetensors"
+    },
+    {
+      "directory": "vae",
+      "name": "soulx-flashhead-lite-vae-ltx.safetensors",
+      "relative_path": "SoulX-FlashHead-1_3B/VAE_LTX/diffusion_pytorch_model.safetensors"
+    },
+    {
+      "directory": "audio_encoders",
+      "name": "soulx-flashhead-wav2vec2-base-960h.safetensors",
+      "relative_path": "wav2vec2-base-960h/model.safetensors"
+    }
+  ]
+}

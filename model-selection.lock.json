@@ -188,6 +188,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/09g-character-swap-qwen21-two-ref-512-20261124.json",
       "decision": "Actual two-reference Qwen Image 2.1 Turbo Q4 512px native vision conditioning; 672x384 correct subject replacement, 439.59s; peak PSI1.96%, min available16.751GiB. Rejected Flux3 asymmetric result that kept original subject. Latest official Qwen Image family checked 2026-11-24. Original general-purpose Qwen edit unchanged."
+    },
+    "video-talking-avatar": {
+      "selected": "talking",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/09j-talking-flashhead-native-45s-e2e-20261125.json",
+      "decision": "SoulX-FlashHead Lite 1.3B ROCm pinned upstream streaming, 33-frame context, 9 anchor frames, 24 new frames per window, 4 steps, bounded audio cache and file-backed video. Actual 45s/1125 unique frames/512x512/25fps in 583.44s, full decode PASS, audio PCM corr 0.999177, sampled visual continuity PASS with limitation, min available13.177GiB, max GTT13.979GiB, PSI2.61%. Previous LTX Talking unqualified, retained in Git and rollback image. No parallel GPU, no global runtime or guard changes. Limit 45s until longer tests."
     }
   },
   "challengers_unqualified": [
@@ -13625,208 +13631,45 @@
     },
     "talking": {
       "status": "ready",
-      "pack": "video-ltx25",
+      "pack": "video-flashhead-lite",
       "models": [
         {
+          "dir": "audio_encoders",
+          "file": "model.safetensors",
+          "repo": "facebook/wav2vec2-base-960h",
+          "phase": "encode",
+          "optional": false,
+          "install_name": "soulx-flashhead-wav2vec2-base-960h.safetensors"
+        },
+        {
           "dir": "diffusion_models",
-          "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
-          "repo": "Lightricks/LTX-2.5",
+          "file": "Model_Lite/diffusion_pytorch_model.safetensors",
+          "repo": "Soul-AILab/SoulX-FlashHead-1_3B",
           "phase": "denoise",
-          "optional": false
-        },
-        {
-          "dir": "latent_upscale_models",
-          "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
-          "repo": "Lightricks/LTX-2.5",
-          "phase": "aux",
-          "optional": false
-        },
-        {
-          "dir": "loras",
-          "file": "LTX-2.3-22b-AV-LoRA-talking-head-v1.safetensors",
-          "repo": "elix3r/LTX-2.3-22b-AV-LoRA-talking-head",
-          "phase": "denoise",
-          "optional": true
-        },
-        {
-          "dir": "text_encoders",
-          "file": "text_encoders/gemma4_e2b_it_int8_convrot.safetensors",
-          "repo": "Comfy-Org/gemma-4",
-          "phase": "encode",
-          "optional": true
-        },
-        {
-          "dir": "text_encoders",
-          "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
-          "repo": "Lightricks/LTX-2.5",
-          "phase": "encode",
-          "optional": false
+          "optional": false,
+          "install_name": "soulx-flashhead-lite-dit.safetensors"
         },
         {
           "dir": "vae",
-          "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
-          "repo": "Lightricks/LTX-2.5",
+          "file": "VAE_LTX/diffusion_pytorch_model.safetensors",
+          "repo": "Soul-AILab/SoulX-FlashHead-1_3B",
           "phase": "decode",
-          "optional": false
-        },
-        {
-          "dir": "vae",
-          "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
-          "repo": "Lightricks/LTX-2.5",
-          "phase": "decode",
-          "optional": false
+          "optional": false,
+          "install_name": "soulx-flashhead-lite-vae-ltx.safetensors"
         }
       ],
       "workflow": [
         {
-          "id": "5514:3059",
-          "class_type": "EmptyLTXVLatentVideo",
+          "id": "3",
+          "class_type": "FreefieldFlashHeadStreaming",
           "inputs": {
-            "width": 960,
-            "height": 544
-          }
-        },
-        {
-          "id": "5514:6001",
-          "class_type": "TrimAudioDuration",
-          "inputs": {
-            "duration": [
-              "5512",
-              0
-            ]
-          }
-        },
-        {
-          "id": "5514:6003",
-          "class_type": "SolidMask",
-          "inputs": {
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "id": "5516:4828",
-          "class_type": "CFGGuider",
-          "inputs": {
-            "cfg": 1
-          }
-        },
-        {
-          "id": "5516:4829",
-          "class_type": "SamplerCustomAdvanced",
-          "inputs": {
-            "sigmas": [
-              "5516:4984",
-              0
-            ]
-          }
-        },
-        {
-          "id": "5516:4831",
-          "class_type": "KSamplerSelect",
-          "inputs": {
-            "sampler_name": "euler_ancestral"
-          }
-        },
-        {
-          "id": "5516:4984",
-          "class_type": "ManualSigmas",
-          "inputs": {
-            "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0"
-          }
-        },
-        {
-          "id": "5517:4964",
-          "class_type": "CFGGuider",
-          "inputs": {
-            "cfg": 1
-          }
-        },
-        {
-          "id": "5517:4971",
-          "class_type": "SamplerCustomAdvanced",
-          "inputs": {
-            "sigmas": [
-              "5517:4985",
-              0
-            ]
-          }
-        },
-        {
-          "id": "5517:4976",
-          "class_type": "KSamplerSelect",
-          "inputs": {
-            "sampler_name": "euler_ancestral"
-          }
-        },
-        {
-          "id": "5517:4985",
-          "class_type": "ManualSigmas",
-          "inputs": {
-            "sigmas": "0.909375, 0.725, 0.421875, 0.0"
-          }
-        },
-        {
-          "id": "5517:6005",
-          "class_type": "SolidMask",
-          "inputs": {
-            "width": 1024,
-            "height": 1024
-          }
-        },
-        {
-          "id": "5575:5569",
-          "class_type": "UNETLoader",
-          "inputs": {
-            "unet_name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
-            "weight_dtype": "default"
-          }
-        },
-        {
-          "id": "5575:5570",
-          "class_type": "VAELoader",
-          "inputs": {
-            "vae_name": "ltx-2.5-audio-vae-bf16.safetensors"
-          }
-        },
-        {
-          "id": "5575:5571",
-          "class_type": "VAELoader",
-          "inputs": {
-            "vae_name": "ltx-2.5-video-vae-bf16.safetensors"
-          }
-        },
-        {
-          "id": "5575:5572",
-          "class_type": "CLIPLoader",
-          "inputs": {
-            "clip_name": "gemma4_e2b_it_int8_convrot.safetensors"
-          }
-        },
-        {
-          "id": "5575:5574",
-          "class_type": "CLIPLoader",
-          "inputs": {
-            "clip_name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors"
-          }
-        },
-        {
-          "id": "5575:5577",
-          "class_type": "LatentUpscaleModelLoader",
-          "inputs": {
-            "model_name": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors"
+            "model_name": "soulx-flashhead-lite-dit.safetensors",
+            "vae_name": "soulx-flashhead-lite-vae-ltx.safetensors"
           }
         }
       ],
       "model_overrides": [],
-      "limits": [
-        {
-          "id": "duration",
-          "default": 5,
-          "min": 2,
-          "max": 10
-        }
-      ]
+      "limits": []
     },
     "transitions": {
       "status": "ready",

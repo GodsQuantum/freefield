@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261124-certified-v4",
+  "revision": "cloud9-20261125-certified-v5",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -312,6 +312,16 @@
       "measured_seconds": 439.59,
       "scope": "Real two-reference subject replacement, Qwen Image 2.1 Turbo Q4, 672 x 384; single visually reviewed scene, 512px preview",
       "review": "visual",
+      "defaults": {}
+    },
+    "talking": {
+      "evidence": "validation/09j-talking-flashhead-native-45s-e2e-20261125.json",
+      "evidence_sha256": "b93807305e3378a4e98303e754c36ae23c7d3d00fc3bfd441a109f9663991b93",
+      "app_sha256": "2704f7d715fa0a083ecd82a6c2a8c6a44bfe17f3afb07c55e494099c568f880b",
+      "workflow_sha256": "21813bb91eceb91f7e18a36b5874b4bfc94538855b7c11990d00da0926132b71",
+      "measured_seconds": 583.44,
+      "scope": "Real 45-second audio-driven portrait animation, 512x512 at 25 fps; single reviewed scene, sampled continuity and original audio verified; square crop; phoneme-level lip sync not measured",
+      "review": "limited",
       "defaults": {}
     }
   }

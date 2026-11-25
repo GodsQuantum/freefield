@@ -24,7 +24,6 @@
     "sdr-hdr",
     "speak",
     "storm-creature",
-    "talking",
     "transitions",
     "truck-ad",
     "vfx-clean-plate",
@@ -34,7 +33,7 @@
     "video-t2v",
     "volcano-ad"
   ],
-  "download_gb": 66.03,
+  "download_gb": 65.6,
   "needs_hf_token": true,
   "custom_nodes": [
     {
@@ -93,7 +92,6 @@
         "sdr-hdr",
         "speak",
         "storm-creature",
-        "talking",
         "transitions",
         "truck-ad",
         "vfx-clean-plate",
@@ -139,22 +137,10 @@
         "rap-video",
         "speak",
         "storm-creature",
-        "talking",
         "truck-ad",
         "video",
         "video-t2v"
       ]
-    },
-    {
-      "repo": "elix3r/LTX-2.3-22b-AV-LoRA-talking-head",
-      "file": "LTX-2.3-22b-AV-LoRA-talking-head-v1.safetensors",
-      "dir": "loras",
-      "gb": 0.43,
-      "name": "LTX-2.3-22b-AV-LoRA-talking-head-v1.safetensors",
-      "gated": false,
-      "license": "OpenRAIL",
-      "used_by": [],
-      "optional": true
     },
     {
       "repo": "Cseti/LTX2.3-22B_IC-LoRA-Cameraman_v2",
@@ -312,7 +298,6 @@
         "roller-coaster",
         "speak",
         "storm-creature",
-        "talking",
         "transitions",
         "truck-ad",
         "vfx-clean-plate",
@@ -402,7 +387,6 @@
         "sdr-hdr",
         "speak",
         "storm-creature",
-        "talking",
         "transitions",
         "truck-ad",
         "vfx-clean-plate",
@@ -445,7 +429,6 @@
         "sdr-hdr",
         "speak",
         "storm-creature",
-        "talking",
         "transitions",
         "truck-ad",
         "vfx-clean-plate",

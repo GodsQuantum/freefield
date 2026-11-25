@@ -152,6 +152,13 @@
     "download_gb": 5.13,
     "needs_hf_token": false
   },
+  "video-flashhead-lite": {
+    "apps": [
+      "talking"
+    ],
+    "download_gb": 8.16,
+    "needs_hf_token": false
+  },
   "video-h3": {
     "apps": [
       "extend-video",
@@ -205,7 +212,6 @@
       "sdr-hdr",
       "speak",
       "storm-creature",
-      "talking",
       "transitions",
       "truck-ad",
       "vfx-clean-plate",
@@ -215,7 +221,7 @@
       "video-t2v",
       "volcano-ad"
     ],
-    "download_gb": 66.03,
+    "download_gb": 65.6,
     "needs_hf_token": true
   },
   "video-ltx25-q3-compact": {

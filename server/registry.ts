@@ -215,7 +215,7 @@ function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]
       !part || part === "." || part === "..")) {
       problems.push({ app: app.id, severity, message: "Unsafe model install_name: " + m.install_name });
     }
-    const name = basename(m.file);
+    const name = basename(m.install_name ?? m.file);
     // ComfyUI-GGUF implicitly loads the required Qwen3-VL mmproj vision
     // tower matching the CLIPLoaderGGUF text encoder, with no separate node.
     const implicitVisionTower = name.startsWith("mmproj-") && name.endsWith("-f16.gguf")
