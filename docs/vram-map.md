@@ -89,7 +89,9 @@ On an 80 GB H100, ComfyUI can keep models from earlier phases loaded, so measure
 | `music` | ready | 11.5 GB | encode 9.2 GB | minimax_music3_text_encoder_pruned_int8_convrot.safetensors (9.2) | fits whole | L4 / A10G (24 GB) | not measured |
 | `character-swap` | ready | 14.2 GB | encode 9.3 GB | qwen3vl_8b_int8_convrot.safetensors (9.4) | fits whole | L4 / A10G (24 GB) | 11.9 GB (H100) |
 | `qwen21-edit` | ready | 14.2 GB | encode 9.3 GB | qwen3vl_8b_int8_convrot.safetensors (9.4) | fits whole | L4 / A10G (24 GB) | not measured |
+| `qwen21-edit-cfg1` | ready | 14.2 GB | encode 9.3 GB | qwen3vl_8b_int8_convrot.safetensors (9.4) | fits whole | L4 / A10G (24 GB) | not measured |
 | `recast` | ready | 17.0 GB | denoise 10.1 GB | SCAIL-2-Q3_K_M.gguf (8.1) | fits whole | L4 / A10G (24 GB) | 30.6 GB (L40S) |
+| `recast-animate-29f` | ready | 17.0 GB | denoise 10.1 GB | SCAIL-2-Q3_K_M.gguf (8.1) | fits whole | L4 / A10G (24 GB) | not measured |
 | `recast-animate-preview` | ready | 17.0 GB | denoise 10.1 GB | SCAIL-2-Q3_K_M.gguf (8.1) | fits whole | L4 / A10G (24 GB) | not measured |
 | `sfx` | ready | 10.4 GB (+6.8 optional) | encode 10.4 GB | stable_audio_3_medium.safetensors (9.2) | fits whole | L4 / A10G (24 GB) | 9.2 GB (L40S) |
 | `create-image` | ready | 17.8 GB | encode 11.6 GB | qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors (6.7) | fits whole | L4 / A10G (24 GB) | 15.4 GB (L40S) |

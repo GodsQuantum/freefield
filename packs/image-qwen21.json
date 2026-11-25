@@ -2,7 +2,8 @@
   "pack": "image-qwen21",
   "apps": [
     "character-swap",
-    "qwen21-edit"
+    "qwen21-edit",
+    "qwen21-edit-cfg1"
   ],
   "download_gb": 14.23,
   "needs_hf_token": false,
@@ -18,7 +19,8 @@
       "license": null,
       "used_by": [
         "character-swap",
-        "qwen21-edit"
+        "qwen21-edit",
+        "qwen21-edit-cfg1"
       ]
     },
     {
@@ -31,7 +33,8 @@
       "license": null,
       "used_by": [
         "character-swap",
-        "qwen21-edit"
+        "qwen21-edit",
+        "qwen21-edit-cfg1"
       ]
     },
     {
@@ -44,7 +47,8 @@
       "license": null,
       "used_by": [
         "character-swap",
-        "qwen21-edit"
+        "qwen21-edit",
+        "qwen21-edit-cfg1"
       ]
     }
   ]

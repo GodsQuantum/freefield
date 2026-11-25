@@ -142,7 +142,8 @@
   "image-qwen21": {
     "apps": [
       "character-swap",
-      "qwen21-edit"
+      "qwen21-edit",
+      "qwen21-edit-cfg1"
     ],
     "download_gb": 14.23,
     "needs_hf_token": false
@@ -255,6 +256,7 @@
   "video-scail": {
     "apps": [
       "recast",
+      "recast-animate-29f",
       "recast-animate-preview"
     ],
     "download_gb": 16.99,

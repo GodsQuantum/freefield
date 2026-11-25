@@ -6,8 +6,8 @@ import {resolveValues} from "../server/runner.ts";
 const {canAttempt,nextTargets,referenceSettings,restoreReference}=await import(new URL("../web/js/quality-profiles.js",import.meta.url).href);
 const c=certifiedCatalog(repoRoot(),loadRegistry().apps);
 const apps=c.apps.map(a=>({...a,runnable:true,qualification:c.proofs.get(a.id)}));
-test("all 32 reference profiles resolve to valid technical inputs and preserve creative work",()=>{
-  assert.equal(apps.length,32);
+test("all 34 reference profiles resolve to valid technical inputs and preserve creative work",()=>{
+  assert.equal(apps.length,34);
   for(const a of apps){
     assert.ok(a.qualification?.guidance,a.id);
     const values={prompt:"keep me",seed:1234,portrait:"my portrait",audio:"my audio",reference:"my reference"};

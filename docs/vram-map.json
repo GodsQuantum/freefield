@@ -2005,6 +2005,32 @@
       "measured_on": null
     },
     {
+      "id": "qwen21-edit-cfg1",
+      "name": "Qwen 2.1 — édition CFG 1 (mémoire optimisée)",
+      "section": "image",
+      "pack": "image-qwen21",
+      "status": "ready",
+      "whole_gb": 14.23,
+      "phases_gb": {
+        "encode": 9.35,
+        "denoise": 4.2,
+        "denoise2": 0.0,
+        "decode": 0.68,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 9.35,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen3vl_8b_int8_convrot.safetensors",
+        "gb": 9.351
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
       "id": "recast",
       "name": "Recast — aperçu remplacement vidéo",
       "section": "video",
@@ -2029,6 +2055,32 @@
       "modal_gpu": "L4 / A10G (24 GB)",
       "measured_peak_gb": 30.57,
       "measured_on": "L40S · 20261020-162214-l40s"
+    },
+    {
+      "id": "recast-animate-29f",
+      "name": "Recast — animation étendue (29 images)",
+      "section": "video",
+      "pack": "video-scail",
+      "status": "ready",
+      "whole_gb": 16.99,
+      "phases_gb": {
+        "encode": 4.92,
+        "denoise": 10.08,
+        "denoise2": 0.0,
+        "decode": 0.25,
+        "aux": 1.75
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 10.08,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "SCAIL-2-Q3_K_M.gguf",
+        "gb": 8.108662432
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
     },
     {
       "id": "recast-animate-preview",

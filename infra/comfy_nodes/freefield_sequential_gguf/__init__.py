@@ -397,3 +397,119 @@ class FreefieldSequentialGGUFBounded(FreefieldSequentialGGUF):
 NODE_CLASS_MAPPINGS["FreefieldLTXStatsUpscale"] = FreefieldLTXStatsUpscale
 NODE_CLASS_MAPPINGS["FreefieldSequentialVideoDecode"] = FreefieldSequentialVideoDecode
 NODE_CLASS_MAPPINGS["FreefieldSequentialGGUFBounded"] = FreefieldSequentialGGUFBounded
+
+
+class FreefieldQwen21Sequential:
+    """Use native Qwen conditioning and release its encoder before GGUF diffusion."""
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"clip_name": (folder_paths.get_filename_list("text_encoders"),), "unet_name": (folder_paths.get_filename_list("unet_gguf"),), "vae": ("VAE",), "image_1": ("IMAGE",), "prompt": ("STRING", {"multiline": True}), "negative_prompt": ("STRING", {"multiline": True}), "resolution": ("INT", {"min": 0, "max": 4096, "step": 32, "default": 768})}, "optional": {"image_2": ("IMAGE",)}}
+    RETURN_TYPES = ("CONDITIONING", "CONDITIONING", "LATENT", "MODEL")
+    FUNCTION = "encode"
+    CATEGORY = "freefield/loaders"
+    def encode(self, clip_name, unet_name, vae, image_1, prompt, negative_prompt, resolution, image_2=None):
+        from comfy_extras.nodes_qwen import TextEncodeQwenImage21
+        dev = mm.get_torch_device()
+        if dev.type != "cuda":
+            raise RuntimeError("FreefieldQwen21Sequential requires GPU")
+        _release()
+        clip = None
+        try:
+            with torch.inference_mode():
+                clip = comfy.sd.load_clip(ckpt_paths=[folder_paths.get_full_path_or_raise("text_encoders", clip_name)], embedding_directory=folder_paths.get_folder_paths("embeddings"), clip_type=comfy.sd.CLIPType.QWEN_IMAGE, model_options={"initial_device": torch.device("cpu"), "load_device": dev, "offload_device": torch.device("cpu")}, disable_dynamic=True)
+                if clip.patcher.load_device.type != "cuda":
+                    raise RuntimeError("Qwen native encoder not assigned to GPU")
+                refs = (weakref.ref(clip.cond_stage_model), weakref.ref(clip.patcher))
+                images = {"image_1": image_1}
+                if image_2 is not None:
+                    images["image_2"] = image_2
+                pos, neg, latent = TextEncodeQwenImage21.execute(clip, prompt, negative_prompt, vae, resolution, images).result
+                torch.cuda.synchronize(dev)
+        finally:
+            del clip
+            _release()
+        if any(ref() is not None for ref in refs):
+            raise RuntimeError("Qwen encoder retained; refusing overlapping diffusion allocation")
+        logging.info("Freefield Qwen native encoder released before diffusion: %d GPU bytes", torch.cuda.memory_allocated(dev))
+        model = nodes.NODE_CLASS_MAPPINGS["UnetLoaderGGUF"]().load_unet(unet_name)[0]
+        return pos, neg, latent, _bound_diffusion_residency(model)
+
+
+class FreefieldQwen21SequentialCPU(FreefieldQwen21Sequential):
+    """Use native Qwen conditioning and release its encoder before GGUF diffusion."""
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"clip_name": (folder_paths.get_filename_list("text_encoders"),), "unet_name": (folder_paths.get_filename_list("unet_gguf"),), "vae": ("VAE",), "image_1": ("IMAGE",), "prompt": ("STRING", {"multiline": True}), "negative_prompt": ("STRING", {"multiline": True}), "resolution": ("INT", {"min": 0, "max": 4096, "step": 32, "default": 768})}, "optional": {"image_2": ("IMAGE",)}}
+    RETURN_TYPES = ("CONDITIONING", "CONDITIONING", "LATENT", "MODEL")
+    FUNCTION = "encode"
+    CATEGORY = "freefield/loaders"
+    def encode(self, clip_name, unet_name, vae, image_1, prompt, negative_prompt, resolution, image_2=None):
+        from comfy_extras.nodes_qwen import TextEncodeQwenImage21
+        dev = mm.get_torch_device()
+        if dev.type != "cuda":
+            raise RuntimeError("FreefieldQwen21Sequential requires GPU")
+        _release()
+        clip = None
+        try:
+            with torch.inference_mode():
+                clip = comfy.sd.load_clip(ckpt_paths=[folder_paths.get_full_path_or_raise("text_encoders", clip_name)], embedding_directory=folder_paths.get_folder_paths("embeddings"), clip_type=comfy.sd.CLIPType.QWEN_IMAGE, model_options={"initial_device": torch.device("cpu"), "load_device": torch.device("cpu"), "offload_device": torch.device("cpu")}, disable_dynamic=True)
+                if clip.patcher.load_device.type != "cpu":
+                    raise RuntimeError("Qwen native encoder not assigned to CPU")
+                refs = (weakref.ref(clip.cond_stage_model), weakref.ref(clip.patcher))
+                images = {"image_1": image_1}
+                if image_2 is not None:
+                    images["image_2"] = image_2
+                pos, neg, latent = TextEncodeQwenImage21.execute(clip, prompt, negative_prompt, vae, resolution, images).result
+                torch.cuda.synchronize(dev)
+        finally:
+            del clip
+            _release()
+        if any(ref() is not None for ref in refs):
+            raise RuntimeError("Qwen encoder retained; refusing overlapping diffusion allocation")
+        logging.info("Freefield Qwen native encoder released before diffusion: %d GPU bytes", torch.cuda.memory_allocated(dev))
+        model = nodes.NODE_CLASS_MAPPINGS["UnetLoaderGGUF"]().load_unet(unet_name)[0]
+        return pos, neg, latent, _bound_diffusion_residency(model)
+
+
+class FreefieldSAM3BoundedDetect:
+    """Use native single-image SAM detection in bounded batches, preserving its union masks."""
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"model": ("MODEL",), "image": ("IMAGE",), "conditioning": ("CONDITIONING",), "threshold": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1.0}), "refine_iterations": ("INT", {"default": 0, "min": 0, "max": 5}), "individual_masks": ("BOOLEAN", {"default": False})}}
+    RETURN_TYPES = ("MASK",)
+    FUNCTION = "detect"
+    CATEGORY = "freefield/video"
+    def detect(self, model, image, conditioning, threshold, refine_iterations, individual_masks):
+        from comfy_extras.nodes_sam3 import SAM3_Detect
+        if individual_masks or not 1 <= len(image) <= 81:
+            raise ValueError("Bounded single-subject union-mask detection requires 1-81 frames")
+        masks = []
+        for first in range(0, len(image), 4):
+            mm.throw_exception_if_processing_interrupted()
+            part = image[first:first+4]
+            m = SAM3_Detect.execute(model, part, conditioning=conditioning, threshold=threshold, refine_iterations=refine_iterations, individual_masks=False).result[0]
+            if m.shape[0] != len(part):
+                raise RuntimeError("SAM mask frame count mismatch")
+            masks.append(m.to(mm.intermediate_device()))
+        return (torch.cat(masks, dim=0),)
+
+
+class FreefieldVAEDecodeRelease:
+    """Release prior diffusion residency before native tiled decode, preserving VAE settings."""
+    @classmethod
+    def INPUT_TYPES(cls):
+        return nodes.VAEDecodeTiled.INPUT_TYPES()
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "decode"
+    CATEGORY = "freefield/video"
+    def decode(self, samples, vae, tile_size, overlap, temporal_size, temporal_overlap):
+        _release()
+        logging.info("Freefield Recast diffusion released before native tiled decode")
+        try:
+            return nodes.VAEDecodeTiled().decode(vae, samples, tile_size, overlap, temporal_size, temporal_overlap)
+        finally:
+            _release()
+
+NODE_CLASS_MAPPINGS["FreefieldQwen21SequentialCPU"] = FreefieldQwen21SequentialCPU
+NODE_CLASS_MAPPINGS["FreefieldSAM3BoundedDetect"] = FreefieldSAM3BoundedDetect
+NODE_CLASS_MAPPINGS["FreefieldVAEDecodeRelease"] = FreefieldVAEDecodeRelease

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v13.1-guidance",
+  "revision": "cloud9-20261125-certified-v14-recast29-qwen-cfg1",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -38,7 +38,7 @@
       "reference_settings": {
         "resolution": 768
       },
-      "guidance": "Décrire la modification et ce qui doit rester identique. Le profil de référence Turbo 768 px à CFG 8 est validé. Le CFG 1 upstream reste un profil distinct à qualifier localement."
+      "guidance": "Décrire la modification et ce qui doit rester identique. Profil de référence 768 px à CFG 8 validé. Le profil distinct Qwen 2.1 CFG 1 utilise le même modèle avec encodeur séquentiel et une empreinte mémoire mesurée inférieure."
     },
     "angles": {
       "evidence": "validation/qwen2511-angles-native-subquad-cli1024-20261119.json",
@@ -520,6 +520,37 @@
       "defaults": {},
       "reference_settings": {},
       "guidance": "Mode qualité lent : un plan unique, une action simple, caméra stable. 896 × 512, 25 images/24 ips, 1,04 s ; environ 19 min 31 s sur le test Cloud9. Pour un aperçu rapide utiliser LTX 448 × 256."
+    },
+    "recast-animate-29f": {
+      "evidence": "validation/10p-recast-native-two-window-bounded-20261125.json",
+      "evidence_sha256": "dbdce053c3b16a1aa74fe82f4e55b09af8c8bd4ebd477ec8d1136b165e02cc8b",
+      "app_sha256": "b02a08b11c55a7a60adac09137734d8d74c34fa3b4b96c786b7df792764b8cb0",
+      "workflow_sha256": "9ca63965ba18ed84912fbd5653c950ec48c98aad2d379c8b4e291dd0d20e1e0e",
+      "measured_seconds": 1045.14,
+      "scope": "Native SCAIL2 two-window animation, 320x320/29 distinct frames/16fps/1.8125s, H264/AAC full decode PASS; sampled join continuity and approximate identity; no HD or long-duration claim.",
+      "review": "limited",
+      "defaults": {},
+      "reference_settings": {
+        "mode": false,
+        "width": 320,
+        "height": 320,
+        "start_seconds": 0
+      },
+      "guidance": "Décrire un seul sujet du clip et le personnage de référence. Fournir une référence en pied, 29 images de mouvement disponibles. Raccord natif de 5 images ; mode étendu lent (17 min 25 s mesurées), 320 × 320. Visage approximatif et cadrage susceptible de se resserrer."
+    },
+    "qwen21-edit-cfg1": {
+      "evidence": "validation/10m-qwen21-edit-cpu-sequential-cfg1-20261125.json",
+      "evidence_sha256": "f7de4c24967a690daa4e29023c6e06e9937cb11dc52d231f580ac2d1858be2d8",
+      "app_sha256": "cf373b317d954f6e0e6e801a4904fd6783e722d83140040aba2a98333fbbffc4",
+      "workflow_sha256": "edfeca6c86e468c3c30c5f345fecf93fe51257f045f3e48a4ef3a9eeef3b0626",
+      "measured_seconds": 558.33,
+      "scope": "768x768 portrait background edit, native CPU sequential encoder + bounded Q4 diffusion, CFG1 eight steps; single-scene visual and full-decode PASS, min RAM17.529GiB, peak GTT7.142GiB; existing CFG8 kept.",
+      "review": "visual",
+      "defaults": {},
+      "reference_settings": {
+        "resolution": 768
+      },
+      "guidance": "Décrire la modification et la conservation de la pose, du cadrage et de l’identité dans le prompt principal. Profil CFG 1 de référence à 768 px : 558,33 s, pic GTT7,14 Gio contre 10,56 Gio sur le test CFG 8. Comparaison sur une seule scène."
     }
   }
 }

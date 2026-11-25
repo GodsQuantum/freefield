@@ -1,0 +1,116 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "qwen21-edit-cfg1",
+  "name": "Qwen 2.1 — édition CFG 1 optimisée",
+  "section": "image",
+  "pack": "image-qwen21",
+  "status": "ready",
+  "higgsfield_feature": "Edit Image",
+  "summary": "Qwen Image 2.1 Turbo Q4, huit étapes CFG 1. Encodage natif CPU puis diffusion GPU séquentielle. Portrait 768 px validé.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "Comfy-Org/workflow_templates/templates/image_qwen_image_2_1_turbo_image_edit.json",
+    "comfyui": "0.42.0",
+    "notes": "Actual native CLI 10m, CPU text encoder released before bounded immutable GGUF diffusion; original 8-step sigma schedule CFG1; same three model files. Comparison to CFG8 single-scene proof."
+  },
+  "inputs": [
+    {
+      "id": "image",
+      "type": "image",
+      "label": "Reference image",
+      "required": true,
+      "limits": {
+        "max_mb": 20
+      },
+      "bind": [
+        {
+          "node": "5",
+          "field": "image"
+        }
+      ]
+    },
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Editing instruction",
+      "required": true,
+      "default": "Change only the background to a pastel lavender wall, preserving the person, face and original camera angle.",
+      "bind": [
+        {
+          "node": "6",
+          "field": "prompt"
+        }
+      ],
+      "help": "Indiquer précisément la modification et ce qui doit rester identique. En CFG 1, écrire les contraintes dans cette consigne, pas dans un prompt négatif."
+    },
+    {
+      "id": "resolution",
+      "type": "select",
+      "label": "Edit resolution",
+      "default": 768,
+      "options": [
+        {
+          "value": 768,
+          "label": "768 px (validé)"
+        }
+      ],
+      "bind": [
+        {
+          "node": "6",
+          "field": "resolution"
+        }
+      ],
+      "help": "Profil 768 px validé ; autres résolutions non certifiées ici."
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": -1,
+      "help": "-1 chooses a random seed",
+      "bind": [
+        {
+          "node": "7",
+          "field": "noise_seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "13",
+      "type": "image",
+      "label": "Edited image"
+    }
+  ],
+  "models": [
+    {
+      "repo": "unsloth/Qwen-Image-2.1-Turbo-GGUF",
+      "file": "diffusion_models/qwen-image-2.1-turbo-Q4_K_M.gguf",
+      "dir": "diffusion_models",
+      "gb": 4.2,
+      "phase": "denoise"
+    },
+    {
+      "repo": "Comfy-Org/Qwen-Image-2.1",
+      "file": "text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+      "dir": "text_encoders",
+      "gb": 9.351,
+      "phase": "encode"
+    },
+    {
+      "repo": "Comfy-Org/Qwen-Image-2.1",
+      "file": "vae/qwen_image_2.1_vae_bf16.safetensors",
+      "dir": "vae",
+      "gb": 0.676,
+      "phase": "decode"
+    }
+  ],
+  "credits": [
+    "Qwen Image 2.1 Turbo original multimodal image editing model",
+    "unsloth/Qwen-Image-2.1-Turbo-GGUF Q4_K_M model (quantized DiT only)",
+    "Comfy-Org Qwen3-VL 8B INT8 ConvRot text encoder and Qwen-Image-2.1 bf16 VAE unchanged",
+    "Original INT8 ConvRot diffusion weight retained locally as rollback, with no duplicate GGUF download"
+  ],
+  "notes": "Le guidage CFG 1 ne tient pas compte du prompt négatif pendant la diffusion. Décrire les contraintes dans la consigne principale. Une modification de fond à 768 px validée ; 9 min 18 s mesurées. Le profil CFG 8 est conservé."
+}
