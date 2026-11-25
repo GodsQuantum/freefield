@@ -174,7 +174,7 @@ function doneCard(e, list) {
       el("div", { class: "row" }, el("span", { class: "tag dark" }, app?.name ?? e.app),
         e.validation?.benchmark_only ? el("span", { class: "tag" }, t("lib.bench")) : null,
         el("div", { class: "acts" }, dl,
-          item.type !== "audio" && hooks.useIn ? el("button", { class: "mini", type: "button", title: t("act.usein"), "aria-label": t("act.usein"),
+          hooks.useIn ? el("button", { class: "mini", type: "button", title: t("act.usein"), "aria-label": t("act.usein"),
             onclick: (ev) => { ev.stopPropagation(); hooks.useIn(ev.currentTarget, item); } }, icon("send")) : null,
           el("button", { class: "mini", type: "button", title: t("act.compare"), "aria-label": t("act.compare"), onclick: stop(() => hooks.compare?.(item)) }, icon("compare")),
           deleteButton(() => feed.remove(e.id)))),

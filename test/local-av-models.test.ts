@@ -24,7 +24,7 @@ test("native ACE-Step 1.5 Turbo music uses the official split 2B + two Qwen enco
   assert.deepEqual(music.graph?.["11"]?.inputs?.audio, ["9", 0]);
   assert.equal(music.graph?.["11"]?.class_type, "SaveAudioMP3");
   assert.equal(music.outputs[0]?.node, "11");
-  assert.equal(music.inputs.find((i) => i.id === "duration")?.max, 1000, "do not add a needless short duration cap");
+  assert.equal(music.inputs.find((i) => i.id === "duration")?.max, 600, "respect the documented upstream duration ceiling");
   assert.equal(music.inputs.find((i) => i.id === "generate_audio_codes")?.default, false, "use the validated 30-second direct-conditioning path; the musical planner remains optional");
   assert.equal(music.graph?.["4"]?.inputs?.generate_audio_codes, false);
   assert.deepEqual([music.test?.duration, music.test?.steps, music.test?.generate_audio_codes], [30, 8, false]);

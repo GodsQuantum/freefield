@@ -5,7 +5,7 @@
   "section": "video",
   "pack": "upscale-hd",
   "status": "ready",
-  "summary": "Restauration légère RealESRGAN x2plus : 512×512 à 1 024×1 024, 25 i/s, clips courts de 1 à 10 s. Traitement image par image, sans accumulation en mémoire.",
+  "summary": "RealESRGAN x2, vidéo CFR 8–60 i/s, 1–20 s, 128–960 px par côté, 140 M pixels-images maximum. Agrandissement proportionnel, audio conservé.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "Official RealESRGAN x2plus v0.2.1 + native Spandrel, streaming file-backed"
@@ -14,16 +14,16 @@
     {
       "id": "clip",
       "type": "video",
-      "label": "Clip carré 512 px à 25 i/s",
+      "label": "Vidéo SDR à cadence constante",
       "required": true,
       "limits": {
         "max_mb": 100,
         "seconds": [
           1,
-          10
+          20
         ]
       },
-      "help": "Résultat Talking Avatar ou autre clip 512×512 H264 à 25 i/s, 1–10 s. Super-résolution apprise, pas génération HD native.",
+      "help": "Format paysage, portrait ou carré. Jusqu’à 960 × 540 (ou 540 × 960), 20 s maximum selon la résolution et la cadence. Pas de génération HD native.",
       "bind": [
         {
           "node": "1",
@@ -36,7 +36,7 @@
     {
       "node": "3",
       "type": "video",
-      "label": "Vidéo 1024×1024"
+      "label": "Vidéo restaurée ×2"
     }
   ],
   "models": [

@@ -10,6 +10,7 @@ import { exampleItem, thumb, hoverPlay, fullMedia, playWhenVisible, optionTile, 
 import { flags, flagButton } from "./flags.js";
 import { feed, feedView, hooks } from "./feed.js";
 import { openPainter, maskPreview } from "./paint.js";
+import { canAttempt, nextTargets, referenceSettings, restoreReference } from "./quality-profiles.js";
 
 // ------------------------------------------------------------------ form state (per app, kept while the page is open)
 const forms = new Map();
@@ -23,6 +24,7 @@ function validValue(inp, v) {
   if (v === undefined || v === null) return false;
   if (inp.multiple) return Array.isArray(v) && v.length <= (inp.multiple.max ?? Infinity) && v.every((x) => (inp.options || []).some((o) => String(o.value) === String(x)));
   if (inp.type === "select") return (inp.options || []).some((o) => String(o.value) === String(v));
+  if (inp.type === "seed") return Number(v) === -1 || (Number.isSafeInteger(Number(v)) && (inp.min === undefined || Number(v) >= inp.min) && (inp.max === undefined || Number(v) <= inp.max));
   if (inp.type === "slider" || inp.type === "number") return Number.isFinite(Number(v)) && (inp.min === undefined || v >= inp.min) && (inp.max === undefined || v <= inp.max);
   return true;
 }
@@ -32,10 +34,15 @@ export function formFor(app) {
   if (f) return f;
   const saved = store.get(`values.${app.id}`) || {};
   // Preserve prompts and user files. Adopt measured defaults once per certification revision.
-  if (app.qualification && store.get(`qualification.${app.id}`) !== app.qualification.revision) {
-    for (const id of Object.keys(app.qualification.defaults ?? {})) delete saved[id];
-    store.set(`values.${app.id}`, saved);
-    store.set(`qualification.${app.id}`, app.qualification.revision);
+  if (app.qualification) {
+    const key = `qualification.defaults.${app.id}`;
+    const signature = JSON.stringify(app.qualification.defaults ?? {});
+    const previous = store.get(key);
+    if (previous !== undefined && previous !== null && previous !== signature) {
+      for (const id of Object.keys(app.qualification.defaults ?? {})) delete saved[id];
+      store.set(`values.${app.id}`, saved);
+    }
+    store.set(key, signature);
   }
   const values = {};
   for (const inp of app.inputs) {
@@ -128,7 +135,7 @@ function buildForm(app, { randomSeed = false } = {}) {
     const v = f.values[inp.id];
     if (inp.type === "toggle") { fd.append(inp.id, v ? "true" : "false"); continue; }
     if (inp.multiple) { fd.append(inp.id, JSON.stringify(Array.isArray(v) ? v : [])); continue; }   // none picked is a choice too
-    if (inp.type === "seed" && (randomSeed || v === -1 || v === "-1" || v === "" || v === null)) continue;
+    if (inp.type === "seed" && (randomSeed || v === -1 || v === "-1" || v === "" || v === null)) { fd.append(inp.id, "-1"); continue; }
     // "Any" in a builder select is the empty value: send it, or the server would fill in the default
     if (v === "" && inp.type === "select" && (inp.options || []).some((o) => o.value === "")) { fd.append(inp.id, ""); continue; }
     if (v === "" || v === null || v === undefined) continue;
@@ -202,35 +209,42 @@ export async function recreate(item, { run = false } = {}) {
   else toast(t("toast.loaded", { app: app.name }));
 }
 
-/** Where a result usually goes next, by the kind of file it is (the rest of the apps that take it follow). */
-const NEXT = {
-  image: ["video", "motion-transfer", "h3-photo", "relight", "upscale", "inpaint", "edit", "expand-image", "character", "remove-bg"],
-  video: ["upscale-video", "extend-video", "reframe", "mixed-media", "video-remove-bg", "smooth", "sdr-hdr"],
-};
-
-/** "Use in…": put a result (an image or a video) into the first slot of that kind in another app, and open that app. */
+/** Route a saved output to a selected, compatible input without launching inference. */
 export function useIn(anchor, item, done) {
   const type = item.type;
-  const slotOf = (a) => a.inputs.find((i) => i.type === type && !i.paint);
-  const first = (NEXT[type] || []).map((id) => byId.get(id)).filter((a) => a && slotOf(a));
-  const rest = apps.filter((a) => slotOf(a) && !first.includes(a)).sort((x, y) => x.name.localeCompare(y.name));
-  const go = async (a) => {
+  const targets = nextTargets(apps, type);
+  const go = async ({app,slot}) => {
     closePopover();
     done?.();
     try {
-      const ext = extOf(item.full) || (type === "video" ? "mp4" : "png");
-      if (!setFile(a, slotOf(a), await fileFromUrl(item.full, `${item.app || "result"}.${ext}`))) return;
-      if (location.hash !== `#/app/${a.id}`) location.hash = `#/app/${a.id}`;
+      const ext = extOf(item.full) || ({video:"mp4",audio:"wav",image:"png"}[type] || "bin");
+      if (!setFile(app, slot, await fileFromUrl(item.full, `${item.app || "result"}.${ext}`))) return;
+      if (location.hash !== `#/app/${app.id}`) location.hash = `#/app/${app.id}`;
       else hooks.rerender?.();
-      toast(t("toast.sent", { app: a.name }));
-    } catch (err) {
-      toast(err.message, { error: true });
-    }
+      toast(t("toast.sent", { app: app.name }));
+    } catch (err) { toast(err.message, { error: true }); }
   };
-  const row = (a) => el("button", { class: "opt", type: "button", onclick: () => go(a) },
-    el("span", { class: "thumb" }, appThumb(a)), el("span", { class: "two" }, el("b", {}, a.name), el("small", {}, tagline(a))));
+  const row = target => el("button", { class: "opt", type: "button", onclick: () => go(target) },
+    el("span", { class: "thumb" }, appThumb(target.app)),
+    el("span", { class: "two" }, el("b", {}, target.app.name), el("small", {}, target.slot.label)));
+  const first = targets.filter(x => x.recommended), rest = targets.filter(x => !x.recommended);
   popover(anchor, el("div", { class: "usein" }, el("h4", {}, t("act.usein")), ...first.map(row),
-    rest.length ? el("details", {}, el("summary", {}, t("usein.more", { n: rest.length })), ...rest.map(row)) : null), { width: 340 });
+    rest.length ? el("details", {}, el("summary", {}, t("usein.more", { n: rest.length })), ...rest.map(row)) : null,
+    targets.length ? null : el("p", {class:"help"}, "Aucune application compatible disponible.")), { width: 340 });
+}
+
+function qualityPanel(app, redraw) {
+  const q = app.qualification;
+  if (!q?.guidance) return null;
+  const entries = referenceSettings(app);
+  return el("details", {class:"adv"}, el("summary", {}, "Qualité · profil de référence"),
+    el("div", {class:"in"}, el("p", {class:"help"}, q.guidance),
+      el("p", {class:"help"}, "Mesure de référence : " + fmtShort(q.measured_seconds) + " · " + q.scope),
+      entries.length ? el("p", {class:"help"}, entries.map(([id,v]) => (app.inputs.find(i=>i.id===id)?.label ?? id) + " : " + String(v)).join(" · ")) : null,
+      entries.length ? el("button",{class:"btn small ghost",type:"button",onclick:()=>{
+        const f=formFor(app); restoreReference(app,f.values); f.preset=""; persist(app); redraw();
+      }},"Appliquer les réglages de référence") : null,
+      el("p",{class:"help"},"Une autre résolution, durée, scène ou configuration nécessite sa propre validation. Les prompts, fichiers et graines ne sont pas réinitialisés.")));
 }
 
 // ------------------------------------------------------------------ small parts
@@ -320,7 +334,7 @@ function rangeInput(inp, value, onChange) {
 }
 
 function seedEditor(app, inp, f, onChange) {
-  const box = el("input", { type: "number", min: inp.min ?? 0, placeholder: t("ws.seed.random"), value: f.values[inp.id] === -1 ? "" : f.values[inp.id] ?? "" });
+  const box = el("input", { type: "number", min: inp.min ?? 0, max: inp.max, placeholder: t("ws.seed.random"), value: f.values[inp.id] === -1 ? "" : f.values[inp.id] ?? "" });
   box.addEventListener("input", () => { f.values[inp.id] = box.value === "" ? -1 : Math.trunc(Number(box.value)); onChange(); });
   const last = feed.list(app.id).find((e) => e.values?.[inp.id] !== undefined);
   return el("div", { class: "pad" },
@@ -333,10 +347,10 @@ function seedEditor(app, inp, f, onChange) {
 
 function genButton(app, onClick, { wide = false } = {}) {
   const est = estimate(app);
-  const b = el("button", { class: `generate${wide ? " wide" : ""}`, type: "button", disabled: !app.runnable || Boolean(app.missing_pack),
-    title: !app.runnable ? (app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"))
+  const b = el("button", { class: `generate${wide ? " wide" : ""}`, type: "button", disabled: !canAttempt(app),
+    title: canAttempt(app) && !app.runnable ? "Vérifier les modèles avant génération" : !app.runnable ? (app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"))
       : app.missing_pack ? t("ws.nopack", { pack: app.missing_pack }) : app.qualification ? "Measured on Cloud9: " + fmtShort(app.qualification.measured_seconds) + " · " + app.qualification.scope : est ? t("ws.est", { gpu: est.gpu }) : null },
-    t("ws.generate"), est ? el("span", { class: "cost" }, icon("spark"), fmtShort(est.seconds)) : el("span", { class: "cost" }, icon("spark")));
+    !app.runnable && canAttempt(app) ? "Vérifier et générer" : t("ws.generate"), est ? el("span", { class: "cost", title: "Mesure de référence, pas une estimation pour tous les réglages" }, icon("spark"), fmtShort(est.seconds)) : el("span", { class: "cost" }, icon("spark")));
   b.addEventListener("click", async () => {
     if (b.dataset.busy) return;
     b.dataset.busy = "1";
@@ -434,12 +448,14 @@ function composerBar(app, rerenderBar) {
   };
   const go = async () => { if (await submit(app, ui) && wsTab !== "history") { wsTab = "history"; hooks.rerender?.(); } };
   const gen = genButton(app, go);
-  if (!app.runnable) { hint.hidden = false; hint.textContent = app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"); }
+  if (!app.runnable && canAttempt(app)) { hint.hidden = false; hint.textContent = "Moteur à réveiller ou inventaire temporairement indisponible. Vérification au lancement."; }
+  else if (!app.runnable) { hint.hidden = false; hint.textContent = app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"); }
   else if (app.missing_pack) { hint.hidden = false; hint.textContent = t("ws.nopack", { pack: app.missing_pack }); }
   else if (app.qualification) { hint.hidden = false; hint.textContent = "Cloud9 · " + fmtShort(app.qualification.measured_seconds) + " measured · " + app.qualification.scope; }
 
   const bar = el("div", { class: "composer" },
     hint,
+    qualityPanel(app, rerenderBar),
     el("div", { class: "cmp-top" }, attach, prompt || el("div", { class: "cmp-prompt dim", style: { paddingTop: "16px" } }, app.summary)),
     el("div", { class: "cmp-row" }, ...chips, el("span", { class: "grow" }), countControl(f), gen),
     mediaInputs.length && maxUploadBodyBytes ? el("p", { class: "faint", style: { margin: "0", padding: "0 16px 10px", fontSize: "12px" } }, t("ws.upload.budget", { mib: maxUploadBodyBytes / 2 ** 20 })) : null,
@@ -617,7 +633,7 @@ function sideField(app, inp, f, ui) {
       inp.help ? el("small", {}, inp.help) : null), el("span", { class: "switch" }, box, el("i"))));
   }
   if (inp.type === "seed") {
-    const box = el("input", { type: "number", min: inp.min ?? 0, placeholder: t("ws.seed.random"), value: f.values[inp.id] === -1 ? "" : f.values[inp.id] ?? "", "aria-label": inp.label });
+    const box = el("input", { type: "number", min: inp.min ?? 0, max: inp.max, placeholder: t("ws.seed.random"), value: f.values[inp.id] === -1 ? "" : f.values[inp.id] ?? "", "aria-label": inp.label });
     box.addEventListener("input", () => set(box.value === "" ? -1 : Math.trunc(Number(box.value))));
     return el("label", { class: "field" }, el("span", { class: "lbl" }, inp.label || t("ws.seed"),
       el("button", { class: "mini", type: "button", title: t("ws.seed.random"), style: { width: "26px", height: "26px" }, onclick: (e) => { e.preventDefault(); box.value = ""; set(-1); } }, icon("dice"))),
@@ -672,8 +688,8 @@ function sidebarPanel(app, rerenderSide) {
   if (app.presets?.length) adv.unshift(presetField(app, f));
   const advanced = adv.length ? el("details", { class: "adv" }, el("summary", {}, t("ws.advanced"), icon("chevD", "i-chev")), el("div", { class: "in" }, ...adv)) : null;
 
-  const scroll = el("div", { class: "side-scroll" }, card, app.qualification ? el("p", { class: "help" }, "Cloud9 · " + fmtShort(app.qualification.measured_seconds) + " measured · " + app.qualification.scope) : null, modeSwitch(app), ...main, advanced);
-  const note = el("p", { class: "side-note" }, !app.runnable ? (app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"))
+  const scroll = el("div", { class: "side-scroll" }, card, app.qualification ? el("p", { class: "help" }, "Cloud9 · " + fmtShort(app.qualification.measured_seconds) + " measured · " + app.qualification.scope) : null, qualityPanel(app, rerenderSide), modeSwitch(app), ...main, advanced);
+  const note = el("p", { class: "side-note" }, !app.runnable && canAttempt(app) ? "Vérification des modèles au lancement" : !app.runnable ? (app.status === "draft" ? t("ws.draft") : t("ws.noworkflow"))
     : app.missing_pack ? t("ws.nopack", { pack: app.missing_pack })
       : maxUploadBodyBytes && app.inputs.some((i) => isMedia(i.type)) ? t("ws.upload.budget", { mib: maxUploadBodyBytes / 2 ** 20 }) : "");
   ui.clearMissing = () => { scroll.querySelectorAll(".missing").forEach((n) => n.classList.remove("missing")); };

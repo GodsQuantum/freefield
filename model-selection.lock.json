@@ -10102,14 +10102,14 @@
         {
           "id": "duration",
           "default": 30,
-          "min": 1,
-          "max": 1000
+          "min": 10,
+          "max": 600
         },
         {
           "id": "steps",
           "default": 8,
           "min": 1,
-          "max": 10000
+          "max": 20
         }
       ]
     },
@@ -14304,7 +14304,7 @@
       "workflow": [
         {
           "id": "2",
-          "class_type": "FreefieldVideoUpscale2x",
+          "class_type": "FreefieldVideoUpscale2xFlexible",
           "inputs": {
             "model_name": "RealESRGAN_x2plus.pth"
           }

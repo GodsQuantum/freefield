@@ -6,7 +6,7 @@
     }
   },
   "2": {
-    "class_type": "FreefieldVideoUpscale2x",
+    "class_type": "FreefieldVideoUpscale2xFlexible",
     "inputs": {
       "clip": [
         "1",

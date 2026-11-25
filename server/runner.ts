@@ -85,7 +85,10 @@ export function resolveValues(app: App, values: Values): Values {
     const emptyIsOption = input.type === "select" && (Boolean(input.multiple) || (input.options ?? []).some((o) => o.value === ""));
     if (v === undefined || (v === "" && !emptyIsOption)) v = input.default;
     if (input.type === "seed" && (v === undefined || v === -1 || v === "-1")) {
-      v = Math.floor(Math.random() * 2 ** 48);
+      const lo = Math.max(0, Math.ceil(input.min ?? 0));
+      const hi = Math.min(Number.MAX_SAFE_INTEGER - 1, Math.floor(input.max ?? (2 ** 48 - 1)));
+      if (hi < lo) throw new InputError(`${input.id}: invalid seed range`);
+      v = lo + Math.floor(Math.random() * (hi - lo + 1));
     }
     if (v === undefined) {
       if (input.required || isFileInput(input)) throw new InputError(`${input.id}: required`);

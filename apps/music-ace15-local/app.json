@@ -44,11 +44,11 @@
       "id": "duration",
       "type": "number",
       "label": "Durée en secondes",
-      "min": 1,
-      "max": 1000,
+      "min": 10,
+      "max": 600,
       "step": 1,
       "default": 30,
-      "help": "Durée demandée; les longs morceaux prennent davantage de temps et de mémoire, sans limite ajoutée par Freefield.",
+      "help": "10–600 s selon upstream. 30 s vérifiées localement ; les durées supérieures sont hors profil mesuré.",
       "bind": [
         {
           "node": "6",
@@ -64,7 +64,7 @@
       "id": "bpm",
       "type": "number",
       "label": "Tempo (BPM)",
-      "min": 10,
+      "min": 30,
       "max": 300,
       "step": 1,
       "default": 110,
@@ -491,7 +491,7 @@
       "type": "number",
       "label": "Étapes de diffusion Turbo",
       "min": 1,
-      "max": 10000,
+      "max": 20,
       "step": 1,
       "default": 8,
       "bind": [

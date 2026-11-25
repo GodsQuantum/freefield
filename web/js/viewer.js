@@ -83,7 +83,7 @@ export function openViewer(items, startKey) {
       el("div", { class: "acts" },
         app && item.validation?.replayable !== false ? el("button", { class: "btn lime", type: "button", onclick: () => { close(); hooks.recreate?.(item); } }, icon("redo"), t("act.recreate")) : null,
         url ? el("a", { class: "btn ghost", href: url, download: downloadName(item, url) }, icon("download"), t("act.download")) : null,
-        url && output.type !== "audio" && hooks.useIn ? el("button", { class: "btn ghost", type: "button", onclick: (ev) => hooks.useIn(ev.currentTarget, { ...item, full: url, type: output.type }, close) }, icon("send"), t("act.usein")) : null,
+        url && hooks.useIn ? el("button", { class: "btn ghost", type: "button", onclick: (ev) => hooks.useIn(ev.currentTarget, { ...item, full: url, type: output.type }, close) }, icon("send"), t("act.usein")) : null,
         el("button", { class: "btn ghost", type: "button", onclick: () => { close(); hooks.compare?.({ ...item, full: url, type: output.type }); } }, icon("compare"), t("act.compare")),
         item.kind === "example" && app ? flagButton(flags.key(app.id)) : null,
         item.kind === "history" ? deleteButton(async () => {

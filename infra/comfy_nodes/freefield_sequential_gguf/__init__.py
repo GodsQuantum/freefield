@@ -258,3 +258,30 @@ class FreefieldLoRAStack:
 
 NODE_CLASS_MAPPINGS = {"FreefieldSequentialGGUF": FreefieldSequentialGGUF, "FreefieldLoRAStack": FreefieldLoRAStack}
 NODE_DISPLAY_NAME_MAPPINGS = {"FreefieldSequentialGGUF": "Freefield Sequential GGUF (GPU)"}
+
+class FreefieldRecastWindow:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required":{"video":("VIDEO",),"frames":("INT",{"default":17,"min":5,"max":81,"step":4}),"start_seconds":("FLOAT",{"default":0.0,"min":0.0,"max":3600.0,"step":0.01})}}
+    RETURN_TYPES=("IMAGE","AUDIO","FLOAT")
+    FUNCTION="load"
+    CATEGORY="freefield/video"
+    def load(self,video,frames,start_seconds):
+        import math
+        fps=float(video.get_frame_rate())
+        w,h=video.get_dimensions()
+        if not (8<=fps<=60 and 5<=frames<=81 and (frames-1)%4==0 and w*h*frames<=33554432 and math.isfinite(start_seconds) and start_seconds>=0):
+            raise ValueError("CFR input 8-60 fps; frame window exceeds safe decode budget")
+        start=round(start_seconds*fps)/fps
+        duration=frames/fps
+        if video.get_duration()+0.5/fps<start+duration:raise ValueError(f"Need {frames} frames after selected start")
+        trimmed=video.as_trimmed(start,duration,strict_duration=False)
+        if trimmed is None:raise ValueError("Cannot trim driving clip")
+        c=trimmed.get_components()
+        if len(c.images)<frames:raise ValueError("Not enough decoded frames in driving clip")
+        images=c.images[:frames]
+        audio=c.audio
+        if audio is not None:
+            audio={**audio,"waveform":audio["waveform"][...,:round(duration*audio["sample_rate"])]}
+        return (images,audio,fps)
+NODE_CLASS_MAPPINGS["FreefieldRecastWindow"]=FreefieldRecastWindow

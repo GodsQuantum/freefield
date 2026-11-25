@@ -59,7 +59,9 @@
           "node": "3",
           "field": "seed"
         }
-      ]
+      ],
+      "min": 0,
+      "max": 4294967295
     }
   ],
   "outputs": [

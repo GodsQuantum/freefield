@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v9",
+  "revision": "cloud9-20261125-certified-v10-quality",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -15,7 +15,14 @@
         "resolution": 1,
         "steps": 15,
         "expand": false
-      }
+      },
+      "reference_settings": {
+        "expand": false,
+        "aspect": "1:1",
+        "resolution": 1,
+        "steps": 15
+      },
+      "guidance": "Décrire composition, lumière, matière et cadrage dans un prompt structuré. Profil 1 MP/15 étapes ; privilégier un upscale séparé plutôt que supposer le 2K natif validé."
     },
     "qwen21-edit": {
       "evidence": "Freefield/ComfyUI/benchmarks/00g-qwen21-turbo-q4-deployed-real-cli-e2e-20261123.json",
@@ -27,7 +34,11 @@
       "review": "visual",
       "defaults": {
         "resolution": 768
-      }
+      },
+      "reference_settings": {
+        "resolution": 768
+      },
+      "guidance": "Décrire le changement et explicitement ce qui doit rester identique. Turbo 768 px validé ; CFG 1 et 8 étapes recommandés upstream, mais le graphe local conserve sa guidance testée jusqu’à comparaison réelle."
     },
     "angles": {
       "evidence": "validation/qwen2511-angles-native-subquad-cli1024-20261119.json",
@@ -37,7 +48,9 @@
       "measured_seconds": 617.59,
       "scope": "1024 px portrait; one camera angle",
       "review": "visual",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Décrire une seule rotation et conserver sujet, vêtements, lumière et arrière-plan. Utiliser la référence originale à chaque changement de caméra pour limiter la dérive cumulative."
     },
     "z-image": {
       "evidence": "validation/z-image-cli1024-20261119.json",
@@ -52,7 +65,14 @@
         "height": 1024,
         "steps": 8,
         "freer_encoder": false
-      }
+      },
+      "reference_settings": {
+        "width": 1024,
+        "height": 1024,
+        "freer_encoder": false,
+        "steps": 8
+      },
+      "guidance": "Le profil Turbo 1024²/8 étapes avec encodeur standard est testé. Augmenter résolution et étapes séparément ; garder la graine pour comparer les détails."
     },
     "nitrofusion2": {
       "evidence": "validation/nitrofusion2-freefield-cli-e2e-20261120.json",
@@ -65,7 +85,12 @@
       "defaults": {
         "width": 1024,
         "height": 1024
-      }
+      },
+      "reference_settings": {
+        "width": 1024,
+        "height": 1024
+      },
+      "guidance": "Ébauche rapide : sélectionner la composition puis refaire les détails fins avec Create Image ou Qwen Edit. L’upscale ne corrige pas une anatomie erronée."
     },
     "moss-image": {
       "evidence": "validation/moss-sft-euler-4step-freefield-e2e-20261120.json",
@@ -80,7 +105,15 @@
         "rewrite": false,
         "width": 1024,
         "height": 1024
-      }
+      },
+      "reference_settings": {
+        "rewrite": false,
+        "fast_mode": true,
+        "width": 1024,
+        "height": 1024,
+        "steps": 25
+      },
+      "guidance": "Pour affiches, citer le texte exact, sa position et la hiérarchie. Mode rapide quatre étapes validé ; contrôler orthographe et composition avant agrandissement."
     },
     "styles": {
       "evidence": "validation/krea2-ultra2-memsafe-production-e2e-20261120.json",
@@ -95,7 +128,15 @@
         "ultra_fast_mode": true,
         "enhance": true,
         "megapixels": 1
-      }
+      },
+      "reference_settings": {
+        "fast_mode": false,
+        "ultra_fast_mode": true,
+        "enhance": true,
+        "aspect": "1:1 (Square)",
+        "megapixels": 1.0
+      },
+      "guidance": "Ultra-rapide avec enhance et 1 MP validé. Le profil Krea Turbo standard 8 étapes peut privilégier les détails, mais il n’est pas certifié sur cette configuration."
     },
     "relight": {
       "evidence": "validation/qwen2511-relight-2509lora-native-substitution-20261120.json",
@@ -105,7 +146,9 @@
       "measured_seconds": 618.58,
       "scope": "1024 px portrait; background may change",
       "review": "limited",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Préciser direction, douceur et température de lumière, demander le maintien des traits et du décor. Contrôler le fond et les ombres avant upscale."
     },
     "upscale": {
       "evidence": "validation/seedvr2-image2x-gpu-vae-tile256-20261119.json",
@@ -117,7 +160,11 @@
       "review": "visual",
       "defaults": {
         "scale": 2
-      }
+      },
+      "reference_settings": {
+        "scale": 2
+      },
+      "guidance": "SeedVR2 : traiter chaque image indépendante seule. Le 2× 1024→2048 a une preuve locale ; le 4× est une option hors profil mesuré."
     },
     "remove-bg": {
       "evidence": "validation/03s-birefnet-image-native-gpu-20261124.json",
@@ -127,7 +174,9 @@
       "measured_seconds": 9.71,
       "scope": "768 x 1280 RGBA; GPU alpha parity",
       "review": "visual",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Préférer un contour lisible et une image nette. Le PNG RGBA conserve la transparence ; vérifier cheveux, verre et bords semi-transparents."
     },
     "depth-map": {
       "evidence": "validation/coverage-moge-depth-20261119.json",
@@ -140,7 +189,12 @@
       "defaults": {
         "map": "depth_colored",
         "detail": 2
-      }
+      },
+      "reference_settings": {
+        "map": "depth_colored",
+        "detail": 2
+      },
+      "guidance": "Detail 2 testé. Une carte de profondeur n’est pas une mesure absolue de distance ; vérifier occlusions et contours avant emploi en composition."
     },
     "h3-video-int4": {
       "evidence": "Freefield/ComfyUI/benchmarks/00a-h3-int4-freefield-cli-e2e-20261122.json",
@@ -153,7 +207,13 @@
       "defaults": {
         "duration": 1,
         "steps": 8
-      }
+      },
+      "reference_settings": {
+        "aspect": "16:9 (Widescreen)",
+        "duration": 1,
+        "steps": 8
+      },
+      "guidance": "Décrire une action courte, caméra et son synchronisés. 1 s demandé et 8 étapes testés ; la durée de sortie dépend du modèle. Aucun profil 2K/15 s local validé."
     },
     "h3-photo-int4": {
       "evidence": "Freefield/ComfyUI/benchmarks/00b-h3-photo-int4-freefield-cli-e2e-20261122.json",
@@ -166,7 +226,12 @@
       "defaults": {
         "duration": 1,
         "steps": 8
-      }
+      },
+      "reference_settings": {
+        "duration": 1,
+        "steps": 8
+      },
+      "guidance": "Prendre une image nette avec cadrage et sujet entièrement visibles. Décrire un mouvement simple plutôt qu’une transformation de scène. Le son peut être contrôlé dans le prompt."
     },
     "extend-video-int4": {
       "evidence": "Freefield/ComfyUI/benchmarks/00c-extend-video-int4-freefield-cli-e2e-20261123.json",
@@ -179,7 +244,12 @@
       "defaults": {
         "duration": 1,
         "steps": 8
-      }
+      },
+      "reference_settings": {
+        "duration": 1,
+        "steps": 8
+      },
+      "guidance": "Conserver identité, lumière, sens de mouvement et ambiance sonore du clip initial. Extension courte vérifiée ; les chaînes longues peuvent accumuler de la dérive."
     },
     "reshoot-int4": {
       "evidence": "validation/08a-reshoot-int4-real-freefield-cli-20261124.json",
@@ -191,7 +261,11 @@
       "review": "limited",
       "defaults": {
         "duration": 1
-      }
+      },
+      "reference_settings": {
+        "duration": 1
+      },
+      "guidance": "Changer la caméra par petits écarts, pas plusieurs axes extrêmes à la fois. Comparer les occultations et la géométrie ; 39 frames à 416×256 constituent la mesure, pas un mode HD."
     },
     "upscale-video": {
       "evidence": "validation/07a-seedvr2-upscalevideo-native-source33f-20261123.json",
@@ -201,7 +275,9 @@
       "measured_seconds": 149.28,
       "scope": "33 frames, 256 x 144 to 512 x 288; 2x",
       "review": "limited",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "SeedVR2 traite la cohérence temporelle ; privilégier un seul plan et des blocs 4n+1. La preuve couvre 33 frames à 2× ; pas de garantie de cadence, durée ou qualité pour tous les clips."
     },
     "video-remove-bg": {
       "evidence": "validation/03r-birefnet-video-native-gpu-20261124.json",
@@ -214,12 +290,16 @@
       "defaults": {
         "background": "green",
         "seconds": 1
-      }
+      },
+      "reference_settings": {
+        "seconds": 1
+      },
+      "guidance": "Un sujet bien séparé du fond facilite le détourage. Vérifier le scintillement des contours en lecture ; le test local couvre 1 seconde."
     },
     "music-ace15-local": {
       "evidence": "validation/ace15-cli-tiled128-30-20261119.json",
       "evidence_sha256": "009316b6273cf2bf634c524b335fa2b79c6e9bbe37d402fa0358343fa0ce08b1",
-      "app_sha256": "7396a8a2ec7b56a20b68c985c03b226aa8da6b557fa785a5348284321a77d6d0",
+      "app_sha256": "8ed271202072b4f4dc403f058893ea04b027ca411591d0fc1f353979e7c88b05",
       "workflow_sha256": "bf59f4b2de3936f4cd497062bda19f0d0e972aa0de9cca9d1b84fd5e33128463",
       "measured_seconds": 82.39,
       "scope": "30 s stereo audio; decode and non-silence verified, not listened",
@@ -228,7 +308,13 @@
         "duration": 30,
         "steps": 8,
         "generate_audio_codes": false
-      }
+      },
+      "reference_settings": {
+        "duration": 30,
+        "generate_audio_codes": false,
+        "steps": 8
+      },
+      "guidance": "Turbo : 8 étapes, CFG 1, shift 3. Paroles structurées [Verse]/[Chorus], tempo et tonalité cohérents. Upstream 10–600 s ; local 30 s vérifié, planificateur musical et longue durée non qualifiés."
     },
     "sfx": {
       "evidence": "validation/sfx-web-after-ace-20261119.json",
@@ -243,7 +329,14 @@
         "category": "SFX",
         "renderer": "medium",
         "reprompt": false
-      }
+      },
+      "reference_settings": {
+        "category": "SFX",
+        "seconds": 3,
+        "renderer": "medium",
+        "reprompt": false
+      },
+      "guidance": "Small-SFX pour essais rapides de bruitages ; Medium pour le profil de référence. Décrire matière, distance, mouvement et réverbération. Écouter avant d’utiliser dans un montage."
     },
     "smooth": {
       "evidence": "validation/coverage-film-smooth33f-20261119.json",
@@ -256,7 +349,12 @@
       "defaults": {
         "factor": 2,
         "mode": true
-      }
+      },
+      "reference_settings": {
+        "factor": 2,
+        "mode": true
+      },
+      "guidance": "Interpolation 2× vérifiée. Préférer un facteur modéré et éviter les coupes franches ou mouvements masqués ; ce traitement ne restaure pas les détails perdus."
     },
     "kandinsky6-lite-int8": {
       "evidence": "validation/03m-k6lite-int8-25f-20261123.json",
@@ -266,7 +364,9 @@
       "measured_seconds": 294.8,
       "scope": "448 x 256, 25 frames, 1.04 s stylized video; quiet sound",
       "review": "limited",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Profil audiovisuel léger 25 frames/448×256. Décrire action et son séparément dans le prompt ; les autres modes upstream (première/dernière image, durée supérieure, SR) ne sont pas exposés sans preuve."
     },
     "music": {
       "evidence": "Freefield/ComfyUI/benchmarks/01d-minimax-q6-music3-10s-live-nooverride-20261123.json",
@@ -278,7 +378,11 @@
       "review": "audio",
       "defaults": {
         "seconds": 10
-      }
+      },
+      "reference_settings": {
+        "seconds": 10
+      },
+      "guidance": "Décrire genre, voix, structure et instrumentation, puis écouter les paroles et transitions. Q6/FP16 cohérents sur le test 10 s ; pas de preuve perceptive du morceau entier."
     },
     "inpaint": {
       "evidence": "validation/09a-inpaint-flux3-current-native-cli-20261124.json",
@@ -290,7 +394,11 @@
       "review": "limited",
       "defaults": {
         "steps": 16
-      }
+      },
+      "reference_settings": {
+        "steps": 16
+      },
+      "guidance": "Peindre une zone précise, avec marge autour des bords. Décrire le résultat attendu et les éléments à préserver ; éviter de masquer tout le visage pour une retouche locale."
     },
     "headshot": {
       "evidence": "validation/09c-headshot-tiled-native-cli-20261124.json",
@@ -302,7 +410,11 @@
       "review": "visual",
       "defaults": {
         "steps": 12
-      }
+      },
+      "reference_settings": {
+        "steps": 12
+      },
+      "guidance": "Visage net, frontal, sans objet occultant. Contrôler traits, cheveux et col ; privilégier le profil 12 étapes et une finition séparée."
     },
     "character-swap": {
       "evidence": "validation/09g-character-swap-qwen21-two-ref-512-20261124.json",
@@ -312,37 +424,45 @@
       "measured_seconds": 439.59,
       "scope": "Real two-reference subject replacement, Qwen Image 2.1 Turbo Q4, 672 x 384; single visually reviewed scene, 512px preview",
       "review": "visual",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Référence du sujet clairement visible et scène cible avec pose lisible. Désigner le sujet à remplacer ; comparer identité et proportions avant réutilisation vidéo."
     },
     "talking": {
       "evidence": "validation/09j-talking-flashhead-native-45s-e2e-20261125.json",
       "evidence_sha256": "b93807305e3378a4e98303e754c36ae23c7d3d00fc3bfd441a109f9663991b93",
-      "app_sha256": "dd9fe3b604eabb2e7c7b00870e282ff49786e5b0908b934856ad92fa3eba98dd",
+      "app_sha256": "ea5d97aae26e042cd1ccf9b649f70550e9a0bfa4c7bed88ae9b5bc33b1a4d645",
       "workflow_sha256": "21813bb91eceb91f7e18a36b5874b4bfc94538855b7c11990d00da0926132b71",
       "measured_seconds": 583.44,
       "scope": "Real 45-second audio-driven portrait animation, 512x512 at 25 fps; single reviewed scene, sampled continuity and original audio verified; square crop; phoneme-level lip sync not measured",
       "review": "limited",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Portrait frontal avec bouche visible et voix isolée. FlashHead Lite local validé jusqu’à 45 s, 512²/25 i/s ; passer ensuite à l’upscale HD. Pas de mesure phonème par phonème."
     },
     "voice-clone": {
       "evidence": "validation/09k-zonos3-voice-clone-freefield-e2e-20261125.json",
       "evidence_sha256": "5ac245015c78a2c010197ae7d8b04bc2e94cb0e8b9be64bc5e0caae71ab415f1",
-      "app_sha256": "054a6be64a9d587b995f51100407340585a3c302051b217297837a1ab410b572",
+      "app_sha256": "a2fc16f46b2d3b12ded82ab351c9f1aea7506a4450c5a02b6acc35356617ef73",
       "workflow_sha256": "9f60a14d3a87b8a592c0a9a65eeaccc7318c8f513d2c036882ee04a9446ddec9",
       "measured_seconds": 10.5,
       "scope": "French short phrase, one stock reference, FLAC mono 44.1 kHz; ASR WER 0; native MECT similarity 0.684 vs 0.091 negative control; no auditory review",
       "review": "audio",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Référence autorisée, une voix seule, 2–30 s. Texte français court (200 caractères), ponctuation naturelle. Réutiliser le FLAC comme piste audio de Talking Avatar ; similarité et ASR ne remplacent pas une écoute."
     },
     "upscale-video-hd": {
-      "evidence": "validation/09k-hd-streaming-freefield-e2e-2s-20261125.json",
-      "evidence_sha256": "88c42cfaf90dc28c2be17517ccec49769ab9de211f428646f21cb00cd8a0b18f",
-      "app_sha256": "e6eb5674843ae2849e1db4128c87a78b2148b95101b9f98868bc806b4147a279",
-      "workflow_sha256": "4189e9f672a3f9d9caa0527767f2f29d47799bb13a0d93935ef416828403e3a7",
-      "measured_seconds": 49.16,
-      "scope": "2s actual Freefield CLI at 1024 square, 25fps, plus 10s native same model/streaming path 189.48s and positive static comparison; 512 square H264 inputs; not native HD generation",
+      "evidence": "validation/10a-hd-long-20s-20261125.json",
+      "evidence_sha256": "72faad881cd7c9013ccc1b3b2af511b4a542623beaeeeeb6a7f2bc2f58fbbc7c",
+      "app_sha256": "0767ddfd2ba8abfa5373d496f701724c0622eed6459c126786909df892f656f8",
+      "workflow_sha256": "ba7aaeda0f01993798525f74800b343e88c56d2ad27fb630bc9d0256d4ca4f80",
+      "measured_seconds": 341.26,
+      "scope": "Upscale x2: 20s 1024x1024 at 25fps, 500 decoded frames in 341.26s; separate 2s portrait 1080x1920 at 15fps, 30 distinct frames in 58.35s. Exact decoded audio parity on both; positive sampled visual review, not native HD generation or exhaustive temporal quality.",
       "review": "limited",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "RealESRGAN x2 proportionnel avec traitement image par image et tuilage. Entrée SDR CFR 8–60 i/s, 128–960 px par côté, maximum 518 400 pixels et 140 M pixels-images, 1–20 s. Validé : portrait Full HD 2 s et carré 1024² 20 s. Les autres combinaisons restent à mesurer. Audio AAC conservé sans réencodage lorsque compatible."
     },
     "ltx25-q3-t2va-lite": {
       "evidence": "validation/09n-ltx25-native-q3-nvme-20261125.json",
@@ -352,7 +472,9 @@
       "measured_seconds": 432.09,
       "scope": "Real CLI 448x256, 25 frames, 1.04s, 24fps H264/AAC; clear prompt adherence, one ghosted motion frame; non-silent stereo audio, no perceptual audio review. Preview only.",
       "review": "limited",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Un plan unique et une seule action, caméra stable, décrire le son associé. Profil Q3 25 frames/448×256 ; le raffinement latent 2× upstream n’est pas encore qualifié localement."
     },
     "recast": {
       "evidence": "validation/09n-recast-native-bypass-q3-20261125.json",
@@ -362,7 +484,13 @@
       "measured_seconds": 551.13,
       "scope": "Real CLI 384x384, 17 distinct frames, 1.0625s at 16fps. Subject and outfit replacement with retained scene; approximate identity, oversize/cropped initial frames and imperfect motion. Replace mode only, no HD or animate-only claim.",
       "review": "limited",
-      "defaults": {}
+      "defaults": {},
+      "reference_settings": {
+        "mode": true,
+        "width": 384,
+        "height": 384
+      },
+      "guidance": "Choisir un sujet non occulté et une référence où tête et corps restent visibles ; le cadrage initial est crucial. Le remplacement 384²/17 frames est testé. Animation et continuation avec recouvrement sont des candidats distincts."
     }
   }
 }

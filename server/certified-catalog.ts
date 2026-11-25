@@ -7,6 +7,8 @@ export type Qualification = {
   evidence: string; evidence_sha256: string; app_sha256: string; workflow_sha256: string;
   measured_seconds: number; scope: string; review: "visual" | "limited" | "audio";
   defaults: Record<string, unknown>;
+  reference_settings?: Record<string, unknown>;
+  guidance?: string;
 };
 export type CertifiedManifest = { schema_version: number; revision: string; apps: Record<string, Qualification> };
 const digest = (file: string) => createHash("sha256").update(readFileSync(file)).digest("hex");
