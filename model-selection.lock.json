@@ -9,29 +9,53 @@
       "assurance": "full_cli_e2e",
       "evidence": "Freefield/ComfyUI/benchmarks/00a-h3-int4-freefield-cli-e2e-20261122.json",
       "fallback": "h3-video",
-      "decision": "Merserk H3 FL2VA + Qwen3VL32B INT4, native+CLI video/audio; 1s low-res validated, INT8 kept as rollback."
+      "decision": "Merserk H3 FL2VA + Qwen3VL32B INT4, native+CLI video/audio; 1s low-res validated, INT8 retained as a downloadable rollback recipe; local retired weights require verified restoration.",
+      "fallback_storage": "remote_restore_required",
+      "fallback_restore_receipt": "validation/10o-freefield-retention-cleanup-20261125.json",
+      "fallback_retired_weights": [
+        "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+        "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+      ]
     },
     "h3-photo-to-video": {
       "selected": "h3-photo-int4",
       "assurance": "full_cli_e2e",
       "evidence": "Freefield/ComfyUI/benchmarks/00b-h3-photo-int4-freefield-cli-e2e-20261122.json",
       "fallback": "h3-photo",
-      "decision": "Native and Freefield CLI matching H264/AAC, smaller INT4."
+      "decision": "Native and Freefield CLI matching H264/AAC, smaller INT4.",
+      "fallback_storage": "remote_restore_required",
+      "fallback_restore_receipt": "validation/10o-freefield-retention-cleanup-20261125.json",
+      "fallback_retired_weights": [
+        "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+        "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+      ]
     },
     "h3-extend-video": {
       "selected": "extend-video-int4",
       "assurance": "full_cli_e2e",
       "evidence": "Freefield/ComfyUI/benchmarks/00c-extend-video-int4-freefield-cli-e2e-20261123.json",
       "fallback": "extend-video",
-      "decision": "Native/CLI 78 of 78 identical decoded frames plus PCM identical; original retained."
+      "decision": "Native/CLI 78 of 78 identical decoded frames plus PCM identical; original recipe retained; retired weights require verified restoration.",
+      "fallback_storage": "remote_restore_required",
+      "fallback_restore_receipt": "validation/10o-freefield-retention-cleanup-20261125.json",
+      "fallback_retired_weights": [
+        "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+        "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+      ]
     },
     "h3-reshoot": {
       "selected": "reshoot-int4",
       "assurance": "full_cli_e2e",
       "evidence": "validation/08a-reshoot-int4-real-freefield-cli-20261124.json",
       "fallback": "reshoot",
-      "decision": "H3 REF2VA INT4, actual production-recipe Freefield CLI 1485.17s, 39-frame 416x256 H264/AAC 1.625s, two outputs and original input imported and authenticated API 200/206 verified. Visual PASS_WITH_LIMITATION, coherent robot and no magenta holes in final; subtle view change, low-res only, subjective audio not assessed. Original INT8 remains rollback.",
-      "previous_evidence": "Freefield/ComfyUI/benchmarks/00d-reshoot-merserk-int4-nvme66_5-native-retry-20261123.json"
+      "decision": "H3 REF2VA INT4, actual production-recipe Freefield CLI 1485.17s, 39-frame 416x256 H264/AAC 1.625s, two outputs and original input imported and authenticated API 200/206 verified. Visual PASS_WITH_LIMITATION, coherent robot and no magenta holes in final; subtle view change, low-res only, subjective audio not assessed. Original INT8 recipe remains rollback after verified weight restoration.",
+      "previous_evidence": "Freefield/ComfyUI/benchmarks/00d-reshoot-merserk-int4-nvme66_5-native-retry-20261123.json",
+      "fallback_storage": "remote_restore_required",
+      "fallback_restore_receipt": "validation/10o-freefield-retention-cleanup-20261125.json",
+      "fallback_retired_weights": [
+        "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+      ]
     },
     "qwen-image-general-edit": {
       "selected": "qwen21-edit",
