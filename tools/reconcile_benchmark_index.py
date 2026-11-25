@@ -220,6 +220,10 @@ def media_evidence(d, source, stem):
                 for media_item in output_items:
                     if not isinstance(media_item, dict) or not media_item.get("filename"):
                         continue
+                    # LoadVideo/LoadImage can expose their original inputs in
+                    # native history. They are not generated output artifacts.
+                    if media_item.get("type") in {"input", "temp"}:
+                        continue
                     fname = Path(media_item["filename"]).name
                     sub = str(media_item.get("subfolder", ""))
                     loc = (root / sub / fname).resolve()
