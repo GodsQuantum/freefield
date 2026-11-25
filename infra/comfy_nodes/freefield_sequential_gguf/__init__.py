@@ -185,5 +185,76 @@ class FreefieldSequentialGGUF:
             model = nodes.NODE_CLASS_MAPPINGS["UnetLoaderGGUF"]().load_unet(unet_name)[0]
             return _bound_diffusion_residency(model), cond
 
-NODE_CLASS_MAPPINGS = {"FreefieldSequentialGGUF": FreefieldSequentialGGUF}
+class FreefieldLoRAStack:
+    """Apply two ordinary LoRAs with ComfyUI's native additive bypass.
+    Preserve each strength, apply non-LoRA diffs with the regular patcher,
+    and never materialize a merged dense base matrix.
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        files = folder_paths.get_filename_list("loras")
+        return {"required": {
+            "model": ("MODEL",),
+            "lora_a": (files,), "strength_a": ("FLOAT", {"default": 1.0}),
+            "lora_b": (files,), "strength_b": ("FLOAT", {"default": 0.8})}}
+    RETURN_TYPES = ("MODEL",)
+    FUNCTION = "load"
+    CATEGORY = "freefield/loaders"
+    def load(self, model, lora_a, strength_a, lora_b, strength_b):
+        import comfy.lora
+        import comfy.lora_convert
+        from comfy.weight_adapter import BypassInjectionManager, WeightAdapterBase
+        from comfy.weight_adapter.lora import LoRAAdapter
+
+        class AdditiveStack(WeightAdapterBase):
+            def __init__(self, items):
+                self.weights = tuple(w for adapter, _ in items for w in adapter.weights)
+                self.strengths = tuple(strength for _, strength in items)
+                self.loaded_keys = set()
+            def h(self, x, base_out):
+                result = None
+                for i, strength in enumerate(self.strengths):
+                    adapter = LoRAAdapter(set(), self.weights[i*6:(i+1)*6])
+                    adapter.multiplier = self.multiplier * strength
+                    for key in ("is_conv", "conv_dim", "kw_dict", "kernel_size",
+                                "in_channels", "out_channels"):
+                        if hasattr(self, key):
+                            setattr(adapter, key, getattr(self, key))
+                    delta = adapter.h(x, base_out)
+                    result = delta if result is None else result + delta
+                return result
+
+        patcher = model.clone()
+        keymap = comfy.lora.model_lora_keys_unet(patcher.model, {})
+        manager = BypassInjectionManager()
+        stacks = {}
+        counts = []
+        for filename, strength in ((lora_a, strength_a), (lora_b, strength_b)):
+            lora = comfy.utils.load_torch_file(folder_paths.get_full_path_or_raise("loras", filename), safe_load=True)
+            loaded = comfy.lora.load_lora(comfy.lora_convert.convert_lora(lora), keymap)
+            regular = {}
+            adapters = 0
+            for key, data in loaded.items():
+                if isinstance(data, LoRAAdapter):
+                    up, down, alpha, mid, dora, reshape = data.weights
+                    if up.ndim == down.ndim == 2 and mid is None and dora is None and reshape is None and isinstance(key, str):
+                        stacks.setdefault(key, []).append((data, strength))
+                        adapters += 1
+                        continue
+                regular[key] = data
+            applied = patcher.add_patches(regular, strength) if regular else []
+            if not adapters:
+                raise RuntimeError("No compatible low-rank adapters in " + filename)
+            counts.append((filename, adapters, len(applied)))
+            del loaded, lora
+        for key, items in stacks.items():
+            manager.add_adapter(key, AdditiveStack(items), 1.0)
+        injections = manager.create_injections(patcher.model)
+        if manager.get_hook_count() != len(stacks):
+            raise RuntimeError("Native bypass hook coverage mismatch")
+        patcher.set_injections("freefield_lora_stack", injections)
+        logging.info("Freefield native additive LoRA stack: %s, %d hooked layers", counts, manager.get_hook_count())
+        return (patcher,)
+
+NODE_CLASS_MAPPINGS = {"FreefieldSequentialGGUF": FreefieldSequentialGGUF, "FreefieldLoRAStack": FreefieldLoRAStack}
 NODE_DISPLAY_NAME_MAPPINGS = {"FreefieldSequentialGGUF": "Freefield Sequential GGUF (GPU)"}
