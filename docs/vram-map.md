@@ -96,6 +96,7 @@ On an 80 GB H100, ComfyUI can keep models from earlier phases loaded, so measure
 | `style-reference` | ready | 19.1 GB | denoise 13.9 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | not measured |
 | `styles` | ready | 19.1 GB (+4.6 optional) | denoise 14.0 GB | krea2_turbo_int8_convrot.safetensors (13.5) | fits whole | L4 / A10G (24 GB) | not measured |
 | `ltx25-q3-t2va-lite` | ready | 21.3 GB | denoise 12.0 GB | ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf (12.0) | fits by phases | L4 / A10G (24 GB) | not measured |
+| `ltx25-q3-t2va-native-896` | ready | 22.3 GB | denoise 12.0 GB | ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf (12.0) | fits by phases | L4 / A10G (24 GB) | not measured |
 | `extend-video-int4` | ready | 29.7 GB | encode 14.9 GB | qwen3vl_32b_minimax_h3_int4_convrot.safetensors (14.9) | fits by phases | L4 / A10G (24 GB) | not measured |
 | `h3-photo-int4` | ready | 29.7 GB | encode 14.9 GB | qwen3vl_32b_minimax_h3_int4_convrot.safetensors (14.9) | fits by phases | L4 / A10G (24 GB) | not measured |
 | `h3-video-int4` | ready | 29.7 GB | encode 14.9 GB | qwen3vl_32b_minimax_h3_int4_convrot.safetensors (14.9) | fits by phases | L4 / A10G (24 GB) | not measured |

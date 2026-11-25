@@ -1,0 +1,76 @@
+{
+  "pack": "video-ltx25-q3-native-896",
+  "apps": [
+    "ltx25-q3-t2va-native-896"
+  ],
+  "download_gb": 22.34,
+  "needs_hf_token": true,
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "models": [
+    {
+      "repo": "ChrisColeTech/LTX-2.5-uncensored-v1.1-FP8",
+      "file": "split/text_encoders/gguf/gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+      "dir": "clip_gguf",
+      "gb": 7.509634752,
+      "name": "gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+      "gated": false,
+      "license": "LTX-2.x Community License",
+      "used_by": [
+        "ltx25-q3-t2va-native-896"
+      ]
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+      "dir": "latent_upscale_models",
+      "gb": 1.0,
+      "name": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+      "gated": true,
+      "license": "LTX-2.x Community License",
+      "used_by": [
+        "ltx25-q3-t2va-native-896"
+      ]
+    },
+    {
+      "repo": "unsloth/LTX-2.5-GGUF",
+      "file": "distilled/ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+      "dir": "unet_gguf",
+      "gb": 12.000207232,
+      "name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf",
+      "gated": false,
+      "license": "LTX-2.x Community License",
+      "used_by": [
+        "ltx25-q3-t2va-native-896"
+      ]
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
+      "dir": "vae",
+      "gb": 0.36,
+      "name": "ltx-2.5-audio-vae-bf16.safetensors",
+      "gated": true,
+      "license": "LTX-2.x Community License",
+      "used_by": [
+        "ltx25-q3-t2va-native-896"
+      ]
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
+      "dir": "vae",
+      "gb": 1.47,
+      "name": "ltx-2.5-video-vae-bf16.safetensors",
+      "gated": true,
+      "license": "LTX-2.x Community License",
+      "used_by": [
+        "ltx25-q3-t2va-native-896"
+      ]
+    }
+  ]
+}

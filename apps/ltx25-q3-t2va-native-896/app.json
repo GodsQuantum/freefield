@@ -1,0 +1,106 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "ltx25-q3-t2va-native-896",
+  "name": "LTX 2.5 — qualité native ×2 (896 × 512)",
+  "section": "video",
+  "pack": "video-ltx25-q3-native-896",
+  "status": "ready",
+  "summary": "Vidéo et audio natifs LTX 2.5 Q3, raffinement latent x2. 896 x 512, 25 images, 1,04 s. Mode lent.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "Native LTX 2.5 two-stage Q3 + official latent spatial upscaler, exact 26-node tested graph",
+    "comfyui": "0.45.0",
+    "notes": "Actual CLI proof 10m; bounded immutable GGUF text encoder and diffusion, native VAE statistics upscaler with phase releases, deferred tiled CPU VAE decode. Original lite recipe unchanged."
+  },
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Scène et ambiance sonore",
+      "default": "A realistic close-up of a man in a red jacket gently turning his head towards the camera, natural daylight, one steady shot, soft street ambience, no speech or music.",
+      "required": true,
+      "bind": [
+        {
+          "node": "405:376",
+          "field": "value"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Graine",
+      "default": -1,
+      "bind": [
+        {
+          "node": "405:339",
+          "field": "noise_seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "75",
+      "type": "video",
+      "label": "MP4 H.264 avec audio"
+    }
+  ],
+  "models": [
+    {
+      "repo": "unsloth/LTX-2.5-GGUF",
+      "file": "distilled/ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+      "dir": "unet_gguf",
+      "gb": 12.000207232,
+      "phase": "denoise",
+      "license": "LTX-2.x Community License",
+      "install_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf"
+    },
+    {
+      "repo": "ChrisColeTech/LTX-2.5-uncensored-v1.1-FP8",
+      "file": "split/text_encoders/gguf/gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+      "dir": "clip_gguf",
+      "gb": 7.509634752,
+      "phase": "encode",
+      "license": "LTX-2.x Community License"
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
+      "dir": "vae",
+      "gb": 1.47,
+      "phase": "decode",
+      "license": "LTX-2.x Community License",
+      "gated": true
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
+      "dir": "vae",
+      "gb": 0.36,
+      "phase": "decode",
+      "license": "LTX-2.x Community License",
+      "gated": true
+    },
+    {
+      "repo": "Lightricks/LTX-2.5",
+      "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+      "dir": "latent_upscale_models",
+      "gb": 1.0,
+      "phase": "aux",
+      "gated": true,
+      "license": "LTX-2.x Community License"
+    }
+  ],
+  "custom_nodes": [
+    {
+      "repo": "https://github.com/city96/ComfyUI-GGUF",
+      "commit": "6ea2651"
+    }
+  ],
+  "notes": "Clip unique de 1,04 s validé à 24 ips. Génération mesurée 19 min 31 s sur Cloud9. Flou de mouvement ponctuel. Audio présent, écoute subjective non effectuée. Ni 720p/1080p natif ni longue durée certifiés.",
+  "test": {
+    "prompt": "A realistic close-up of a man in a red jacket gently turning his head towards the camera, natural daylight, one steady shot, soft street ambience, no speech or music.",
+    "seed": 202611250945
+  }
+}

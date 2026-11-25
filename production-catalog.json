@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v12-recast-animate",
+  "revision": "cloud9-20261125-certified-v13-ltx-native-896",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -508,6 +508,18 @@
         "start_seconds": 0.75
       },
       "guidance": "Choisir un clip avec un seul sujet bien visible et le décrire précisément. Fournir une référence en pied si nécessaire ; choisir 17 images à partir du début indiqué. Le cadrage final peut se resserrer. Aperçu court, pas de HD native."
+    },
+    "ltx25-q3-t2va-native-896": {
+      "evidence": "validation/10m-ltx25-bounded-encoder-native-hd-20261125.json",
+      "evidence_sha256": "72b201e96c783d3146cb0b7b37aa8aede3e7ea6c8c5c39cd8a5f0113660dc2e6",
+      "app_sha256": "07f1e7e87d68a967277980b6bc6008b7101229eefa93fe6d2dbc552aa29dbf9f",
+      "workflow_sha256": "89d2f185f29910224cc85757954207e09f5eda8e4549ea724ab465cb1fc43da7",
+      "measured_seconds": 1170.72,
+      "scope": "Actual native 2-stage CLI 896x512, 25 distinct frames/1.041667s/24fps, H264 + non-silent stereo AAC, full decode PASS. Sampled visual inspection PASS_WITH_LIMITATIONS; coherent head rotation, one motion-blurred frame; 1170.72s total, slow CPU VAE. No native HD or long duration claim.",
+      "review": "limited",
+      "defaults": {},
+      "reference_settings": {},
+      "guidance": "Mode qualité lent : un plan unique, une action simple, caméra stable. 896 × 512, 25 images/24 ips, 1,04 s ; environ 19 min 31 s sur le test Cloud9. Pour un aperçu rapide utiliser LTX 448 × 256."
     }
   }
 }

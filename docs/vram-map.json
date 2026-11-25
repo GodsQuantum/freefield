@@ -2187,6 +2187,32 @@
       "measured_on": null
     },
     {
+      "id": "ltx25-q3-t2va-native-896",
+      "name": "LTX 2.5 — qualité native ×2 (896 × 512)",
+      "section": "video",
+      "pack": "video-ltx25-q3-native-896",
+      "status": "ready",
+      "whole_gb": 22.34,
+      "phases_gb": {
+        "encode": 7.51,
+        "denoise": 12.0,
+        "denoise2": 0.0,
+        "decode": 1.83,
+        "aux": 1.0
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 12.0,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+        "gb": 12.000207232
+      },
+      "verdict_24gb": "fits by phases",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
       "id": "extend-video-int4",
       "name": "Extend Video INT4 compact",
       "section": "video",

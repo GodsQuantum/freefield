@@ -5,13 +5,17 @@ import { loadRegistry, repoRoot } from "../server/registry.ts";
 const root = repoRoot(), { apps } = loadRegistry(root);
 test("certified production catalog exposes exactly reviewed applications, not installed candidates", () => {
   const c = certifiedCatalog(root, apps);
-  assert.equal(c.apps.length, 31);
+  assert.equal(c.apps.length, 32);
   assert.equal(c.proofs.size, c.apps.length);
   assert.ok(c.proofs.has("character-swap"));
   assert.ok(c.proofs.has("talking"));
   assert.ok(c.proofs.has("voice-clone"));
   assert.ok(c.proofs.has("upscale-video-hd"));
   assert.ok(c.proofs.has("ltx25-q3-t2va-lite"));
+  assert.ok(c.proofs.has("ltx25-q3-t2va-native-896"));
+  const ltx=c.apps.find(a=>a.id==="ltx25-q3-t2va-native-896")!;
+  assert.equal(ltx.graph!["ff_up"].class_type,"FreefieldLTXStatsUpscale");
+  assert.equal(ltx.graph!["405:374"].class_type,"FreefieldSequentialVideoDecode");
   assert.ok(c.proofs.has("recast"));
   assert.ok(c.proofs.has("recast-animate-preview"));
   const animation=c.apps.find(a=>a.id==="recast-animate-preview")!;
@@ -33,5 +37,5 @@ test("workflow drift excludes a formerly certified recipe", () => {
   const altered = apps.map(a=>a.id==="create-image" ? {...a, workflowPath: apps.find(b=>b.id==="z-image")!.workflowPath}:a);
   const c=certifiedCatalog(root, altered);
   assert.ok(!c.proofs.has("create-image"));
-  assert.equal(c.apps.length,30);
+  assert.equal(c.apps.length,31);
 });

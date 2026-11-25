@@ -285,3 +285,115 @@ class FreefieldRecastWindow:
             audio={**audio,"waveform":audio["waveform"][...,:round(duration*audio["sample_rate"])]}
         return (images,audio,fps)
 NODE_CLASS_MAPPINGS["FreefieldRecastWindow"]=FreefieldRecastWindow
+
+
+class FreefieldLTXStatsUpscale:
+    """Native spatial upscaler with only the VAE statistics required by the native operation."""
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"samples": ("LATENT",), "model_name": (folder_paths.get_filename_list("latent_upscale_models"),), "vae_name": (folder_paths.get_filename_list("vae"),)}}
+    RETURN_TYPES = ("LATENT",)
+    FUNCTION = "upscale"
+    CATEGORY = "freefield/video"
+    def upscale(self, samples, model_name, vae_name):
+        from types import SimpleNamespace
+        from safetensors import safe_open
+        from comfy.ldm.lightricks.vae.causal_video_autoencoder import processor
+        from comfy_extras.nodes_hunyuan import LatentUpscaleModelLoader
+        from comfy_extras.nodes_lt_upsampler import LTXVLatentUpsampler
+        dev = mm.get_torch_device()
+        if dev.type != "cuda":
+            raise RuntimeError("FreefieldLTXStatsUpscale requires GPU")
+        _release()
+        logging.info("Freefield LTX released stage1 before any spatial upscale weights: %d GPU bytes", torch.cuda.memory_allocated(dev))
+        stats = processor()
+        state = {}
+        with safe_open(folder_paths.get_full_path_or_raise("vae", vae_name), framework="pt", device="cpu") as f:
+            for k in ("mean-of-means", "std-of-means"):
+                t = f.get_tensor("per_channel_statistics." + k)
+                if t.shape != (128,) or not torch.isfinite(t).all() or (k == "std-of-means" and not (t > 0).all()):
+                    raise RuntimeError("Invalid native LTX VAE latent statistics")
+                state[k] = t.float().clone()
+        stats.load_state_dict(state, strict=True)
+        del state, t
+        vae = SimpleNamespace(first_stage_model=SimpleNamespace(per_channel_statistics=stats))
+        upscaler = None
+        try:
+            with torch.inference_mode():
+                upscaler = LatentUpscaleModelLoader.execute(model_name).result[0]
+                result = LTXVLatentUpsampler.execute(samples, upscaler, vae).result[0]
+                torch.cuda.synchronize(dev)
+        finally:
+            del upscaler
+            _release()
+        logging.info("Freefield LTX spatial upscaler released before refinement: %d GPU bytes", torch.cuda.memory_allocated(dev))
+        return (result,)
+
+
+class FreefieldSequentialVideoDecode:
+    """Load native video VAE only after final diffusion has been released."""
+    @classmethod
+    def INPUT_TYPES(cls):
+        args = dict(nodes.VAEDecodeTiled.INPUT_TYPES()["required"])
+        del args["vae"]
+        args["vae_name"] = (folder_paths.get_filename_list("vae"),)
+        return {"required": args}
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "decode"
+    CATEGORY = "freefield/video"
+    def decode(self, samples, vae_name, tile_size, overlap, temporal_size, temporal_overlap):
+        _release()
+        logging.info("Freefield video diffusion released before loading final VAE")
+        vae = None
+        try:
+            vae = nodes.VAELoader().load_vae(vae_name)[0]
+            return nodes.VAEDecodeTiled().decode(vae, samples, tile_size, overlap, temporal_size, temporal_overlap)
+        finally:
+            del vae
+            _release()
+
+
+class FreefieldSequentialGGUFBounded(FreefieldSequentialGGUF):
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "clip_name": (folder_paths.get_filename_list("clip_gguf"),),
+            "unet_name": (folder_paths.get_filename_list("unet_gguf"),),
+            "family": (["wan", "ltxv"],),
+            "text": ("STRING", {"multiline": True})},
+            "optional": {"after_drive_mask": ("IMAGE",), "after_ref_mask": ("IMAGE",)}}
+    RETURN_TYPES = ("MODEL", "CONDITIONING")
+    FUNCTION = "load"
+    CATEGORY = "freefield/loaders"
+    def load(self, clip_name, unet_name, family, text, after_drive_mask=None, after_ref_mask=None):
+        dev = mm.get_torch_device()
+        if dev.type != "cuda":
+            raise RuntimeError("FreefieldSequentialGGUF requires a GPU")
+        for label, mask in (("driver", after_drive_mask), ("reference", after_ref_mask)):
+            if mask is not None:
+                blue = (mask[..., 2] > .88) & (mask[..., 0] < .12) & (mask[..., 1] < .12)
+                if not bool(blue.flatten(1).any(dim=1).all().item()):
+                    raise ValueError("No target in one or more " + label + " frames; choose a more specific target.")
+        _release()
+        before = torch.cuda.memory_allocated(dev)
+        with torch.inference_mode():
+            clip = _scoped_loader().load_clip(clip_name, family)[0]
+            # Immutable file-backed GGUF; avoid the eager GPU/CPU detachment of offloaded encoder layers.
+            clip.patcher = _bound_diffusion_residency(clip.patcher)
+            if clip.patcher.load_device.type != "cuda":
+                raise RuntimeError("Text encoder not assigned to GPU")
+            refs = (weakref.ref(clip.cond_stage_model), weakref.ref(clip.patcher))
+            cond = nodes.CLIPTextEncode().encode(clip, text)[0]
+            torch.cuda.synchronize(dev)
+            # Conditioning is the only encoder result retained.
+            del clip
+            _release()
+            if any(ref() is not None for ref in refs):
+                raise RuntimeError("Text encoder retained: refusing overlapping model allocation")
+            logging.info("Freefield sequential %s: encoder released, GPU bytes %d -> %d", family, before, torch.cuda.memory_allocated(dev))
+            model = nodes.NODE_CLASS_MAPPINGS["UnetLoaderGGUF"]().load_unet(unet_name)[0]
+            return _bound_diffusion_residency(model), cond
+
+NODE_CLASS_MAPPINGS["FreefieldLTXStatsUpscale"] = FreefieldLTXStatsUpscale
+NODE_CLASS_MAPPINGS["FreefieldSequentialVideoDecode"] = FreefieldSequentialVideoDecode
+NODE_CLASS_MAPPINGS["FreefieldSequentialGGUFBounded"] = FreefieldSequentialGGUFBounded

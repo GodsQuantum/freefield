@@ -245,6 +245,13 @@
     "download_gb": 21.34,
     "needs_hf_token": true
   },
+  "video-ltx25-q3-native-896": {
+    "apps": [
+      "ltx25-q3-t2va-native-896"
+    ],
+    "download_gb": 22.34,
+    "needs_hf_token": true
+  },
   "video-scail": {
     "apps": [
       "recast",

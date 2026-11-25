@@ -248,6 +248,12 @@
       "evidence": "validation/10f-recast-single-window-animate-bindfix-20261125.json",
       "assurance": "full_cli_e2e",
       "reason": "Exact native animation-only graph qualified at 320x320/17 frames; no new model weights."
+    },
+    "video-ltx25-native-896": {
+      "selected": "ltx25-q3-t2va-native-896",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/10m-ltx25-bounded-encoder-native-hd-20261125.json",
+      "decision": "Actual two-stage native LTX 2.5 Q3 896x512 25f 1.04s 24fps, 1170.72s, visual PASS_WITH_LIMITATIONS and technical AV PASS. Optional slow quality profile only; preview remains unchanged. Exact bound graph matches native prompt. No 720p/1080p or long-duration claim."
     }
   },
   "challengers_unqualified": [
@@ -8031,6 +8037,131 @@
           "class_type": "ManualSigmas",
           "inputs": {
             "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0"
+          }
+        }
+      ],
+      "model_overrides": [],
+      "limits": []
+    },
+    "ltx25-q3-t2va-native-896": {
+      "status": "ready",
+      "pack": "video-ltx25-q3-native-896",
+      "models": [
+        {
+          "dir": "clip_gguf",
+          "file": "split/text_encoders/gguf/gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+          "repo": "ChrisColeTech/LTX-2.5-uncensored-v1.1-FP8",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "latent_upscale_models",
+          "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+          "repo": "Lightricks/LTX-2.5",
+          "phase": "aux",
+          "optional": false
+        },
+        {
+          "dir": "unet_gguf",
+          "file": "distilled/ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+          "repo": "unsloth/LTX-2.5-GGUF",
+          "phase": "denoise",
+          "optional": false,
+          "install_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf"
+        },
+        {
+          "dir": "vae",
+          "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
+          "repo": "Lightricks/LTX-2.5",
+          "phase": "decode",
+          "optional": false
+        },
+        {
+          "dir": "vae",
+          "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
+          "repo": "Lightricks/LTX-2.5",
+          "phase": "decode",
+          "optional": false
+        }
+      ],
+      "workflow": [
+        {
+          "id": "405:344",
+          "class_type": "SamplerCustomAdvanced",
+          "inputs": {
+            "sigmas": [
+              "405:404",
+              0
+            ]
+          }
+        },
+        {
+          "id": "405:352",
+          "class_type": "KSamplerSelect",
+          "inputs": {
+            "sampler_name": "euler_ancestral"
+          }
+        },
+        {
+          "id": "405:356",
+          "class_type": "EmptyLTXVLatentVideo",
+          "inputs": {
+            "width": 448,
+            "height": 256
+          }
+        },
+        {
+          "id": "405:374",
+          "class_type": "FreefieldSequentialVideoDecode",
+          "inputs": {
+            "vae_name": "ltx-2.5-video-vae-bf16.safetensors"
+          }
+        },
+        {
+          "id": "405:384",
+          "class_type": "FreefieldSequentialGGUFBounded",
+          "inputs": {
+            "clip_name": "gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+            "unet_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf"
+          }
+        },
+        {
+          "id": "405:386",
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "ltx-2.5-audio-vae-bf16.safetensors"
+          }
+        },
+        {
+          "id": "405:404",
+          "class_type": "ManualSigmas",
+          "inputs": {
+            "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0"
+          }
+        },
+        {
+          "id": "ff_refine",
+          "class_type": "SamplerCustomAdvanced",
+          "inputs": {
+            "sigmas": [
+              "ff_refine_sigmas",
+              0
+            ]
+          }
+        },
+        {
+          "id": "ff_refine_sigmas",
+          "class_type": "ManualSigmas",
+          "inputs": {
+            "sigmas": "0.909375, 0.725, 0.421875, 0.0"
+          }
+        },
+        {
+          "id": "ff_up",
+          "class_type": "FreefieldLTXStatsUpscale",
+          "inputs": {
+            "model_name": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+            "vae_name": "ltx-2.5-video-vae-bf16.safetensors"
           }
         }
       ],

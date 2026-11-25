@@ -81,3 +81,21 @@ test("LTX2.5 Q3 portable standalone pack preserves existing LTX2.5 baseline sepa
   assert.equal(original.graph["405:368"].class_type, "SamplerCustomAdvanced");
   assert.equal(original.graph["405:348"].class_type, "LTXVLatentUpsampler");
 });
+
+
+test("native LTX quality profile adds only the official latent upscaler without changing preview pack", () => {
+  const a = apps.find(x => x.id === "ltx25-q3-t2va-native-896");
+  assert.ok(a?.graph);
+  assert.equal(a.pack, "video-ltx25-q3-native-896");
+  assert.equal(Object.keys(a.graph).length, 26);
+  assert.equal(Object.values(a.graph).filter(n=>n.class_type === "SamplerCustomAdvanced").length,2);
+  assert.equal(a.graph["405:384"].class_type,"FreefieldSequentialGGUFBounded");
+  assert.equal(a.graph["405:356"].inputs.width,448);
+  assert.equal(a.graph["405:356"].inputs.height,256);
+  assert.equal(a.graph["405:362"].inputs.value,1);
+  assert.equal(a.graph["405:361"].inputs.value,24);
+  assert.equal(a.graph["ff_up"].inputs.model_name,"ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors");
+  const pack=JSON.parse(readFileSync(new URL("../packs/video-ltx25-q3-native-896.json",import.meta.url),"utf8"));
+  assert.deepEqual(pack.apps,[a.id]);
+  assert.equal(pack.models.length,5);
+});
