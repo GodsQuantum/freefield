@@ -1,0 +1,47 @@
+{
+  "pack": "audio-zonos3",
+  "apps": [
+    "voice-clone"
+  ],
+  "download_gb": 2.91,
+  "needs_hf_token": false,
+  "custom_nodes": [],
+  "models": [
+    {
+      "repo": "Zyphra/ZONOS3-Mini",
+      "file": "gguf/backbone-ptq.gguf",
+      "dir": "audio_encoders",
+      "gb": 0.663150624,
+      "name": "zonos3-backbone-ptq.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "voice-clone"
+      ]
+    },
+    {
+      "repo": "Zyphra/ZONOS3-Mini",
+      "file": "gguf/spk-encoder.gguf",
+      "dir": "audio_encoders",
+      "gb": 0.045385728,
+      "name": "zonos3-spk-encoder.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "voice-clone"
+      ]
+    },
+    {
+      "repo": "Zyphra/ZONOS3-Mini",
+      "file": "gguf/zac.gguf",
+      "dir": "audio_encoders",
+      "gb": 2.199903264,
+      "name": "zonos3-zac-full-mr.gguf",
+      "gated": false,
+      "license": "Apache-2.0",
+      "used_by": [
+        "voice-clone"
+      ]
+    }
+  ]
+}

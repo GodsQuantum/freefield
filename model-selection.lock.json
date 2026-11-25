@@ -194,6 +194,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/09j-talking-flashhead-native-45s-e2e-20261125.json",
       "decision": "SoulX-FlashHead Lite 1.3B ROCm pinned upstream streaming, 33-frame context, 9 anchor frames, 24 new frames per window, 4 steps, bounded audio cache and file-backed video. Actual 45s/1125 unique frames/512x512/25fps in 583.44s, full decode PASS, audio PCM corr 0.999177, sampled visual continuity PASS with limitation, min available13.177GiB, max GTT13.979GiB, PSI2.61%. Previous LTX Talking unqualified, retained in Git and rollback image. No parallel GPU, no global runtime or guard changes. Limit 45s until longer tests."
+    },
+    "voice-clone": {
+      "selected": "voice-clone",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/09k-zonos3-voice-clone-freefield-e2e-20261125.json",
+      "decision": "Existing native ZONOS3-Mini PTQ, MECT-B2 reference embedding, full_mr decoder, French LACI; no second runtime. Exact local model SHA256 matches current upstream HF. Independent ASR word error rate zero. No perceptual guarantee."
     }
   },
   "challengers_unqualified": [
@@ -15134,6 +15140,39 @@
         }
       ]
     },
+    "voice-clone": {
+      "status": "ready",
+      "pack": "audio-zonos3",
+      "models": [
+        {
+          "dir": "audio_encoders",
+          "file": "gguf/backbone-ptq.gguf",
+          "repo": "Zyphra/ZONOS3-Mini",
+          "phase": "all",
+          "optional": false,
+          "install_name": "zonos3-backbone-ptq.gguf"
+        },
+        {
+          "dir": "audio_encoders",
+          "file": "gguf/spk-encoder.gguf",
+          "repo": "Zyphra/ZONOS3-Mini",
+          "phase": "encode",
+          "optional": false,
+          "install_name": "zonos3-spk-encoder.gguf"
+        },
+        {
+          "dir": "audio_encoders",
+          "file": "gguf/zac.gguf",
+          "repo": "Zyphra/ZONOS3-Mini",
+          "phase": "decode",
+          "optional": false,
+          "install_name": "zonos3-zac-full-mr.gguf"
+        }
+      ],
+      "workflow": [],
+      "model_overrides": [],
+      "limits": []
+    },
     "volcano-ad": {
       "status": "ready",
       "pack": "video-ltx25",
@@ -15796,5 +15835,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-24T22:52:31.770763+00:00"
+  "last_selection_review_utc": "2026-11-25T01:38:59.876562+00:00"
 }

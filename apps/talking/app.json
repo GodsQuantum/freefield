@@ -26,7 +26,8 @@
           "node": "1",
           "field": "image"
         }
-      ]
+      ],
+      "help": "Portrait frontal net, un visage, bouche visible, éclairage homogène. Cadrage final carré 512 × 512."
     },
     {
       "id": "audio",
@@ -45,7 +46,8 @@
           "node": "2",
           "field": "audio"
         }
-      ]
+      ],
+      "help": "Voix seule et intelligible, 2–45 s, sans musique ni réverbération marquée. Le modèle pilote la bouche et les mouvements à partir du son, sans prompt texte."
     },
     {
       "id": "seed",

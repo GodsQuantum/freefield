@@ -26,7 +26,8 @@
           "node": "1",
           "field": "image"
         }
-      ]
+      ],
+      "help": "Source nette, sans compression excessive. Restaurer les détails plutôt que multiplier aveuglément la résolution ; 2× est le mode qualifié."
     },
     {
       "id": "scale",

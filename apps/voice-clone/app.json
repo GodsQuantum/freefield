@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "voice-clone",
+  "name": "Clonage vocal - ZONOS3",
+  "section": "audio",
+  "pack": "audio-zonos3",
+  "status": "ready",
+  "summary": "Clone une voix de référence en français, avec le moteur ZONOS3-Mini natif et le décodeur complet 44,1 kHz.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "Zyphra ZONOS3-Mini native /v2/generate; existing Cloud9 service"
+  },
+  "inputs": [
+    {
+      "id": "reference",
+      "type": "audio",
+      "label": "Voix de référence",
+      "required": true,
+      "help": "Enregistrement autorisé de 2 à 30 secondes, une seule voix, sans musique ni réverbération.",
+      "limits": {
+        "max_mb": 30,
+        "seconds": [
+          2,
+          30
+        ]
+      },
+      "bind": [
+        {
+          "node": "1",
+          "field": "audio"
+        }
+      ]
+    },
+    {
+      "id": "text",
+      "type": "textarea",
+      "label": "Texte français",
+      "required": true,
+      "default": "Ce matin, je vous propose une expérience très simple. Écoutez cette voix, puis dites-moi si le ton vous paraît naturel.",
+      "help": "1 à 200 caractères. Ponctuation naturelle, écrire les nombres en toutes lettres pour contrôler la prononciation.",
+      "bind": [
+        {
+          "node": "2",
+          "field": "text"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": 42,
+      "bind": [
+        {
+          "node": "2",
+          "field": "seed"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "3",
+      "type": "audio",
+      "label": "Voix clonée (FLAC)"
+    }
+  ],
+  "models": [
+    {
+      "repo": "Zyphra/ZONOS3-Mini",
+      "file": "gguf/backbone-ptq.gguf",
+      "dir": "audio_encoders",
+      "install_name": "zonos3-backbone-ptq.gguf",
+      "gb": 0.663150624,
+      "phase": "all",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Zyphra/ZONOS3-Mini",
+      "file": "gguf/spk-encoder.gguf",
+      "dir": "audio_encoders",
+      "install_name": "zonos3-spk-encoder.gguf",
+      "gb": 0.045385728,
+      "phase": "encode",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "Zyphra/ZONOS3-Mini",
+      "file": "gguf/zac.gguf",
+      "dir": "audio_encoders",
+      "install_name": "zonos3-zac-full-mr.gguf",
+      "gb": 2.199903264,
+      "phase": "decode",
+      "license": "Apache-2.0"
+    }
+  ],
+  "notes": "Requires the existing locally configured native ZONOS3 service. No second model or service. French short-phrase scope."
+}

@@ -1,0 +1,33 @@
+{
+  "1": {
+    "class_type": "LoadAudio",
+    "inputs": {
+      "audio": "reference.mp3"
+    }
+  },
+  "2": {
+    "class_type": "FreefieldZonosVoiceClone",
+    "inputs": {
+      "reference": [
+        "1",
+        0
+      ],
+      "text": "Ce matin, je vous propose une expérience très simple. Écoutez cette voix, puis dites-moi si le ton vous paraît naturel.",
+      "seed": 42,
+      "backbone": "zonos3-backbone-ptq.gguf",
+      "speaker_encoder": "zonos3-spk-encoder.gguf",
+      "decoder": "zonos3-zac-full-mr.gguf"
+    }
+  },
+  "3": {
+    "class_type": "SaveAudioAdvanced",
+    "inputs": {
+      "audio": [
+        "2",
+        0
+      ],
+      "filename_prefix": "freefield/voice-clone",
+      "format": "flac"
+    }
+  }
+}

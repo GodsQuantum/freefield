@@ -25,7 +25,8 @@
           "node": "4",
           "field": "file"
         }
-      ]
+      ],
+      "help": "Clip à cadence constante, sans coupes abruptes. L’interpolation ne crée pas de nouvelles informations de scène."
     },
     {
       "id": "factor",

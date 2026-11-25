@@ -35,7 +35,7 @@
       "label": "What happens",
       "required": true,
       "default": "The person smiles, waves at the camera and says: \"Hey, good to see you.\"",
-      "help": "Put spoken words in quotes; describe sounds and music too.",
+      "help": "Décrire seulement le mouvement, l’expression, la caméra et le son souhaités. Préserver l’identité, le décor et le cadrage de l’image source.",
       "bind": [
         {
           "node": "105:104",

@@ -1,0 +1,8 @@
+{
+  "base_url": "http://192.168.1.219:1919",
+  "weights": {
+    "zonos3-backbone-ptq.gguf": "/srv/storage/nvme/shared/ai-models/audio/tts/zonos3-mini/gguf/backbone-ptq.gguf",
+    "zonos3-spk-encoder.gguf": "/srv/storage/nvme/shared/ai-models/audio/tts/zonos3-mini/gguf/spk-encoder.gguf",
+    "zonos3-zac-full-mr.gguf": "/srv/storage/nvme/shared/ai-models/audio/tts/zonos3-mini/gguf/zac.gguf"
+  }
+}

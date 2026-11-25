@@ -74,7 +74,8 @@
           "field": "value",
           "template": " relight the image using {light}{direction}{quality}{brightness}{color}. {details}"
         }
-      ]
+      ],
+      "help": "Décrire direction, couleur, douceur, sources et ombres de la nouvelle lumière ; conserver l’identité et la composition."
     },
     {
       "id": "direction",

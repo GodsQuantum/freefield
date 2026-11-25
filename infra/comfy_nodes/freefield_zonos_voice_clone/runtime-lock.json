@@ -1,0 +1,30 @@
+{
+  "upstream": "https://huggingface.co/Zyphra/ZONOS3-Mini",
+  "revision": "2921b8821772b0bd10a04456863d21abf9d2f283",
+  "existing_service": "zonos3-mini.service",
+  "service_source_commit": "9a5007445c683aa990b75c379d2ea7d114506f8a",
+  "weights": {
+    "zonos3-backbone-ptq.gguf": {
+      "filename": "backbone-ptq.gguf",
+      "sha256": "66fceb6d73a8c30bde80249e4112bb308380ab7f3384fa11c8e4048115e4ceec",
+      "size": 663150624
+    },
+    "zonos3-spk-encoder.gguf": {
+      "filename": "spk-encoder.gguf",
+      "sha256": "9539f340b70be246005403b9c254732e180e85e0b3c57fb1973f0d6bc6c59bdc",
+      "size": 45385728
+    },
+    "zonos3-zac-full-mr.gguf": {
+      "filename": "zac.gguf",
+      "sha256": "9dc8e29cb681dae320bd77329c0f7a39806ad5de6c231ad111adab1a1f6774d8",
+      "size": 2199903264
+    }
+  },
+  "native_settings": {
+    "speaker_mode": "embedding",
+    "decoder": "full_mr",
+    "language": "fr_fr",
+    "laci": true,
+    "max_tokens": 360
+  }
+}

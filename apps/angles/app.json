@@ -145,14 +145,15 @@
             }
           ]
         }
-      ]
+      ],
+      "help": "Choisir un mouvement de caméra précis. Une seule rotation ou variation de distance à la fois."
     },
     {
       "id": "details",
       "type": "textarea",
       "label": "Extra direction",
       "default": "",
-      "help": "Added at the end of the app's prompt.",
+      "help": "Conserver explicitement le sujet, les vêtements et le décor ; éviter une nouvelle description contradictoire.",
       "bind": []
     },
     {

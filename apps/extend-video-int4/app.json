@@ -41,7 +41,8 @@
           "node": "105:104",
           "field": "prompt"
         }
-      ]
+      ],
+      "help": "Poursuivre la dernière action et conserver les mêmes acteurs, vêtements, lumière, géométrie et caméra. Éviter de réintroduire la scène."
     },
     {
       "id": "duration",

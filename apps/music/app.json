@@ -25,7 +25,8 @@
           "node": "37:13",
           "field": "caption"
         }
-      ]
+      ],
+      "help": "Indiquer genre, instrumentation, voix, tempo, ambiance et progression de l’arrangement."
     },
     {
       "id": "lyrics",
@@ -37,7 +38,8 @@
           "node": "37:13",
           "field": "lyrics"
         }
-      ]
+      ],
+      "help": "Utiliser les paroles exactes, avec des sections [Verse], [Chorus] et [Bridge] ; éviter de mélanger les consignes de style et les paroles."
     },
     {
       "id": "seconds",

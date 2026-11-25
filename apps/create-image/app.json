@@ -26,7 +26,8 @@
           "field": "value",
           "template": "{prompt} {look}"
         }
-      ]
+      ],
+      "help": "Décrire le sujet, son action, le cadrage, la lumière et le rendu. Préférer une description naturelle cohérente aux listes de mots-clés contradictoires. Texte visible entre guillemets."
     },
     {
       "id": "expand",

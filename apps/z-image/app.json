@@ -24,7 +24,8 @@
           "node": "57:27",
           "field": "text"
         }
-      ]
+      ],
+      "help": "Décrire en langage naturel la scène, le sujet, la composition, les textures et la lumière. Les huit étapes Turbo sont le réglage qualifié."
     },
     {
       "id": "width",

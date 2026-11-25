@@ -25,7 +25,8 @@
           "node": "4",
           "field": "text"
         }
-      ]
+      ],
+      "help": "Une description directe du sujet, des matières, de la scène et de la lumière. Ajouter les détails photographiques utiles, sans instructions incompatibles."
     },
     {
       "id": "width",

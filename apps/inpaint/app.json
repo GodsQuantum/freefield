@@ -58,7 +58,8 @@
           "field": "text",
           "template": "{instruction}. Keep the rest of the image exactly the same."
         }
-      ]
+      ],
+      "help": "Décrire uniquement le résultat voulu dans la zone masquée. Choisir un masque propre et éviter les changements hors masque."
     },
     {
       "id": "steps",

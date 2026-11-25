@@ -27,7 +27,8 @@
           "node": "9",
           "field": "image"
         }
-      ]
+      ],
+      "help": "Choisir une photo nette avec perspective et plans lisibles. La profondeur estimée est relative, pas une mesure métrique."
     },
     {
       "id": "map",

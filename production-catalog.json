@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v5",
+  "revision": "cloud9-20261125-certified-v6",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
       "evidence": "validation/flux3-native-cli1024-20261119.json",
       "evidence_sha256": "f0e8be355d546622bc4e42be654240e33586ed9c4efb495e6ab57676f299d531",
-      "app_sha256": "66361c6ce6c9e91b549215eab47ca593b9f85449de04c96c28eac81990f6e8d2",
+      "app_sha256": "97e07d88fd1027f43de36e52aee8f6ed5210d7ae76b2b44815dffb640f5d1067",
       "workflow_sha256": "c6137be1210a2667d83c4a05492af0c2ed0da1f1ec5d7f3f8725cfacdc596931",
       "measured_seconds": 270.89,
       "scope": "1024 x 1024 photo; one scene",
@@ -20,7 +20,7 @@
     "qwen21-edit": {
       "evidence": "Freefield/ComfyUI/benchmarks/00g-qwen21-turbo-q4-deployed-real-cli-e2e-20261123.json",
       "evidence_sha256": "5720477e80a5d23385c01d94e5105bd470602ecdb3829d8e5861e01dd1ea9bff",
-      "app_sha256": "65c2143986fa15edf60cd60fb0842b1e264b77dd58397a8e6d289d210ac6f3fa",
+      "app_sha256": "ab94edb992ad6ff0b5aab31fad6db86df25d2fb75d90a57189a49430e04858dc",
       "workflow_sha256": "936d663d741c4e27b3bf119bf0f060fed119bb7a9f19a1fc243e37b16f83f3aa",
       "measured_seconds": 574.27,
       "scope": "768 px portrait edit; one scene",
@@ -32,7 +32,7 @@
     "angles": {
       "evidence": "validation/qwen2511-angles-native-subquad-cli1024-20261119.json",
       "evidence_sha256": "acbf3d2e08209f33da9d73cabd8fff6b2f397bf34866eb9aa517704eb72953a1",
-      "app_sha256": "d2b59df4f95fdc1d5e300e52afde30de51fec53f7f35678e4ba1f3b9528dda53",
+      "app_sha256": "50f6f8974fa523f2686b2a19120550f1640dda8779a3c60f0b83ce4af4d83972",
       "workflow_sha256": "3dcf1f13a6fa30b5853e60ba6f98de13c41aec7ea389fd992290acbb2839ef6b",
       "measured_seconds": 617.59,
       "scope": "1024 px portrait; one camera angle",
@@ -42,7 +42,7 @@
     "z-image": {
       "evidence": "validation/z-image-cli1024-20261119.json",
       "evidence_sha256": "0c35f40da79aab16f8eff6532d2feb6f44e44fcdf6e73e2a5df92b15208f031f",
-      "app_sha256": "1b6e46046e76dcb9727e22b12059cb0cc5c82d06f2bb9b14bd8d0a2ac58a09d9",
+      "app_sha256": "e121a35f44f56eae6c88633acdad913afac2d028a0845dcd25bcbb96dc8ebbf8",
       "workflow_sha256": "7613ae4b0cc0fd9448b2e47e78cacebf12261f286e6b6985351b3aafd6238e1e",
       "measured_seconds": 194.93,
       "scope": "1024 x 1024 portrait; stock encoder",
@@ -57,7 +57,7 @@
     "nitrofusion2": {
       "evidence": "validation/nitrofusion2-freefield-cli-e2e-20261120.json",
       "evidence_sha256": "a52bf90994f6a2e7b4490215f2f0e28df07f26f84f33773ec8291ad0a5d9992a",
-      "app_sha256": "5bb2d028892283eaf7add94a13533998ff920c3c396fa08b5b447628d4f3d1c1",
+      "app_sha256": "5e38374fc3ee940113eaf2f28b572d456ae62676c53dd8d4e6430c4f9020834c",
       "workflow_sha256": "4a2f387b929c3b081f918fccc406c228c9f7dde387f5a6379bf5da63f5867b52",
       "measured_seconds": 115.78,
       "scope": "1024 x 1024 still life; minor detail limitations",
@@ -70,7 +70,7 @@
     "moss-image": {
       "evidence": "validation/moss-sft-euler-4step-freefield-e2e-20261120.json",
       "evidence_sha256": "f6717a5afd1e217bf1c3f6447522022909376b69d028dd07179f7549e1c3fef2",
-      "app_sha256": "2b951216aeb72b4945574f8f726c032caec7e8ad7afbab93911839c4d24b150d",
+      "app_sha256": "bae58abaa1b9428be66bd403421e047809a88fc3b9d091df3b43bfe5f77a7acf",
       "workflow_sha256": "933a13b9f460efe2326dc223077d80e23b0da8609dc1ca633a5ec80cc3f837fc",
       "measured_seconds": 279.62,
       "scope": "1024 x 1024 poster; four-step mode",
@@ -100,7 +100,7 @@
     "relight": {
       "evidence": "validation/qwen2511-relight-2509lora-native-substitution-20261120.json",
       "evidence_sha256": "692b61d0979cd4bf64810935e179d3d7059221cb14df4186705f2e712585f6f4",
-      "app_sha256": "c906b80fe08c61361513043ec26d25ba8ffd733796e8364edaed2c9599e020fc",
+      "app_sha256": "429ea6ccc4ccfa4c71d0d7bcf0c486968a28e07332644292a94407e90cc2eb34",
       "workflow_sha256": "08a1d2ffa9398e7de4be904b27c601aa7b18258ab91163c9c4299c041e966d93",
       "measured_seconds": 618.58,
       "scope": "1024 px portrait; background may change",
@@ -110,7 +110,7 @@
     "upscale": {
       "evidence": "validation/seedvr2-image2x-gpu-vae-tile256-20261119.json",
       "evidence_sha256": "9818d3233221f94dd05b6efc5720ecdf518e116c31ee46ce5216634b46f08a2e",
-      "app_sha256": "69c2030896fada9cd3059e65303087a990630e241f67d41bbdc553e2c89c1e67",
+      "app_sha256": "cc224316b744e385fcf270273b3df9482315866ca54839ad4e4fea805f5d3fc1",
       "workflow_sha256": "36f2aaf46c2a2becad3d53c9b9ace4fffda2d562212fe8ddce681647f2fdb664",
       "measured_seconds": 210.34,
       "scope": "1024 to 2048 px, 2x image upscale",
@@ -122,7 +122,7 @@
     "remove-bg": {
       "evidence": "validation/03s-birefnet-image-native-gpu-20261124.json",
       "evidence_sha256": "29dd33d93f9e76b8c93019370a62003c0ff6b43af44fc2f6d5a99b662723877b",
-      "app_sha256": "0bf259901c27d5af03b32f7850029e7ea449855689060ece46fe02fd6e08c143",
+      "app_sha256": "0d235991f021ffd7c2e2364fd4f432d06e895ef29fd5dc5cec90057710a38657",
       "workflow_sha256": "5465ea4882926cccf4b891decd2c99ad21a80afce8578af77ce2f19183718c0a",
       "measured_seconds": 9.71,
       "scope": "768 x 1280 RGBA; GPU alpha parity",
@@ -132,7 +132,7 @@
     "depth-map": {
       "evidence": "validation/coverage-moge-depth-20261119.json",
       "evidence_sha256": "b3f9a3fefe81bed39063af84e5700dad93025313d3b49e57a078f64779dfee87",
-      "app_sha256": "7ce0a0064cf943102fb37a90e56d3f8c3e540843ba8d4c4d3ef3d9c90971cd83",
+      "app_sha256": "70d488ada414c14d95ad855a2768d38b54a4f08e57e79e7061a523189cadad41",
       "workflow_sha256": "7f2182cc10c8a7e12794c234183db082925faab66d1b01d9fb8e2a38cd0af5f1",
       "measured_seconds": 24.96,
       "scope": "Portrait depth map; detail 2",
@@ -145,7 +145,7 @@
     "h3-video-int4": {
       "evidence": "Freefield/ComfyUI/benchmarks/00a-h3-int4-freefield-cli-e2e-20261122.json",
       "evidence_sha256": "1d8a8d7c4da754e0aae4ae970a42a25236ab30fea727cb068c0c6cd821e38ffb",
-      "app_sha256": "9f1190f814dcf5336e46c6521311154b87b0641a012b25c6e15154589cb0b726",
+      "app_sha256": "6f149c497dc0568575b573d93869b14e8419d260b69ed4b09cf04c5d4fb93292",
       "workflow_sha256": "2fd573fe236091f54391ea88ca1e8a4255d4ac0cbd9c61eb40fbf149938f2477",
       "measured_seconds": 1137.46,
       "scope": "Short low-resolution video with audio; slow preview",
@@ -158,7 +158,7 @@
     "h3-photo-int4": {
       "evidence": "Freefield/ComfyUI/benchmarks/00b-h3-photo-int4-freefield-cli-e2e-20261122.json",
       "evidence_sha256": "d6a6f0ade72be2ba46dc25277b7c6d9b6ede54fda182c42468187f4daba7ae9a",
-      "app_sha256": "4d654eb1a678a42b2123f1ed94ddb8d2be7226560c58b1325cafdd43b231bb58",
+      "app_sha256": "02adf0ed6675ae4c6e7d25e48882130a55ffe31c452d6f10e9d2e0599a9ed55c",
       "workflow_sha256": "9625eca5bd821744564feebb858c0547e58696e732672cb90084f3eea42299d2",
       "measured_seconds": 981.7,
       "scope": "1 s low-resolution image-to-video with audio",
@@ -171,7 +171,7 @@
     "extend-video-int4": {
       "evidence": "Freefield/ComfyUI/benchmarks/00c-extend-video-int4-freefield-cli-e2e-20261123.json",
       "evidence_sha256": "6060dbce2d032345e00e36025824b42410ba532b4910168105d1edc75c407d22",
-      "app_sha256": "d903efce9f06481831e2302eb62f26fa5b7bbff1f19b92aa343feb85f40d2968",
+      "app_sha256": "a2f86f9fd67c2baaf5287e046c197c459f42e1b0a4cc3cefc72f3be02f2ca2fc",
       "workflow_sha256": "2698343595bc8864922c13f8188218b79c2a59fb5373f92d4e35a24fa16aa06a",
       "measured_seconds": 1019.8,
       "scope": "Short extension; 78 frames and PCM parity",
@@ -184,7 +184,7 @@
     "reshoot-int4": {
       "evidence": "validation/08a-reshoot-int4-real-freefield-cli-20261124.json",
       "evidence_sha256": "23f488f38143b7ba08a8529c714f56283e166f06556d0cbd54d678feac9bd764",
-      "app_sha256": "1f3bd1b54827c6704acd60e56c68b0cde0e07c076da09d59b6f04b449469acd1",
+      "app_sha256": "e439bacc01b7ccacc87574a76c7fec5fb59866deec26b1bceceff1972a041db4",
       "workflow_sha256": "df75ec80fb2449ecf88b3e1fa79c10fd0ef9562747a5f73a0b5719eb6561853f",
       "measured_seconds": 1485.17,
       "scope": "39 frames, 416 x 256, 1.625 s; slow preview",
@@ -196,7 +196,7 @@
     "upscale-video": {
       "evidence": "validation/07a-seedvr2-upscalevideo-native-source33f-20261123.json",
       "evidence_sha256": "c077982ad6e7264a99389b6afa546be6e64c919bf3e1c62ec70d911a4827fa59",
-      "app_sha256": "3b90fefa9bb62a8cad3567022a526c8978f742377e653f9a508ec30dc06c8c57",
+      "app_sha256": "12bc683615ad21b95ffa9e8e34f0b829976fe365363b666af72a6c4c93c25ca0",
       "workflow_sha256": "67ddcfc8f6131253fa49ab43cfc8fbff6cd709d112fa38da9431bc1132ce91af",
       "measured_seconds": 149.28,
       "scope": "33 frames, 256 x 144 to 512 x 288; 2x",
@@ -206,7 +206,7 @@
     "video-remove-bg": {
       "evidence": "validation/03r-birefnet-video-native-gpu-20261124.json",
       "evidence_sha256": "89b907d587dcc9e06aefd74a7ba9b4a5c2010eb50ace708d34b78a65fbd09037",
-      "app_sha256": "c938017c0c890bdb70b42ba3f2f4a1581fa0ec829e5416b2da4f26d4b843cbaa",
+      "app_sha256": "9ee1f629aac390eb53316675affc7b30567bf937797b872ae7bfdf0eb18827ab",
       "workflow_sha256": "d5f2c00007a403c02c85ff2ddde97205932585465a75d938c8fc5c6c3ce4ed4b",
       "measured_seconds": 101.0,
       "scope": "1 s at 734 x 1286; per-frame mask, edge flicker possible",
@@ -219,7 +219,7 @@
     "music-ace15-local": {
       "evidence": "validation/ace15-cli-tiled128-30-20261119.json",
       "evidence_sha256": "009316b6273cf2bf634c524b335fa2b79c6e9bbe37d402fa0358343fa0ce08b1",
-      "app_sha256": "27c07ef0fe27f8e63bc4a761221c3aa3f84f6575d83e4bcf4c2f59c06c63bb58",
+      "app_sha256": "7396a8a2ec7b56a20b68c985c03b226aa8da6b557fa785a5348284321a77d6d0",
       "workflow_sha256": "bf59f4b2de3936f4cd497062bda19f0d0e972aa0de9cca9d1b84fd5e33128463",
       "measured_seconds": 82.39,
       "scope": "30 s stereo audio; decode and non-silence verified, not listened",
@@ -233,7 +233,7 @@
     "sfx": {
       "evidence": "validation/sfx-web-after-ace-20261119.json",
       "evidence_sha256": "5574ee1b1ec24cc11455c35ef4e138accd1130dd3c09e509f2d775d8ca374242",
-      "app_sha256": "4b587d18b60274fed6fdfe848e4d69389ff77d5dc57220f05d0a83b34b6de243",
+      "app_sha256": "bd69d348bb762457ed3fc17c128ee3b7508ed69676d7e6bc36893cca3fb8f25b",
       "workflow_sha256": "a688d5c645d66566ee22f5f7678be068ffcca7ee65282c54033218493bbd57f3",
       "measured_seconds": 30.24,
       "scope": "3 s Medium SFX; decoded audio. Small-SFX opt-in also tested",
@@ -248,7 +248,7 @@
     "smooth": {
       "evidence": "validation/coverage-film-smooth33f-20261119.json",
       "evidence_sha256": "a8dfa3f2c51af5200cdab30bb45bd94c72296395e7d9e685938105bcc4c88012",
-      "app_sha256": "bb5fedf5ad79e941898edc31b8ec1df7e22af725dc2cbbe90d0ab78b424591a2",
+      "app_sha256": "c403d61d5bab3ad65ac23da422258ee706a0e7992434c4bcb9972da73aac9d4e",
       "workflow_sha256": "7268125c6cc9747485ea1c2a882da8181326622c80bc2ecb6a096133cc74fa6a",
       "measured_seconds": 9.9,
       "scope": "33 input frames -> 65 output frames, 2x interpolation; static contact reviewed",
@@ -261,7 +261,7 @@
     "kandinsky6-lite-int8": {
       "evidence": "validation/03m-k6lite-int8-25f-20261123.json",
       "evidence_sha256": "f719c541c47881ebff39325c11f46f145eeee7e20517084f6900604e336f6b79",
-      "app_sha256": "9e02aefb8f3e481fba1cb628eb9fb7066d5d28d907e216428c29097ef009a08e",
+      "app_sha256": "82ae7deb2968a0ab1052ea5447749190392500e4cf6681441282956ef6b11c52",
       "workflow_sha256": "b422b139bfae70718b9a503e2078e357f1f59e8896939188acaabd7a458bfe37",
       "measured_seconds": 294.8,
       "scope": "448 x 256, 25 frames, 1.04 s stylized video; quiet sound",
@@ -271,7 +271,7 @@
     "music": {
       "evidence": "Freefield/ComfyUI/benchmarks/01d-minimax-q6-music3-10s-live-nooverride-20261123.json",
       "evidence_sha256": "2e397389ff1e4123cb92471aaee8efc7b376ca47d820489f079bd84d98bb62e9",
-      "app_sha256": "c68dc65ca752800b618f951cb2f22de6f0c0650744444f42191c34a7051a16cf",
+      "app_sha256": "704f9087128483f3ca7b1cdf4c4a94c3c5a6ef1c0723363e55a4a8831829db96",
       "workflow_sha256": "a7221797b90b4e308d4373fbbd474e0e0f5a029308897177e2b3c1e3ea2d3be5",
       "measured_seconds": 340.52,
       "scope": "10 s audio; Q6/FP16 waveform parity 0.99954, not listened",
@@ -283,7 +283,7 @@
     "inpaint": {
       "evidence": "validation/09a-inpaint-flux3-current-native-cli-20261124.json",
       "evidence_sha256": "58faf1ff1aa30a04902e6bdbf8c7cc13cb2cdb837bf6a19e246e2f630baed416",
-      "app_sha256": "762e933b4f5736e671e1f521537e399bd1f4e145f7b251f0bec95ddb2b33cfaf",
+      "app_sha256": "0b9f198228c3b731d9363e68de2605ce99d1207414e45fb567ddc59ec722b6ca",
       "workflow_sha256": "639c36780db3d1ad8af2fe68ad416ce4192dc0b114307a80567a09e155fe0aad",
       "measured_seconds": 325.04,
       "scope": "1024 x 1024 masked local edit; 16 steps, slight transition on coarse mask",
@@ -295,7 +295,7 @@
     "headshot": {
       "evidence": "validation/09c-headshot-tiled-native-cli-20261124.json",
       "evidence_sha256": "af8de8d437a7ff0e31f7413e9c8cdb1bc6c3b8cda5374ea402291de5b80ff169",
-      "app_sha256": "5d016984298dc28d370310bdf086ceb977dde9c79462de21e7fb97b9cebe11c9",
+      "app_sha256": "860a6edbb91de4f8c9d5e2aad5b8dd3c87e9307a75fa5f3e3ec055c76f4d619e",
       "workflow_sha256": "b6e44d5e60f3a6de291e258d952ec88e09939aba4996f7274617deec61e15903",
       "measured_seconds": 264.49,
       "scope": "672 x 1136 realistic portrait, 12 steps, tiled decode",
@@ -307,7 +307,7 @@
     "character-swap": {
       "evidence": "validation/09g-character-swap-qwen21-two-ref-512-20261124.json",
       "evidence_sha256": "f5e297a544aaa33f403712a25f559229f9ffc46a4279a30bf26f7c8fdc7652eb",
-      "app_sha256": "6af4e4e294c318977ea423a99e7fc98eb8bc389eaf03710c5b5d37c5b5976ae1",
+      "app_sha256": "504f25b7d84aa094a5c9709d84981e46d13bdd210fda9bd733184932e618e91b",
       "workflow_sha256": "ca43676d53bc970e03c3db3fc1e16398fc0c6c67b429359ee1e49af0a3b95fd7",
       "measured_seconds": 439.59,
       "scope": "Real two-reference subject replacement, Qwen Image 2.1 Turbo Q4, 672 x 384; single visually reviewed scene, 512px preview",
@@ -317,11 +317,21 @@
     "talking": {
       "evidence": "validation/09j-talking-flashhead-native-45s-e2e-20261125.json",
       "evidence_sha256": "b93807305e3378a4e98303e754c36ae23c7d3d00fc3bfd441a109f9663991b93",
-      "app_sha256": "2704f7d715fa0a083ecd82a6c2a8c6a44bfe17f3afb07c55e494099c568f880b",
+      "app_sha256": "dd9fe3b604eabb2e7c7b00870e282ff49786e5b0908b934856ad92fa3eba98dd",
       "workflow_sha256": "21813bb91eceb91f7e18a36b5874b4bfc94538855b7c11990d00da0926132b71",
       "measured_seconds": 583.44,
       "scope": "Real 45-second audio-driven portrait animation, 512x512 at 25 fps; single reviewed scene, sampled continuity and original audio verified; square crop; phoneme-level lip sync not measured",
       "review": "limited",
+      "defaults": {}
+    },
+    "voice-clone": {
+      "evidence": "validation/09k-zonos3-voice-clone-freefield-e2e-20261125.json",
+      "evidence_sha256": "5ac245015c78a2c010197ae7d8b04bc2e94cb0e8b9be64bc5e0caae71ab415f1",
+      "app_sha256": "054a6be64a9d587b995f51100407340585a3c302051b217297837a1ab410b572",
+      "workflow_sha256": "9f60a14d3a87b8a592c0a9a65eeaccc7318c8f513d2c036882ee04a9446ddec9",
+      "measured_seconds": 10.5,
+      "scope": "French short phrase, one stock reference, FLAC mono 44.1 kHz; ASR WER 0; native MECT similarity 0.684 vs 0.091 negative control; no auditory review",
+      "review": "audio",
       "defaults": {}
     }
   }

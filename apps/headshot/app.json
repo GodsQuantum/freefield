@@ -82,7 +82,7 @@
       "type": "textarea",
       "label": "Extra direction",
       "default": "",
-      "help": "Added at the end of the app's prompt.",
+      "help": "Préciser expression, lumière, objectif et cadrage en préservant les traits. Référence nette, sans filtre.",
       "bind": [
         {
           "node": "4",

@@ -40,7 +40,8 @@
           "node": "6",
           "field": "prompt"
         }
-      ]
+      ],
+      "help": "Indiquer exactement la modification, puis ce qui doit rester identique (identité, pose, cadrage, arrière-plan). Utiliser une référence nette."
     },
     {
       "id": "negative_prompt",
@@ -52,7 +53,8 @@
           "node": "6",
           "field": "negative_prompt"
         }
-      ]
+      ],
+      "help": "Le mode Turbo CFG 1 ne guide pas la génération par le négatif : exprimer les contraintes de conservation dans l’instruction principale."
     },
     {
       "id": "resolution",

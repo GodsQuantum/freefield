@@ -24,7 +24,8 @@
           "node": "5",
           "field": "video_caption"
         }
-      ]
+      ],
+      "help": "Décrire un plan continu, mouvement du sujet, cadrage et lumière. Pour éviter les changements de scène, préciser le mouvement de caméra."
     },
     {
       "id": "sound",
@@ -37,7 +38,8 @@
           "node": "5",
           "field": "audio_caption"
         }
-      ]
+      ],
+      "help": "Décrire séparément les sons synchronisés avec les actions visibles et l’ambiance du lieu."
     },
     {
       "id": "negative",

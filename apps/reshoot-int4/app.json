@@ -106,7 +106,8 @@
           "field": "prompt",
           "template": "crossview. {prompt}"
         }
-      ]
+      ],
+      "help": "Décrire le contenu à conserver ; les contrôles d’azimut, d’élévation et de distance pilotent le changement de point de vue."
     },
     {
       "id": "seed",

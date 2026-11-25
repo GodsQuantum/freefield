@@ -25,7 +25,8 @@
           "node": "18:17",
           "field": "value"
         }
-      ]
+      ],
+      "help": "Décrire la composition et le style. Pour les affiches, écrire le texte exact entre guillemets, en précisant l’emplacement et la hiérarchie typographique."
     },
     {
       "id": "rewrite",

@@ -26,7 +26,8 @@
           "node": "17",
           "field": "image"
         }
-      ]
+      ],
+      "help": "Sujet entièrement visible, bords nets, sans recadrage coupant les cheveux ou les membres."
     }
   ],
   "outputs": [

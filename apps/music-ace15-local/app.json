@@ -24,7 +24,8 @@
           "node": "4",
           "field": "tags"
         }
-      ]
+      ],
+      "help": "Genre, humeur, instrumentation, tempo et arrangement. Aligner BPM, tonalité et mesure avec cette description."
     },
     {
       "id": "lyrics",
@@ -36,7 +37,8 @@
           "node": "4",
           "field": "lyrics"
         }
-      ]
+      ],
+      "help": "Paroles exactes organisées en sections telles que [Verse], [Chorus], [Bridge]. Pour un instrumental, laisser vide."
     },
     {
       "id": "duration",

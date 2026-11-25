@@ -30,7 +30,8 @@
           "node": "73",
           "field": "file"
         }
-      ]
+      ],
+      "help": "Clip court, stable et peu compressé. SeedVR2 restaure les détails ; le rendu peut varier selon la durée et la résolution. Le benchmark qualifié est un clip court."
     },
     {
       "id": "seed",

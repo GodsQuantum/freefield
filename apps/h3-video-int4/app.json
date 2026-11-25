@@ -20,7 +20,7 @@
       "label": "Prompt",
       "required": true,
       "default": "Cinematic studio video of a small red toy robot slowly waving one hand on a light wooden table, clear electronic sound",
-      "help": "Put spoken words in quotes; describe sounds and music too.",
+      "help": "Décrire un plan unique : sujet, action continue, environnement, caméra, lumière et sons. Dialogue court entre guillemets. Respecter la durée disponible.",
       "bind": [
         {
           "node": "140:131",

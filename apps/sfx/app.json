@@ -24,7 +24,8 @@
           "node": "52:31",
           "field": "value"
         }
-      ]
+      ],
+      "help": "Décrire une source sonore précise, sa matière, son environnement, sa distance et son évolution dans le temps. Un événement cohérent par clip."
     },
     {
       "id": "category",
