@@ -9,7 +9,7 @@ const { apps, problems } = loadRegistry();
 const specs = [
   { id: "styles", consumers: ["30:16", "30:6"],
     graphBefore: "69de6ecef0cd28cebf48f6316f9105d53a9bce8c97a82bd9e3361abad7581731",
-    manifest: "d658bb42e17d824fe292560c5f1ebc40be9cb0cb12a625cbe0baf086188aeb66" },
+    manifest: "9f9eb6a99be262f1f84220500454b56c5eae4f0fdf65f3b16515baea68f446ab" },
 
 ];
 const sha = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
@@ -171,7 +171,7 @@ test("styles: native 2-step Ultra preview remains optional, lazily overrides 3-s
   });
   assert.deepEqual(g["ff_krea_ultra_no_enhance"].inputs, { value: false });
   assert.deepEqual(g["30:21"].inputs.switch, ["ff_krea_effective_enhance", 0]);
-  assert.match(String(ultra.help), /skips Enhance prompt/);
+  assert.match(String(ultra.help), /prompt brut, même si Enhance est activé/);
   assert.deepEqual(g["30:15"].inputs.model, ["ff_krea_ultra_model", 0]);
   assert.deepEqual(g["30:3"].inputs.steps, ["ff_krea_steps_ultra_selected", 0]);
   assert.equal(app.models.filter(m => m.file.endsWith("2step_rank_64_lora_comfyui.safetensors")).length, 1);
