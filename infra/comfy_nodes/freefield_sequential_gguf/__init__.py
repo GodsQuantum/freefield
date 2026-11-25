@@ -120,6 +120,32 @@ def _release():
     mm.cleanup_models()
     mm.soft_empty_cache(force=True)
 
+def _bound_diffusion_residency(model):
+    """Keep GGUF file-backed and bound initial GPU transfers on shared RAM.
+    Native GGUF's eager mmap detachment copies all offloaded weights through
+    GPU and CPU. For immutable, local model files this is unnecessary.
+    The scope is this returned patcher, including its LoRA clones.
+    """
+    native = type(model)
+    class BoundedPatcher(native):
+        def clone(self, *args, **kwargs):
+            result = super().clone(*args, **kwargs)
+            result.__class__ = BoundedPatcher
+            return result
+        def load(self, device_to=None, lowvram_model_memory=0, force_patch_weights=False, full_load=False):
+            budget = min(lowvram_model_memory or 1536 * 1024**2, 1536 * 1024**2)
+            logging.info("Freefield bounded GGUF diffusion: resident budget %.0f MiB, immutable mmap retained", budget / 1024**2)
+            # This flag suppresses only native eager device round-trip
+            # detachment; packed weights remain valid through their mmap owners.
+            self.mmap_released = True
+            self.named_modules_to_munmap = {}
+            return super().load(device_to, lowvram_model_memory=budget,
+                force_patch_weights=force_patch_weights, full_load=False)
+    model.__class__ = BoundedPatcher
+    model.mmap_released = True
+    model.named_modules_to_munmap = {}
+    return model
+
 class FreefieldSequentialGGUF:
     @classmethod
     def INPUT_TYPES(cls):
@@ -157,7 +183,7 @@ class FreefieldSequentialGGUF:
                 raise RuntimeError("Text encoder retained: refusing overlapping model allocation")
             logging.info("Freefield sequential %s: encoder released, GPU bytes %d -> %d", family, before, torch.cuda.memory_allocated(dev))
             model = nodes.NODE_CLASS_MAPPINGS["UnetLoaderGGUF"]().load_unet(unet_name)[0]
-            return model, cond
+            return _bound_diffusion_residency(model), cond
 
 NODE_CLASS_MAPPINGS = {"FreefieldSequentialGGUF": FreefieldSequentialGGUF}
 NODE_DISPLAY_NAME_MAPPINGS = {"FreefieldSequentialGGUF": "Freefield Sequential GGUF (GPU)"}
