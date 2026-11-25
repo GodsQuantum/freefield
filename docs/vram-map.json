@@ -29,6 +29,32 @@
       "measured_on": "L40S · 20261020-133620-l40s"
     },
     {
+      "id": "upscale-video-hd",
+      "name": "Upscale vidéo HD 2×",
+      "section": "video",
+      "pack": "upscale-hd",
+      "status": "ready",
+      "whole_gb": 0.07,
+      "phases_gb": {
+        "encode": 0.07,
+        "denoise": 0.07,
+        "denoise2": 0.0,
+        "decode": 0.07,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 0.07,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "RealESRGAN_x2plus.pth",
+        "gb": 0.067061725
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
       "id": "remove-bg",
       "name": "Remove Background",
       "section": "image",
@@ -105,6 +131,32 @@
       "modal_gpu": "L4 / A10G (24 GB)",
       "measured_peak_gb": 6.64,
       "measured_on": "H100 · 20261024-172353-h100"
+    },
+    {
+      "id": "voice-clone",
+      "name": "Clonage vocal - ZONOS3",
+      "section": "audio",
+      "pack": "audio-zonos3",
+      "status": "ready",
+      "whole_gb": 2.91,
+      "phases_gb": {
+        "encode": 0.71,
+        "denoise": 0.66,
+        "denoise2": 0.0,
+        "decode": 2.86,
+        "aux": 0.0
+      },
+      "largest_phase": "decode",
+      "largest_phase_gb": 2.86,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "zac.gguf",
+        "gb": 2.199903264
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
     },
     {
       "id": "upscale",
@@ -204,6 +256,58 @@
       "biggest_file": {
         "name": "acestep_v1.5_turbo.safetensors",
         "gb": 4.79
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "kandinsky6-lite-int8",
+      "name": "Kandinsky 6 Lite INT8",
+      "section": "video",
+      "pack": "video-kandinsky6-lite-int8",
+      "status": "ready",
+      "whole_gb": 11.3,
+      "phases_gb": {
+        "encode": 4.93,
+        "denoise": 4.17,
+        "denoise2": 0.0,
+        "decode": 2.2,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 4.93,
+      "optional_gb": 1.35,
+      "biggest_file": {
+        "name": "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+        "gb": 4.683
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "nitrofusion2",
+      "name": "NitroFusion2 Fast",
+      "section": "image",
+      "pack": "image-nitro",
+      "status": "ready",
+      "whole_gb": 10.99,
+      "phases_gb": {
+        "encode": 5.63,
+        "denoise": 5.02,
+        "denoise2": 0.0,
+        "decode": 0.34,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 5.63,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen_3_4b_fp8_mixed.safetensors",
+        "gb": 5.63
       },
       "verdict_24gb": "fits whole",
       "modal_gpu": "L4 / A10G (24 GB)",
@@ -443,32 +547,6 @@
       "modal_gpu": "L4 / A10G (24 GB)",
       "measured_peak_gb": 12.18,
       "measured_on": "L40S · 20261026-002124-l40s"
-    },
-    {
-      "id": "character-swap",
-      "name": "Character Swap",
-      "section": "image",
-      "pack": "image-flux3",
-      "status": "ready",
-      "whole_gb": 11.03,
-      "phases_gb": {
-        "encode": 4.86,
-        "denoise": 5.83,
-        "denoise2": 0.0,
-        "decode": 0.34,
-        "aux": 0.0
-      },
-      "largest_phase": "denoise",
-      "largest_phase_gb": 5.83,
-      "optional_gb": 0,
-      "biggest_file": {
-        "name": "flux3-image-klein-int8-convrot.safetensors",
-        "gb": 5.83
-      },
-      "verdict_24gb": "fits whole",
-      "modal_gpu": "L4 / A10G (24 GB)",
-      "measured_peak_gb": 11.92,
-      "measured_on": "H100 · 20261024-164909-h100"
     },
     {
       "id": "cinema-studio",
@@ -1693,6 +1771,32 @@
       "measured_on": "H100 · 20261024-164909-h100"
     },
     {
+      "id": "talking",
+      "name": "Talking Avatar",
+      "section": "video",
+      "pack": "video-flashhead-lite",
+      "status": "ready",
+      "whole_gb": 8.16,
+      "phases_gb": {
+        "encode": 0.38,
+        "denoise": 6.11,
+        "denoise2": 0.0,
+        "decode": 1.68,
+        "aux": 0.0
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 6.11,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "diffusion_pytorch_model.safetensors",
+        "gb": 6.107542048
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": 43.24,
+      "measured_on": "H100 · 20261024-164909-h100"
+    },
+    {
       "id": "z-image",
       "name": "Z-Image Turbo",
       "section": "image",
@@ -1717,6 +1821,32 @@
       "modal_gpu": "L4 / A10G (24 GB)",
       "measured_peak_gb": 12.56,
       "measured_on": "H100 · 20261024-164909-h100"
+    },
+    {
+      "id": "kandinsky6-lite",
+      "name": "Kandinsky 6 Lite AV",
+      "section": "video",
+      "pack": "video-kandinsky6-lite",
+      "status": "ready",
+      "whole_gb": 13.51,
+      "phases_gb": {
+        "encode": 4.93,
+        "denoise": 6.38,
+        "denoise2": 0.0,
+        "decode": 2.2,
+        "aux": 0.0
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 6.38,
+      "optional_gb": 1.35,
+      "biggest_file": {
+        "name": "diffusion_pytorch_model.safetensors",
+        "gb": 6.382
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
     },
     {
       "id": "wan22-5b-i2v-local",
@@ -1776,10 +1906,10 @@
       "section": "image",
       "pack": "image-moss",
       "status": "ready",
-      "whole_gb": 13.0,
+      "whole_gb": 14.19,
       "phases_gb": {
         "encode": 7.34,
-        "denoise": 5.41,
+        "denoise": 6.6,
         "denoise2": 0.0,
         "decode": 0.25,
         "aux": 0.0
@@ -1802,10 +1932,10 @@
       "section": "audio",
       "pack": "audio",
       "status": "ready",
-      "whole_gb": 14.33,
+      "whole_gb": 11.54,
       "phases_gb": {
         "encode": 9.2,
-        "denoise": 4.91,
+        "denoise": 2.12,
         "denoise2": 0.0,
         "decode": 0.22,
         "aux": 0.0
@@ -1816,6 +1946,110 @@
       "biggest_file": {
         "name": "minimax_music3_text_encoder_pruned_int8_convrot.safetensors",
         "gb": 9.2
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "character-swap",
+      "name": "Character Swap",
+      "section": "image",
+      "pack": "image-qwen21",
+      "status": "ready",
+      "whole_gb": 14.23,
+      "phases_gb": {
+        "encode": 9.35,
+        "denoise": 4.2,
+        "denoise2": 0.0,
+        "decode": 0.68,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 9.35,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen3vl_8b_int8_convrot.safetensors",
+        "gb": 9.351
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": 11.92,
+      "measured_on": "H100 · 20261024-164909-h100"
+    },
+    {
+      "id": "qwen21-edit",
+      "name": "Edit Image - Qwen 2.1",
+      "section": "image",
+      "pack": "image-qwen21",
+      "status": "ready",
+      "whole_gb": 14.23,
+      "phases_gb": {
+        "encode": 9.35,
+        "denoise": 4.2,
+        "denoise2": 0.0,
+        "decode": 0.68,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 9.35,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen3vl_8b_int8_convrot.safetensors",
+        "gb": 9.351
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "recast",
+      "name": "Recast — aperçu remplacement vidéo",
+      "section": "video",
+      "pack": "video-scail",
+      "status": "ready",
+      "whole_gb": 16.99,
+      "phases_gb": {
+        "encode": 4.92,
+        "denoise": 10.08,
+        "denoise2": 0.0,
+        "decode": 0.25,
+        "aux": 1.75
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 10.08,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "SCAIL-2-Q3_K_M.gguf",
+        "gb": 8.108662432
+      },
+      "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": 30.57,
+      "measured_on": "L40S · 20261020-162214-l40s"
+    },
+    {
+      "id": "recast-animate-preview",
+      "name": "Recast — Animation (aperçu)",
+      "section": "video",
+      "pack": "video-scail",
+      "status": "ready",
+      "whole_gb": 16.99,
+      "phases_gb": {
+        "encode": 4.92,
+        "denoise": 10.08,
+        "denoise2": 0.0,
+        "decode": 0.25,
+        "aux": 1.75
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 10.08,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "SCAIL-2-Q3_K_M.gguf",
+        "gb": 8.108662432
       },
       "verdict_24gb": "fits whole",
       "modal_gpu": "L4 / A10G (24 GB)",
@@ -1838,7 +2072,7 @@
       },
       "largest_phase": "encode",
       "largest_phase_gb": 10.41,
-      "optional_gb": 4.55,
+      "optional_gb": 6.82,
       "biggest_file": {
         "name": "stable_audio_3_medium.safetensors",
         "gb": 9.22
@@ -1916,12 +2150,142 @@
       },
       "largest_phase": "denoise",
       "largest_phase_gb": 13.96,
-      "optional_gb": 4.2,
+      "optional_gb": 4.64,
       "biggest_file": {
         "name": "krea2_turbo_int8_convrot.safetensors",
         "gb": 13.49
       },
       "verdict_24gb": "fits whole",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "ltx25-q3-t2va-lite",
+      "name": "LTX 2.5 — aperçu vidéo + audio",
+      "section": "video",
+      "pack": "video-ltx25-q3-compact",
+      "status": "ready",
+      "whole_gb": 21.34,
+      "phases_gb": {
+        "encode": 7.51,
+        "denoise": 12.0,
+        "denoise2": 0.0,
+        "decode": 1.83,
+        "aux": 0.0
+      },
+      "largest_phase": "denoise",
+      "largest_phase_gb": 12.0,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+        "gb": 12.000207232
+      },
+      "verdict_24gb": "fits by phases",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "extend-video-int4",
+      "name": "Extend Video INT4 compact",
+      "section": "video",
+      "pack": "video-h3",
+      "status": "ready",
+      "whole_gb": 29.71,
+      "phases_gb": {
+        "encode": 14.95,
+        "denoise": 11.34,
+        "denoise2": 0.0,
+        "decode": 3.42,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 14.95,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+        "gb": 14.95
+      },
+      "verdict_24gb": "fits by phases",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "h3-photo-int4",
+      "name": "H3 Photo INT4 compact",
+      "section": "video",
+      "pack": "video-h3",
+      "status": "ready",
+      "whole_gb": 29.71,
+      "phases_gb": {
+        "encode": 14.95,
+        "denoise": 11.34,
+        "denoise2": 0.0,
+        "decode": 3.42,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 14.95,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+        "gb": 14.95
+      },
+      "verdict_24gb": "fits by phases",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "h3-video-int4",
+      "name": "H3 Video INT4 compact",
+      "section": "video",
+      "pack": "video-h3",
+      "status": "ready",
+      "whole_gb": 29.71,
+      "phases_gb": {
+        "encode": 14.95,
+        "denoise": 11.34,
+        "denoise2": 0.0,
+        "decode": 3.42,
+        "aux": 0.0
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 14.95,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+        "gb": 14.95
+      },
+      "verdict_24gb": "fits by phases",
+      "modal_gpu": "L4 / A10G (24 GB)",
+      "measured_peak_gb": null,
+      "measured_on": null
+    },
+    {
+      "id": "reshoot-int4",
+      "name": "Re-shoot INT4 compact",
+      "section": "video",
+      "pack": "video-h3",
+      "status": "ready",
+      "whole_gb": 32.93,
+      "phases_gb": {
+        "encode": 14.95,
+        "denoise": 13.9,
+        "denoise2": 0.0,
+        "decode": 3.42,
+        "aux": 0.66
+      },
+      "largest_phase": "encode",
+      "largest_phase_gb": 14.95,
+      "optional_gb": 0,
+      "biggest_file": {
+        "name": "qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+        "gb": 14.95
+      },
+      "verdict_24gb": "fits by phases",
       "modal_gpu": "L4 / A10G (24 GB)",
       "measured_peak_gb": null,
       "measured_on": null
@@ -2029,32 +2393,6 @@
       "modal_gpu": "L4 / A10G (24 GB)",
       "measured_peak_gb": 41.94,
       "measured_on": "H100 · 20261023-162024-h100"
-    },
-    {
-      "id": "recast",
-      "name": "Recast",
-      "section": "video",
-      "pack": "video-scail",
-      "status": "ready",
-      "whole_gb": 28.62,
-      "phases_gb": {
-        "encode": 8.0,
-        "denoise": 18.62,
-        "denoise2": 0.0,
-        "decode": 0.25,
-        "aux": 1.75
-      },
-      "largest_phase": "denoise",
-      "largest_phase_gb": 18.62,
-      "optional_gb": 0,
-      "biggest_file": {
-        "name": "wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
-        "gb": 16.65
-      },
-      "verdict_24gb": "fits by phases",
-      "modal_gpu": "L4 / A10G (24 GB)",
-      "measured_peak_gb": 30.57,
-      "measured_on": "L40S · 20261020-162214-l40s"
     },
     {
       "id": "asmr-host",
@@ -2369,32 +2707,6 @@
       "measured_on": "H100 · 20261023-225832-h100"
     },
     {
-      "id": "talking",
-      "name": "Talking Avatar",
-      "section": "video",
-      "pack": "video-ltx25",
-      "status": "ready",
-      "whole_gb": 39.7,
-      "phases_gb": {
-        "encode": 15.37,
-        "denoise": 21.5,
-        "denoise2": 0.0,
-        "decode": 1.83,
-        "aux": 1.0
-      },
-      "largest_phase": "denoise",
-      "largest_phase_gb": 21.5,
-      "optional_gb": 5.63,
-      "biggest_file": {
-        "name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
-        "gb": 21.5
-      },
-      "verdict_24gb": "tight (by phases)",
-      "modal_gpu": "test on L4 / A10G; L40S (48 GB) is comfortable",
-      "measured_peak_gb": 43.24,
-      "measured_on": "H100 · 20261024-164909-h100"
-    },
-    {
       "id": "truck-ad",
       "name": "Truck Ad",
       "section": "video",
@@ -2566,7 +2878,7 @@
       },
       "largest_phase": "denoise",
       "largest_phase_gb": 21.65,
-      "optional_gb": 0,
+      "optional_gb": 21.35,
       "biggest_file": {
         "name": "qwen_image_edit_2509_int8_convrot.safetensors",
         "gb": 20.5

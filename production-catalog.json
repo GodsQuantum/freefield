@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v10-quality",
+  "revision": "cloud9-20261125-certified-v12-recast-animate",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -491,6 +491,23 @@
         "height": 384
       },
       "guidance": "Choisir un sujet non occulté et une référence où tête et corps restent visibles ; le cadrage initial est crucial. Le remplacement 384²/17 frames est testé. Animation et continuation avec recouvrement sont des candidats distincts."
+    },
+    "recast-animate-preview": {
+      "evidence": "validation/10f-recast-single-window-animate-bindfix-20261125.json",
+      "evidence_sha256": "780f9c1a083c8dca5d35f007d65b0ce6c4c71e5da93aa3c67d41205871b674e8",
+      "app_sha256": "0c62d3a69612f6246f72ef2bfe37c9478bf3df735c9df14179d75bcb36d788a3",
+      "workflow_sha256": "c4b61696b2241a610655ea825c2276245dbbacaaf9d833d557613f1502732ece",
+      "measured_seconds": 487.95,
+      "scope": "Animation only, exact native CLI graph, 320x320, 17 distinct frames, 1.062s at 16fps. Forward walk with approximate character/reference scene; sampled visual review only. No HD or long-duration claim.",
+      "review": "limited",
+      "defaults": {},
+      "reference_settings": {
+        "mode": false,
+        "width": 320,
+        "height": 320,
+        "start_seconds": 0.75
+      },
+      "guidance": "Choisir un clip avec un seul sujet bien visible et le décrire précisément. Fournir une référence en pied si nécessaire ; choisir 17 images à partir du début indiqué. Le cadrage final peut se resserrer. Aperçu court, pas de HD native."
     }
   }
 }

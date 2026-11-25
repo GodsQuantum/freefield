@@ -218,6 +218,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/09n-recast-native-bypass-q3-20261125.json",
       "decision": "Native additive stack of both original LoRAs, Q3/UMT5 Q4 sequential, actual 551.13s CLI successful; limited replacement review. Original INT8 weights preserved."
+    },
+    "video-recast-animation-preview": {
+      "selected": "recast-animate-preview",
+      "evidence": "validation/10f-recast-single-window-animate-bindfix-20261125.json",
+      "assurance": "full_cli_e2e",
+      "reason": "Exact native animation-only graph qualified at 320x320/17 frames; no new model weights."
     }
   },
   "challengers_unqualified": [
@@ -11411,6 +11417,226 @@
               "ff_ref_size",
               1
             ]
+          }
+        }
+      ],
+      "model_overrides": [],
+      "limits": []
+    },
+    "recast-animate-preview": {
+      "status": "ready",
+      "pack": "video-scail",
+      "models": [
+        {
+          "dir": "checkpoints",
+          "file": "checkpoints/sam3.1_multiplex_fp16.safetensors",
+          "repo": "Comfy-Org/sam3.1",
+          "phase": "aux",
+          "optional": false
+        },
+        {
+          "dir": "clip_gguf",
+          "file": "umt5-xxl-encoder-Q4_K_M.gguf",
+          "repo": "city96/umt5-xxl-encoder-gguf",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "clip_vision",
+          "file": "split_files/clip_vision/clip_vision_h.safetensors",
+          "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+          "phase": "encode",
+          "optional": false
+        },
+        {
+          "dir": "loras",
+          "file": "Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+          "repo": "Kijai/WanVideo_comfy",
+          "phase": "denoise",
+          "optional": false
+        },
+        {
+          "dir": "loras",
+          "file": "loras/wan2.1_SCAIL_2_DPO_lora_bf16.safetensors",
+          "repo": "Comfy-Org/SCAIL-2",
+          "phase": "denoise",
+          "optional": false
+        },
+        {
+          "dir": "unet_gguf",
+          "file": "SCAIL-2-Q3_K_M.gguf",
+          "repo": "realrebelai/SCAIL-2_GGUF",
+          "phase": "denoise",
+          "optional": false
+        },
+        {
+          "dir": "vae",
+          "file": "Wan2_1_VAE_bf16.safetensors",
+          "repo": "Kijai/WanVideo_comfy",
+          "phase": "decode",
+          "optional": false
+        }
+      ],
+      "workflow": [
+        {
+          "id": "213:114",
+          "class_type": "WanSCAILToVideo",
+          "inputs": {
+            "width": [
+              "213:163",
+              0
+            ],
+            "height": [
+              "213:163",
+              1
+            ]
+          }
+        },
+        {
+          "id": "213:154",
+          "class_type": "FreefieldSequentialGGUF",
+          "inputs": {
+            "clip_name": "umt5-xxl-encoder-Q4_K_M.gguf",
+            "unet_name": "SCAIL-2-Q3_K_M.gguf"
+          }
+        },
+        {
+          "id": "213:18",
+          "class_type": "BasicScheduler",
+          "inputs": {
+            "steps": 6,
+            "scheduler": "simple",
+            "denoise": 1
+          }
+        },
+        {
+          "id": "213:19",
+          "class_type": "SamplerCustom",
+          "inputs": {
+            "sigmas": [
+              "213:18",
+              0
+            ],
+            "cfg": 1
+          }
+        },
+        {
+          "id": "213:193",
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "sam3.1_multiplex_fp16.safetensors"
+          }
+        },
+        {
+          "id": "213:27",
+          "class_type": "KSamplerSelect",
+          "inputs": {
+            "sampler_name": "euler"
+          }
+        },
+        {
+          "id": "213:7",
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "Wan2_1_VAE_bf16.safetensors"
+          }
+        },
+        {
+          "id": "213:75",
+          "class_type": "CLIPVisionLoader",
+          "inputs": {
+            "clip_name": "clip_vision_h.safetensors"
+          }
+        },
+        {
+          "id": "ff_drive_black",
+          "class_type": "EmptyImage",
+          "inputs": {
+            "width": [
+              "213:163",
+              0
+            ],
+            "height": [
+              "213:163",
+              1
+            ]
+          }
+        },
+        {
+          "id": "ff_drive_blue",
+          "class_type": "EmptyImage",
+          "inputs": {
+            "width": [
+              "213:163",
+              0
+            ],
+            "height": [
+              "213:163",
+              1
+            ]
+          }
+        },
+        {
+          "id": "ff_drive_white",
+          "class_type": "EmptyImage",
+          "inputs": {
+            "width": [
+              "213:163",
+              0
+            ],
+            "height": [
+              "213:163",
+              1
+            ]
+          }
+        },
+        {
+          "id": "ff_ref_black",
+          "class_type": "EmptyImage",
+          "inputs": {
+            "width": [
+              "ff_ref_size",
+              0
+            ],
+            "height": [
+              "ff_ref_size",
+              1
+            ]
+          }
+        },
+        {
+          "id": "ff_ref_blue",
+          "class_type": "EmptyImage",
+          "inputs": {
+            "width": [
+              "ff_ref_size",
+              0
+            ],
+            "height": [
+              "ff_ref_size",
+              1
+            ]
+          }
+        },
+        {
+          "id": "ff_ref_white",
+          "class_type": "EmptyImage",
+          "inputs": {
+            "width": [
+              "ff_ref_size",
+              0
+            ],
+            "height": [
+              "ff_ref_size",
+              1
+            ]
+          }
+        },
+        {
+          "id": "ff_window",
+          "class_type": "FreefieldRecastWindow",
+          "inputs": {
+            "frames": 17
           }
         }
       ],

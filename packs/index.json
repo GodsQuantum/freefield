@@ -247,7 +247,8 @@
   },
   "video-scail": {
     "apps": [
-      "recast"
+      "recast",
+      "recast-animate-preview"
     ],
     "download_gb": 16.99,
     "needs_hf_token": false
