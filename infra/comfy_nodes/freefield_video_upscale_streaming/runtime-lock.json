@@ -1,0 +1,8 @@
+{
+  "model_sha256": "49fafd45f8fd7aa8d31ab2a22d14d91b536c34494a5cfe31eb5d89c2fa266abb",
+  "upstream": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth",
+  "hf_mirror": "https://huggingface.co/Rennart/realesrgan-x2/blob/main/RealESRGAN_x2plus.pth",
+  "native_10s_receipt": "validation/09k-realesrgan-x2plus-10s-20261125.json",
+  "engine_sha256": "f3f3064c8cbec46e092fee151460cde2cdcebeea9288c1c605c303a46b2d7b4d",
+  "adapter_sha256": "c61526d27eb00c2bdd54436af57415e5fa80993c23099c884ad3994ae35ad610"
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "upscale-video-hd",
+  "name": "Upscale vidéo HD 2×",
+  "section": "video",
+  "pack": "upscale-hd",
+  "status": "ready",
+  "summary": "Restauration légère RealESRGAN x2plus : 512×512 à 1 024×1 024, 25 i/s, clips courts de 1 à 10 s. Traitement image par image, sans accumulation en mémoire.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "Official RealESRGAN x2plus v0.2.1 + native Spandrel, streaming file-backed"
+  },
+  "inputs": [
+    {
+      "id": "clip",
+      "type": "video",
+      "label": "Clip carré 512 px à 25 i/s",
+      "required": true,
+      "limits": {
+        "max_mb": 100,
+        "seconds": [
+          1,
+          10
+        ]
+      },
+      "help": "Résultat Talking Avatar ou autre clip 512×512 H264 à 25 i/s, 1–10 s. Super-résolution apprise, pas génération HD native.",
+      "bind": [
+        {
+          "node": "1",
+          "field": "file"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "node": "3",
+      "type": "video",
+      "label": "Vidéo 1024×1024"
+    }
+  ],
+  "models": [
+    {
+      "repo": "Rennart/realesrgan-x2",
+      "file": "RealESRGAN_x2plus.pth",
+      "dir": "upscale_models",
+      "gb": 0.067061725,
+      "phase": "all",
+      "license": "BSD-3-Clause"
+    }
+  ]
+}

@@ -200,6 +200,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/09k-zonos3-voice-clone-freefield-e2e-20261125.json",
       "decision": "Existing native ZONOS3-Mini PTQ, MECT-B2 reference embedding, full_mr decoder, French LACI; no second runtime. Exact local model SHA256 matches current upstream HF. Independent ASR word error rate zero. No perceptual guarantee."
+    },
+    "video-hd-light": {
+      "selected": "upscale-video-hd",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/09k-hd-streaming-freefield-e2e-2s-20261125.json",
+      "decision": "RealESRGAN x2plus official SHA pinned 67MB, FP16 frame-streaming. 10s native 1024x1024 189.48s, 2s actual CLI 49.16s, sampled visual review positive; not native HD or temporally trained restoration. Preserve SeedVR2 distinct existing recipe."
     }
   },
   "challengers_unqualified": [
@@ -14232,6 +14238,30 @@
       "model_overrides": [],
       "limits": []
     },
+    "upscale-video-hd": {
+      "status": "ready",
+      "pack": "upscale-hd",
+      "models": [
+        {
+          "dir": "upscale_models",
+          "file": "RealESRGAN_x2plus.pth",
+          "repo": "Rennart/realesrgan-x2",
+          "phase": "all",
+          "optional": false
+        }
+      ],
+      "workflow": [
+        {
+          "id": "2",
+          "class_type": "FreefieldVideoUpscale2x",
+          "inputs": {
+            "model_name": "RealESRGAN_x2plus.pth"
+          }
+        }
+      ],
+      "model_overrides": [],
+      "limits": []
+    },
     "vfx-clean-plate": {
       "status": "ready",
       "pack": "video-ltx25",
@@ -15835,5 +15865,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-25T01:38:59.876562+00:00"
+  "last_selection_review_utc": "2026-11-25T01:48:29.777101+00:00"
 }

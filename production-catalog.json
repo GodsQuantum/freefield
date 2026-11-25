@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v6",
+  "revision": "cloud9-20261125-certified-v7",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -332,6 +332,16 @@
       "measured_seconds": 10.5,
       "scope": "French short phrase, one stock reference, FLAC mono 44.1 kHz; ASR WER 0; native MECT similarity 0.684 vs 0.091 negative control; no auditory review",
       "review": "audio",
+      "defaults": {}
+    },
+    "upscale-video-hd": {
+      "evidence": "validation/09k-hd-streaming-freefield-e2e-2s-20261125.json",
+      "evidence_sha256": "88c42cfaf90dc28c2be17517ccec49769ab9de211f428646f21cb00cd8a0b18f",
+      "app_sha256": "e6eb5674843ae2849e1db4128c87a78b2148b95101b9f98868bc806b4147a279",
+      "workflow_sha256": "4189e9f672a3f9d9caa0527767f2f29d47799bb13a0d93935ef416828403e3a7",
+      "measured_seconds": 49.16,
+      "scope": "2s actual Freefield CLI at 1024 square, 25fps, plus 10s native same model/streaming path 189.48s and positive static comparison; 512 square H264 inputs; not native HD generation",
+      "review": "limited",
       "defaults": {}
     }
   }

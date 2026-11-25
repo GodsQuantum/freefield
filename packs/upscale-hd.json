@@ -1,0 +1,23 @@
+{
+  "pack": "upscale-hd",
+  "apps": [
+    "upscale-video-hd"
+  ],
+  "download_gb": 0.07,
+  "needs_hf_token": false,
+  "custom_nodes": [],
+  "models": [
+    {
+      "repo": "Rennart/realesrgan-x2",
+      "file": "RealESRGAN_x2plus.pth",
+      "dir": "upscale_models",
+      "gb": 0.067061725,
+      "name": "RealESRGAN_x2plus.pth",
+      "gated": false,
+      "license": "BSD-3-Clause",
+      "used_by": [
+        "upscale-video-hd"
+      ]
+    }
+  ]
+}
