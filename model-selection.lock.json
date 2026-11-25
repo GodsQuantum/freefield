@@ -151,7 +151,13 @@
       "selected": "kandinsky6-lite-int8",
       "assurance": "full_cli_e2e",
       "evidence": "validation/03m-k6lite-int8-25f-20261123.json",
-      "decision": "Kandinsky 6 Lite INT8 ConvRot 4.166GB, 25 frames 448x256 (1.04s) H264/AAC in 294.8s, visual QA and real Freefield Library. Quiet audio, only short preview qualified; not 5s or unrestricted behavior."
+      "decision": "Kandinsky 6 Lite INT8 ConvRot 4.166GB, 25 frames 448x256 (1.04s) H264/AAC in 294.8s, visual QA and real Freefield Library. Quiet audio, only short preview qualified; not 5s or unrestricted behavior. Original BF16 hidden recipe remains available for explicit rollback only after pinned SHA-verified weight restoration; original BF16 local checkpoint retired after 32/32 live model inventory PASS.",
+      "fallback": "kandinsky6-lite",
+      "fallback_storage": "remote_restore_required",
+      "fallback_restore_receipt": "validation/10y-k6-bf16-retention-audit-20261125.json",
+      "fallback_retired_weights": [
+        "Kandinsky-6.0-Lite-distill-5s-Diffusers/transformer/diffusion_pytorch_model.safetensors"
+      ]
     },
     "video-frame-interpolation": {
       "selected": "smooth",
