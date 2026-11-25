@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v7",
+  "revision": "cloud9-20261125-certified-v8",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -341,6 +341,16 @@
       "workflow_sha256": "4189e9f672a3f9d9caa0527767f2f29d47799bb13a0d93935ef416828403e3a7",
       "measured_seconds": 49.16,
       "scope": "2s actual Freefield CLI at 1024 square, 25fps, plus 10s native same model/streaming path 189.48s and positive static comparison; 512 square H264 inputs; not native HD generation",
+      "review": "limited",
+      "defaults": {}
+    },
+    "ltx25-q3-t2va-lite": {
+      "evidence": "validation/09n-ltx25-native-q3-nvme-20261125.json",
+      "evidence_sha256": "c2ae46d03b455c376fac2828318b7d69003e6377fe2aa9c29dbfcc32df068bf3",
+      "app_sha256": "a44ddf8ccde4f31c8716ac3ac9bc0def8e8f18ae0c024933a980a5a131326489",
+      "workflow_sha256": "904fc2909b7eadf728436f1aeefd3b07e82b5e6fa0e976c05a72fd4be409ecf0",
+      "measured_seconds": 432.09,
+      "scope": "Real CLI 448x256, 25 frames, 1.04s, 24fps H264/AAC; clear prompt adherence, one ghosted motion frame; non-silent stereo audio, no perceptual audio review. Preview only.",
       "review": "limited",
       "defaults": {}
     }

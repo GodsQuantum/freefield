@@ -206,6 +206,12 @@
       "assurance": "full_cli_e2e",
       "evidence": "validation/09k-hd-streaming-freefield-e2e-2s-20261125.json",
       "decision": "RealESRGAN x2plus official SHA pinned 67MB, FP16 frame-streaming. 10s native 1024x1024 189.48s, 2s actual CLI 49.16s, sampled visual review positive; not native HD or temporally trained restoration. Preserve SeedVR2 distinct existing recipe."
+    },
+    "ltx25-av-preview": {
+      "selected": "ltx25-q3-t2va-lite",
+      "assurance": "full_cli_e2e",
+      "evidence": "validation/09n-ltx25-native-q3-nvme-20261125.json",
+      "decision": "Actual 432.09s CLI success, Q3 and Q4 encoder sequential, 25 frames 448x256 with non-silent stereo audio. Positive limited visual review. Original recipes retained."
     }
   },
   "challengers_unqualified": [
@@ -7907,18 +7913,19 @@
       "pack": "video-ltx25-q3-compact",
       "models": [
         {
-          "dir": "text_encoders",
-          "file": "gemma4-12b-ltx-2.5-w4a8.safetensors",
-          "repo": "jameriles/LTX-2.5-22B-Distilled-Hybrid-W4A8-INT8-ConvRot",
+          "dir": "clip_gguf",
+          "file": "split/text_encoders/gguf/gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+          "repo": "ChrisColeTech/LTX-2.5-uncensored-v1.1-FP8",
           "phase": "encode",
           "optional": false
         },
         {
           "dir": "unet_gguf",
-          "file": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+          "file": "distilled/ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
           "repo": "unsloth/LTX-2.5-GGUF",
           "phase": "denoise",
-          "optional": false
+          "optional": false,
+          "install_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf"
         },
         {
           "dir": "vae",
@@ -7957,21 +7964,16 @@
           "id": "405:356",
           "class_type": "EmptyLTXVLatentVideo",
           "inputs": {
-            "width": [
-              "405:353",
-              1
-            ],
-            "height": [
-              "405:355",
-              1
-            ]
+            "width": 448,
+            "height": 256
           }
         },
         {
           "id": "405:384",
-          "class_type": "UnetLoaderGGUF",
+          "class_type": "FreefieldSequentialGGUF",
           "inputs": {
-            "unet_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf"
+            "clip_name": "gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+            "unet_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf"
           }
         },
         {
@@ -7989,24 +7991,10 @@
           }
         },
         {
-          "id": "405:387",
-          "class_type": "CLIPLoader",
-          "inputs": {
-            "clip_name": "gemma4-12b-ltx-2.5-w4a8.safetensors"
-          }
-        },
-        {
           "id": "405:404",
           "class_type": "ManualSigmas",
           "inputs": {
             "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0"
-          }
-        },
-        {
-          "id": "409",
-          "class_type": "ResolutionSelector",
-          "inputs": {
-            "megapixels": 0.12
           }
         }
       ],
@@ -15865,5 +15853,5 @@
       "limits": []
     }
   },
-  "last_selection_review_utc": "2026-11-25T01:48:29.777101+00:00"
+  "last_selection_review_utc": "2026-11-25T03:37:14.638208+00:00"
 }

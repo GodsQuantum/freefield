@@ -60,43 +60,11 @@
       "title": "KSamplerSelect"
     }
   },
-  "405:353": {
-    "class_type": "ComfyMathExpression",
-    "inputs": {
-      "values.a": [
-        "405:372",
-        0
-      ],
-      "expression": "a/2"
-    },
-    "_meta": {
-      "title": "Math Expression"
-    }
-  },
-  "405:355": {
-    "class_type": "ComfyMathExpression",
-    "inputs": {
-      "values.a": [
-        "405:360",
-        0
-      ],
-      "expression": "a/2"
-    },
-    "_meta": {
-      "title": "Math Expression"
-    }
-  },
   "405:356": {
     "class_type": "EmptyLTXVLatentVideo",
     "inputs": {
-      "width": [
-        "405:353",
-        1
-      ],
-      "height": [
-        "405:355",
-        1
-      ],
+      "width": 448,
+      "height": 256,
       "length": [
         "405:378",
         1
@@ -136,18 +104,6 @@
       "title": "Math Expression (fps)"
     }
   },
-  "405:360": {
-    "class_type": "PrimitiveInt",
-    "inputs": {
-      "value": [
-        "409",
-        1
-      ]
-    },
-    "_meta": {
-      "title": "Height"
-    }
-  },
   "405:361": {
     "class_type": "PrimitiveInt",
     "inputs": {
@@ -166,32 +122,16 @@
       "title": "Duration"
     }
   },
-  "405:364": {
-    "class_type": "CLIPTextEncode",
-    "inputs": {
-      "clip": [
-        "405:387",
-        0
-      ],
-      "text": [
-        "405:376",
-        0
-      ]
-    },
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
   "405:365": {
     "class_type": "LTXVConditioning",
     "inputs": {
       "positive": [
-        "405:364",
-        0
+        "405:384",
+        1
       ],
       "negative": [
-        "405:364",
-        0
+        "405:384",
+        1
       ],
       "frame_rate": [
         "405:359",
@@ -254,18 +194,6 @@
     },
     "_meta": {
       "title": "Create Video"
-    }
-  },
-  "405:372": {
-    "class_type": "PrimitiveInt",
-    "inputs": {
-      "value": [
-        "409",
-        0
-      ]
-    },
-    "_meta": {
-      "title": "Width"
     }
   },
   "405:374": {
@@ -331,12 +259,15 @@
     }
   },
   "405:384": {
-    "class_type": "UnetLoaderGGUF",
+    "class_type": "FreefieldSequentialGGUF",
     "inputs": {
-      "unet_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf"
-    },
-    "_meta": {
-      "title": "Unsloth LTX 2.5 22B distilled GGUF UD-Q3_K_XL 12GB experimental"
+      "clip_name": "gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+      "unet_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf",
+      "family": "ltxv",
+      "text": [
+        "405:376",
+        0
+      ]
     }
   },
   "405:385": {
@@ -355,17 +286,6 @@
     },
     "_meta": {
       "title": "Load VAE"
-    }
-  },
-  "405:387": {
-    "class_type": "CLIPLoader",
-    "inputs": {
-      "clip_name": "gemma4-12b-ltx-2.5-w4a8.safetensors",
-      "type": "ltxv",
-      "device": "cpu"
-    },
-    "_meta": {
-      "title": "Load CLIP"
     }
   },
   "405:388": {
@@ -397,17 +317,6 @@
     },
     "_meta": {
       "title": "ManualSigmas"
-    }
-  },
-  "409": {
-    "class_type": "ResolutionSelector",
-    "inputs": {
-      "aspect_ratio": "16:9 (Widescreen)",
-      "megapixels": 0.12,
-      "multiple": 64
-    },
-    "_meta": {
-      "title": "Resolution Selector"
     }
   }
 }

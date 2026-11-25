@@ -1,16 +1,16 @@
 {
   "$schema": "../../schema/app.schema.json",
   "id": "ltx25-q3-t2va-lite",
-  "name": "LTX 2.5 Q3 AV compact",
+  "name": "LTX 2.5 — aperçu vidéo + audio",
   "section": "video",
   "pack": "video-ltx25-q3-compact",
   "status": "ready",
-  "summary": "LTX-2.5 Q3 audio/vidéo, 1,04 s, 8 étapes, basse résolution. Un seul encodage Gemma4 sur CPU. Non certifié.",
+  "summary": "Vidéo et audio natifs LTX 2.5 Q3. Aperçu certifié 448 × 256, 25 images, 1,04 s.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "LTX-2.5 official T2VA template, single-stage only from SHA-verified native 43-node baseline; reused seed/condition path",
     "comfyui": "0.45.0",
-    "notes": "Unsloth UD-Q3_K_XL 12.000GB 4349-tensor complete SHA, jameriles Gemma4 W4A8 10.604GB SHA; deliberately 8-step single-stage at original first-stage half-resolution, 24fps/25frames, spatial tiled256 temporal16/4; no upscale or prompt enhancer, no claims of full two-stage image quality. Revision 2026-11-24 after previous 30-node real CLI safety abort at PSI5.21 with 23.126GiB host RAM free before sampling: supported CLIPLoader device=cpu, duplicate negative CLIPTextEncode removed; LTXVConditioning receives shared positive output for both inputs at dual CFG video/audio=1. Native LTXAVDualCFGGuider equal scales delegates to CFGGuider, and cfg1 disregards the unconditional branch. 29 nodes (was30); distinct new GPU test required. Source no original model/weights changed."
+    "notes": "Genuine Freefield CLI proof 09n, scoped sequential GPU Gemma4 Q4 then native LTX Q3, 1536MiB resident limit, immutable mmap, exact official distilled 8-step schedule. Low-resolution preview only."
   },
   "inputs": [
     {
@@ -49,17 +49,18 @@
   "models": [
     {
       "repo": "unsloth/LTX-2.5-GGUF",
-      "file": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+      "file": "distilled/ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
       "dir": "unet_gguf",
-      "gb": 12.0003,
+      "gb": 12.000207232,
       "phase": "denoise",
-      "license": "LTX-2.x Community License"
+      "license": "LTX-2.x Community License",
+      "install_name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf"
     },
     {
-      "repo": "jameriles/LTX-2.5-22B-Distilled-Hybrid-W4A8-INT8-ConvRot",
-      "file": "gemma4-12b-ltx-2.5-w4a8.safetensors",
-      "dir": "text_encoders",
-      "gb": 10.6044,
+      "repo": "ChrisColeTech/LTX-2.5-uncensored-v1.1-FP8",
+      "file": "split/text_encoders/gguf/gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+      "dir": "clip_gguf",
+      "gb": 7.509634752,
       "phase": "encode",
       "license": "LTX-2.x Community License"
     },
@@ -88,7 +89,7 @@
       "commit": "6ea2651"
     }
   ],
-  "notes": "LTX-2.5 preview basse résolution, limité aux 25 images à 24 ips (1,04 s) et au format 16:9. Non certifié sur AMD gfx1103 à la création. Les choix originaux LTX INT8 restent inchangés; mode opt-in non exposé tant que génération CLI non passée. CPU encoder & shared CFG=1 positive/negative eliminate duplicate Gemma4 pass; previous Q3 default CLIPLoader trial aborted before sampling. Not a successful qualification yet.",
+  "notes": "Aperçu de 1,04 seconde à 24 ips ; une scène réaliste testée. Artefact de mouvement possible. Pas de certification HD ou longue durée.",
   "test": {
     "prompt": "A small red ceramic robot slowly waving its right hand on a sunlit wooden table, subtle mechanical whirs and light ticking noises, cinematic close-up, smooth motion, realistic texture, a single steady shot.",
     "seed": 202611232250

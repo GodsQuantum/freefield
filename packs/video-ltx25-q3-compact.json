@@ -3,7 +3,7 @@
   "apps": [
     "ltx25-q3-t2va-lite"
   ],
-  "download_gb": 24.43,
+  "download_gb": 21.34,
   "needs_hf_token": true,
   "custom_nodes": [
     {
@@ -13,11 +13,11 @@
   ],
   "models": [
     {
-      "repo": "jameriles/LTX-2.5-22B-Distilled-Hybrid-W4A8-INT8-ConvRot",
-      "file": "gemma4-12b-ltx-2.5-w4a8.safetensors",
-      "dir": "text_encoders",
-      "gb": 10.6044,
-      "name": "gemma4-12b-ltx-2.5-w4a8.safetensors",
+      "repo": "ChrisColeTech/LTX-2.5-uncensored-v1.1-FP8",
+      "file": "split/text_encoders/gguf/gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
+      "dir": "clip_gguf",
+      "gb": 7.509634752,
+      "name": "gemma4_12b_ltx25_uncensored-Q4_K_M.gguf",
       "gated": false,
       "license": "LTX-2.x Community License",
       "used_by": [
@@ -26,10 +26,10 @@
     },
     {
       "repo": "unsloth/LTX-2.5-GGUF",
-      "file": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+      "file": "distilled/ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
       "dir": "unet_gguf",
-      "gb": 12.0003,
-      "name": "ltx-2.5-22b-distilled-UD-Q3_K_XL.gguf",
+      "gb": 12.000207232,
+      "name": "ltx-2.5-22b-distilled-UD-Q3_K_XL-nvme.gguf",
       "gated": false,
       "license": "LTX-2.x Community License",
       "used_by": [
