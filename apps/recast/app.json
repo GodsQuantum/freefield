@@ -1,17 +1,17 @@
 {
   "$schema": "../../schema/app.schema.json",
   "id": "recast",
-  "name": "Recast",
+  "name": "Recast — aperçu remplacement vidéo",
   "section": "video",
   "pack": "video-scail",
   "status": "ready",
   "higgsfield_feature": "Character swap",
-  "summary": "Puts your character into a video in place of the person there, keeping their motion (SCAIL-2 with SAM 3.1 tracking).",
+  "summary": "Remplacement vidéo SCAIL-2 Q3, certifié sur 17 images, 384 × 384. Aperçu : identité et cadrage approximatifs.",
   "workflow": "workflow.api.json",
   "source": {
     "template": "video_wan21_scail2_character_replacement_int8.json",
     "comfyui": "0.42.0",
-    "notes": "First segment only (81 frames): the template's extend subgraph needs 157+ frames and is removed."
+    "notes": "Actual Freefield CLI 09n: native framewise SAM3, scoped sequential UMT5 Q4/SCAIL-2 Q3, both original LoRAs additive, six steps. Positive limited replacement review; animation-only branch not qualified."
   },
   "inputs": [
     {
@@ -22,7 +22,7 @@
       "limits": {
         "max_mb": 200
       },
-      "help": "Uses the first 81 frames, so give it at least that many (about 3 s at 30 fps)",
+      "help": "Uses the first 17 frames in this memory-bounded preview.",
       "bind": [
         {
           "node": "155",
@@ -54,7 +54,7 @@
       "default": "A person in a red jacket walks through a sunny park, natural light, realistic",
       "bind": [
         {
-          "node": "213:3",
+          "node": "213:154",
           "field": "text"
         }
       ]
@@ -64,7 +64,7 @@
       "type": "text",
       "label": "Who to replace in the video",
       "default": "person",
-      "help": "What SAM 3.1 should track, e.g. \"woman\", \"man in a hat\"",
+      "help": "Text description of one subject. The highest-scoring match is detected in each frame; not for multiple similar subjects.",
       "bind": [
         {
           "node": "213:191",
@@ -81,10 +81,6 @@
         {
           "value": true,
           "label": "Replace: your character takes their place in the video"
-        },
-        {
-          "value": false,
-          "label": "Animate: your character's own image moves like the video"
         }
       ],
       "bind": [
@@ -92,46 +88,18 @@
           "node": "213:203",
           "field": "value"
         }
-      ]
-    },
-    {
-      "id": "fast",
-      "type": "toggle",
-      "label": "Fast (6 steps with the Lightx2v LoRA)",
-      "default": true,
-      "help": "Off: 40 steps, slower and a little finer",
-      "bind": [
-        {
-          "node": "213:172",
-          "field": "value"
-        }
-      ]
+      ],
+      "help": "Mode remplacement validé. Le mode animation seule reste hors qualification."
     },
     {
       "id": "width",
       "type": "select",
       "label": "Width",
-      "default": 896,
+      "default": 384,
       "options": [
         {
-          "value": 512,
-          "label": "512 px"
-        },
-        {
-          "value": 640,
-          "label": "640 px"
-        },
-        {
-          "value": 832,
-          "label": "832 px"
-        },
-        {
-          "value": 896,
-          "label": "896 px"
-        },
-        {
-          "value": 1024,
-          "label": "1024 px"
+          "value": 384,
+          "label": "384 px (preview)"
         }
       ],
       "bind": [
@@ -145,27 +113,11 @@
       "id": "height",
       "type": "select",
       "label": "Height",
-      "default": 512,
+      "default": 384,
       "options": [
         {
-          "value": 512,
-          "label": "512 px"
-        },
-        {
-          "value": 640,
-          "label": "640 px"
-        },
-        {
-          "value": 832,
-          "label": "832 px"
-        },
-        {
-          "value": 896,
-          "label": "896 px"
-        },
-        {
-          "value": 1024,
-          "label": "1024 px"
+          "value": 384,
+          "label": "384 px (preview)"
         }
       ],
       "bind": [
@@ -198,10 +150,10 @@
   ],
   "models": [
     {
-      "repo": "Comfy-Org/SCAIL-2",
-      "file": "diffusion_models/wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
-      "dir": "diffusion_models",
-      "gb": 16.65,
+      "repo": "realrebelai/SCAIL-2_GGUF",
+      "file": "SCAIL-2-Q3_K_M.gguf",
+      "dir": "unet_gguf",
+      "gb": 8.108662432,
       "phase": "denoise",
       "license": "MIT"
     },
@@ -222,10 +174,10 @@
       "license": "Apache-2.0"
     },
     {
-      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
-      "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
-      "dir": "text_encoders",
-      "gb": 6.74,
+      "repo": "city96/umt5-xxl-encoder-gguf",
+      "file": "umt5-xxl-encoder-Q4_K_M.gguf",
+      "dir": "clip_gguf",
+      "gb": 3.655145312,
       "phase": "encode",
       "license": "Apache-2.0"
     },
@@ -254,7 +206,7 @@
       "license": "SAM License"
     }
   ],
-  "notes": "Use footage and photos of yourself, fictional characters, or people who agreed to it.",
+  "notes": "Aperçu d’un sujet, 17 images. Le décor et le remplacement ont été vérifiés. Ressemblance du visage, cadrage et mouvement imparfaits ; pas de certification HD ni de suivi long. Utiliser uniquement des images autorisées.",
   "credits": [
     "SCAIL-2 by Zhipu AI / zai-org (MIT)",
     "SAM 3.1 by Meta (SAM License)",
@@ -264,7 +216,7 @@
   "test": {
     "clip": "test/clip.mp4",
     "character": "test/portrait.png",
-    "width": 512,
-    "height": 512
+    "width": 384,
+    "height": 384
   }
 }

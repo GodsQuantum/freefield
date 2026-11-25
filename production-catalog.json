@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "cloud9-20261125-certified-v8",
+  "revision": "cloud9-20261125-certified-v9",
   "policy": "Generation-backed apps only. Distinct functions with positive visual or functional audio evidence retained, including explicitly labelled short previews. A recipe edit fails closed until reviewed. Evidence is scoped, not a universal quality guarantee.",
   "apps": {
     "create-image": {
@@ -351,6 +351,16 @@
       "workflow_sha256": "904fc2909b7eadf728436f1aeefd3b07e82b5e6fa0e976c05a72fd4be409ecf0",
       "measured_seconds": 432.09,
       "scope": "Real CLI 448x256, 25 frames, 1.04s, 24fps H264/AAC; clear prompt adherence, one ghosted motion frame; non-silent stereo audio, no perceptual audio review. Preview only.",
+      "review": "limited",
+      "defaults": {}
+    },
+    "recast": {
+      "evidence": "validation/09n-recast-native-bypass-q3-20261125.json",
+      "evidence_sha256": "9845889d5af3d51fc69d2be529e2b3a484919350a1bd415906926ccc8ca15f0f",
+      "app_sha256": "30c29834d8aa9c2512616fa4f209c7645ab45abb3018174f4b23400e87464233",
+      "workflow_sha256": "01c50383d0fd5aca9377b6d59d3e438c17e155caa7b9697423c2577f3fccdad3",
+      "measured_seconds": 551.13,
+      "scope": "Real CLI 384x384, 17 distinct frames, 1.0625s at 16fps. Subject and outfit replacement with retained scene; approximate identity, oversize/cropped initial frames and imperfect motion. Replace mode only, no HD or animate-only claim.",
       "review": "limited",
       "defaults": {}
     }

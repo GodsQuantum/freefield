@@ -3,7 +3,7 @@
   "apps": [
     "recast"
   ],
-  "download_gb": 28.62,
+  "download_gb": 16.99,
   "needs_hf_token": false,
   "custom_nodes": [],
   "models": [
@@ -20,11 +20,11 @@
       ]
     },
     {
-      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
-      "file": "split_files/clip_vision/clip_vision_h.safetensors",
-      "dir": "clip_vision",
-      "gb": 1.26,
-      "name": "clip_vision_h.safetensors",
+      "repo": "city96/umt5-xxl-encoder-gguf",
+      "file": "umt5-xxl-encoder-Q4_K_M.gguf",
+      "dir": "clip_gguf",
+      "gb": 3.655145312,
+      "name": "umt5-xxl-encoder-Q4_K_M.gguf",
       "gated": false,
       "license": "Apache-2.0",
       "used_by": [
@@ -32,13 +32,13 @@
       ]
     },
     {
-      "repo": "Comfy-Org/SCAIL-2",
-      "file": "diffusion_models/wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
-      "dir": "diffusion_models",
-      "gb": 16.65,
-      "name": "wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
+      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "file": "split_files/clip_vision/clip_vision_h.safetensors",
+      "dir": "clip_vision",
+      "gb": 1.26,
+      "name": "clip_vision_h.safetensors",
       "gated": false,
-      "license": "MIT",
+      "license": "Apache-2.0",
       "used_by": [
         "recast"
       ]
@@ -68,13 +68,13 @@
       ]
     },
     {
-      "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
-      "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
-      "dir": "text_encoders",
-      "gb": 6.74,
-      "name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "repo": "realrebelai/SCAIL-2_GGUF",
+      "file": "SCAIL-2-Q3_K_M.gguf",
+      "dir": "unet_gguf",
+      "gb": 8.108662432,
+      "name": "SCAIL-2-Q3_K_M.gguf",
       "gated": false,
-      "license": "Apache-2.0",
+      "license": "MIT",
       "used_by": [
         "recast"
       ]
