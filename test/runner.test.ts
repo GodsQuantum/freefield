@@ -245,3 +245,13 @@ test("prepare sends the effective checkpoint-specific model key to the gateway",
   assert.notEqual(posts[0].models, posts[1].models, "switch to Small forces the gateway's unload");
   assert.match(posts[1].models, /active:52:25\.ckpt_name=stable_audio_3_small_sfx\.safetensors/);
 });
+
+
+test("a stale recipe binding fails before GPU preparation or asset upload", async () => {
+  const seen: string[] = [];
+  const runner = new Runner({ baseUrl: "http://backend.test", fetch: fakeFetch(() => 500, seen) });
+  const app = structuredClone(byId("recast"));
+  app.inputs.find(i => i.id === "seed")!.bind!.push({ node: "removed-sampler", field: "noise_seed" });
+  await assert.rejects(runner.submit(app, {}), /invalid workflow recipe:.*removed-sampler/);
+  assert.deepEqual(seen, []);
+});

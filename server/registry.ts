@@ -241,6 +241,14 @@ function checkGraph(app: App, problems: Problem[], severity: Problem["severity"]
   }
 }
 
+/** Validate the exact recipe again before any inference-side preparation. */
+export function recipeGraphErrors(app: App): Problem[] {
+  if (!app.graph) return [{ app: app.id, severity: "error", message: "workflow graph is missing" }];
+  const problems: Problem[] = [];
+  checkGraph(app, problems, "error");
+  return problems.filter(p => p.severity === "error");
+}
+
 export function loadRegistry(root = repoRoot()): { apps: App[]; problems: Problem[] } {
   const schema = JSON.parse(readFileSync(join(root, "schema", "app.schema.json"), "utf-8"));
   const ajv = new Ajv2020({ allErrors: true, strict: false });

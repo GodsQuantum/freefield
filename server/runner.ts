@@ -2,7 +2,7 @@
 // asks the gateway to clear the GPU when the app's models change, and submits with the Comfy SDK.
 import { Comfy } from "@comfyorg/sdk";
 import type { App, Input } from "./registry.ts";
-import { isFileInput, modelKey } from "./registry.ts";
+import { isFileInput, modelKey, recipeGraphErrors } from "./registry.ts";
 
 export type FileValue = { bytes: Uint8Array; name: string; type?: string };
 export type Values = Record<string, unknown>;
@@ -260,6 +260,8 @@ export class Runner {
     if (app.status !== "ready" && !this.allowDrafts) {
       throw new InputError(`${app.id} is a draft; set FREEFIELD_DRAFTS=1 (or pass --draft) to run it anyway`);
     }
+    const errors = recipeGraphErrors(app);
+    if (errors.length) throw new InputError(`${app.id}: invalid workflow recipe: ${errors.map(p => p.message).join("; ")}`);
     const values = resolveValues(app, rawValues);
     await this.prepare(app, values);
     const wf = await this.comfy.workflows.fromFile(app.workflowPath);
