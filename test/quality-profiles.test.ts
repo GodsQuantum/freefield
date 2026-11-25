@@ -47,3 +47,21 @@ test("random seeds respect the native 32-bit limits; ACE Turbo prevents excessiv
   assert.throws(()=>resolveValues(ace,{steps:10000}));
   assert.throws(()=>resolveValues(ace,{duration:1000}));
 });
+
+
+test("certified quality instructions reflect effective native guidance and fast branches",()=>{
+  const qwen=apps.find(a=>a.id==="qwen21-edit")!;
+  assert.equal(qwen.graph!["8"].inputs.cfg,8);
+  assert.match(qwen.inputs.find(i=>i.id==="negative_prompt")!.help!,/CFG 8/);
+  assert.match(qwen.qualification!.scope,/CFG 8/);
+  const krea=apps.find(a=>a.id==="styles")!;
+  assert.equal(krea.inputs.find(i=>i.id==="ultra_fast_mode")!.default,true);
+  assert.deepEqual(krea.graph!["ff_krea_effective_enhance"].inputs.on_true,["ff_krea_ultra_no_enhance",0]);
+  assert.equal(krea.graph!["ff_krea_ultra_no_enhance"].inputs.value,false);
+  assert.match(krea.qualification!.scope,/rewrite bypassed/);
+  assert.match(krea.inputs.find(i=>i.id==="enhance")!.help!,/ignoré/);
+  const moss=apps.find(a=>a.id==="moss-image")!;
+  assert.equal(moss.inputs.find(i=>i.id==="fast_mode")!.default,true);
+  assert.equal(moss.graph!["ff_moss_fast_sampler"].inputs.steps,4);
+  assert.match(moss.inputs.find(i=>i.id==="steps")!.help!,/qualité uniquement/);
+});

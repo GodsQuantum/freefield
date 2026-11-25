@@ -54,7 +54,7 @@
           "field": "negative_prompt"
         }
       ],
-      "help": "Le mode Turbo CFG 1 ne guide pas la génération par le négatif : exprimer les contraintes de conservation dans l’instruction principale."
+      "help": "Le profil de référence validé utilise CFG 8 : le négatif participe à la guidance. Décrire aussi dans le prompt principal ce qui doit rester identique."
     },
     {
       "id": "resolution",

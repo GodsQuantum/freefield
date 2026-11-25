@@ -27,10 +27,10 @@
     "qwen21-edit": {
       "evidence": "Freefield/ComfyUI/benchmarks/00g-qwen21-turbo-q4-deployed-real-cli-e2e-20261123.json",
       "evidence_sha256": "5720477e80a5d23385c01d94e5105bd470602ecdb3829d8e5861e01dd1ea9bff",
-      "app_sha256": "ab94edb992ad6ff0b5aab31fad6db86df25d2fb75d90a57189a49430e04858dc",
+      "app_sha256": "835a29c8c882900dea160d935cbf7cfa960bcac6b6f8a0596eba02afbab6163b",
       "workflow_sha256": "936d663d741c4e27b3bf119bf0f060fed119bb7a9f19a1fc243e37b16f83f3aa",
       "measured_seconds": 574.27,
-      "scope": "768 px portrait edit; one scene",
+      "scope": "768 px portrait edit, CFG 8; one visually reviewed scene",
       "review": "visual",
       "defaults": {
         "resolution": 768
@@ -38,7 +38,7 @@
       "reference_settings": {
         "resolution": 768
       },
-      "guidance": "Décrire le changement et explicitement ce qui doit rester identique. Turbo 768 px validé ; CFG 1 et 8 étapes recommandés upstream, mais le graphe local conserve sa guidance testée jusqu’à comparaison réelle."
+      "guidance": "Décrire la modification et ce qui doit rester identique. Le profil de référence Turbo 768 px à CFG 8 est validé. Le CFG 1 upstream reste un profil distinct à qualifier localement."
     },
     "angles": {
       "evidence": "validation/qwen2511-angles-native-subquad-cli1024-20261119.json",
@@ -95,7 +95,7 @@
     "moss-image": {
       "evidence": "validation/moss-sft-euler-4step-freefield-e2e-20261120.json",
       "evidence_sha256": "f6717a5afd1e217bf1c3f6447522022909376b69d028dd07179f7549e1c3fef2",
-      "app_sha256": "bae58abaa1b9428be66bd403421e047809a88fc3b9d091df3b43bfe5f77a7acf",
+      "app_sha256": "6c33245a0a00050ecfa422776d60a8d194c2f38d54ef5416fa5cc4b1cb3ac4bd",
       "workflow_sha256": "933a13b9f460efe2326dc223077d80e23b0da8609dc1ca633a5ec80cc3f837fc",
       "measured_seconds": 279.62,
       "scope": "1024 x 1024 poster; four-step mode",
@@ -113,15 +113,15 @@
         "height": 1024,
         "steps": 25
       },
-      "guidance": "Pour affiches, citer le texte exact, sa position et la hiérarchie. Mode rapide quatre étapes validé ; contrôler orthographe et composition avant agrandissement."
+      "guidance": "Pour une affiche, citer le texte exact, sa position et sa hiérarchie. Profil rapide quatre étapes sans réécriture, 1024 px validé. Le curseur Steps ne concerne que le mode qualité. Vérifier l’orthographe et la composition avant agrandissement."
     },
     "styles": {
       "evidence": "validation/krea2-ultra2-memsafe-production-e2e-20261120.json",
       "evidence_sha256": "3ac29b422acc2822c1dfbb0651da1322f5db240b9bcaff53c64695f427701227",
-      "app_sha256": "d658bb42e17d824fe292560c5f1ebc40be9cb0cb12a625cbe0baf086188aeb66",
+      "app_sha256": "9f9eb6a99be262f1f84220500454b56c5eae4f0fdf65f3b16515baea68f446ab",
       "workflow_sha256": "f1f672ab2b2920bfc5ce92b47381a702421dd4371c9378167ce7f80cd2094c70",
       "measured_seconds": 175.51,
-      "scope": "1 MP watercolor; two-step mode with enhancer",
+      "scope": "1 MP watercolor; two-step Ultra mode with prompt rewrite bypassed",
       "review": "limited",
       "defaults": {
         "fast_mode": false,
@@ -136,7 +136,7 @@
         "aspect": "1:1 (Square)",
         "megapixels": 1.0
       },
-      "guidance": "Ultra-rapide avec enhance et 1 MP validé. Le profil Krea Turbo standard 8 étapes peut privilégier les détails, mais il n’est pas certifié sur cette configuration."
+      "guidance": "Profil Ultra 2 étapes à 1 MP validé, sans réécriture du prompt même si Enhance est coché. Désactiver Ultra pour utiliser Fast 3 étapes ou qualité 8 étapes. Comparaison mesurée : 175,51 s contre 293,2 s sur la scène de référence ; gain combiné des deux étapes et de la réécriture désactivée."
     },
     "relight": {
       "evidence": "validation/qwen2511-relight-2509lora-native-substitution-20261120.json",

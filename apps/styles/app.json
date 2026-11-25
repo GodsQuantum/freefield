@@ -160,7 +160,7 @@
       "type": "toggle",
       "label": "Fast render (3 steps)",
       "default": false,
-      "help": "Optional Krea Turbo 3-step distillation. Cloud9 measured 329 s vs 593 s at 1024x1024; original 8-step quality remains default. Experimental detail/coherence differences may occur.",
+      "help": "Distillation Krea Turbo en 3 étapes. Désactiver Ultra pour utiliser Fast. Avec Ultra et Fast désactivés, le mode qualité conserve ses 8 étapes.",
       "bind": [
         {
           "node": "ff_krea_fast_enabled",
@@ -173,7 +173,7 @@
       "type": "toggle",
       "label": "Ultra-fast preview (2 steps)",
       "default": false,
-      "help": "Optional Krea Turbo 2-step distillation with native 1024x1024 212 s benchmark. Ultra takes priority over Fast and automatically uses the prompt exactly as written (skips Enhance prompt to save time and shared GPU memory). Quality 8-step and Fast 3-step still honor Enhance as before; all old defaults remain unchanged.",
+      "help": "Profil de référence certifié : 2 étapes, 1 MP, 175,51 s sur Cloud9. Ultra est prioritaire sur Fast et utilise le prompt brut, même si Enhance est activé. Les autres modes conservent le réglage Enhance.",
       "bind": [
         {
           "node": "ff_krea_ultra_enabled",
@@ -186,7 +186,7 @@
       "type": "toggle",
       "label": "Enhance prompt",
       "default": true,
-      "help": "Rewrites your prompt with the Qwen3-VL text encoder first in Quality/Fast. Ultra-fast preview deliberately skips this rewrite to reduce load.",
+      "help": "Réécriture du prompt pour les modes qualité et Fast. Ce réglage est ignoré quand Ultra est activé : Ultra utilise le prompt brut.",
       "bind": [
         {
           "node": "30:24",

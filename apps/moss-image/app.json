@@ -46,7 +46,7 @@
       "type": "toggle",
       "label": "Fast preview (4 steps)",
       "default": false,
-      "help": "Optional MOSS Euler-native 4-step LoRA. 291.3 s for 1024px on Cloud9 vs 1118.2 s quality reference; visual result smoother. When on, fixed 4-step Euler CFG1 overrides quality Steps slider. Quality 25 steps remains unchanged by default.",
+      "help": "Profil de référence certifié : 4 étapes Euler à CFG 1, 1024 px, 279,62 s sur Cloud9. Ce mode fixe le sampler et ignore le nombre d’étapes qualité. Désactiver Fast pour le mode qualité (25 étapes par défaut).",
       "bind": [
         {
           "node": "ff_moss_fast_switch",
@@ -128,7 +128,7 @@
           "field": "steps"
         }
       ],
-      "help": "Quality mode only (20–60 steps). Fast preview always uses 4 steps Euler CFG1."
+      "help": "Nombre d’étapes du mode qualité uniquement. Le mode Fast utilise exactement 4 étapes, indépendamment de ce réglage."
     },
     {
       "id": "seed",
